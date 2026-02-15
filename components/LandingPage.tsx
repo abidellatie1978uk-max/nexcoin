@@ -22,7 +22,15 @@ export function LandingPage({ onNavigate }: LandingPageProps) {
         setTimeout(async () => {
             await setLanguage(lang);
             setIsTransitioning(false);
-        }, 150); // Reduzido para 150ms para ser mais rápido
+        }, 150);
+    };
+
+    const scrollTo = (id: string) => {
+        const element = document.getElementById(id);
+        if (element) {
+            element.scrollIntoView({ behavior: 'smooth' });
+        }
+        setIsMobileMenuOpen(false);
     };
 
     // Garantir que o body possa rolar
@@ -96,9 +104,9 @@ export function LandingPage({ onNavigate }: LandingPageProps) {
                         <div className="flex items-center gap-12">
                             <h1 className="text-2xl font-black italic tracking-tighter text-black">NexCoin</h1>
                             <div className="hidden lg:flex gap-8 text-sm font-semibold text-gray-600">
-                                <a href="#" className="hover:text-black transition-colors">{t.landingPage.products}</a>
-                                <a href="#" className="hover:text-black transition-colors">{t.landingPage.company}</a>
-                                <a href="#" className="hover:text-black transition-colors">{t.landingPage.help}</a>
+                                <button onClick={() => scrollTo('products')} className="hover:text-black transition-colors">{t.landingPage.products}</button>
+                                <button onClick={() => scrollTo('company')} className="hover:text-black transition-colors">{t.landingPage.company}</button>
+                                <button onClick={() => scrollTo('help')} className="hover:text-black transition-colors">{t.landingPage.help}</button>
                             </div>
                         </div>
 
@@ -138,18 +146,18 @@ export function LandingPage({ onNavigate }: LandingPageProps) {
                             >
                                 <div className="p-8 flex flex-col gap-8">
                                     <div className="flex flex-col gap-6">
-                                        <a href="#" className="flex items-center justify-between text-xl font-bold text-gray-900 group">
+                                        <button onClick={() => scrollTo('products')} className="flex items-center justify-between text-xl font-bold text-gray-900 group text-left">
                                             {t.landingPage.products}
                                             <ChevronRight className="w-5 h-5 text-gray-300 group-hover:text-black transition-colors" />
-                                        </a>
-                                        <a href="#" className="flex items-center justify-between text-xl font-bold text-gray-900 group">
+                                        </button>
+                                        <button onClick={() => scrollTo('company')} className="flex items-center justify-between text-xl font-bold text-gray-900 group text-left">
                                             {t.landingPage.company}
                                             <ChevronRight className="w-5 h-5 text-gray-300 group-hover:text-black transition-colors" />
-                                        </a>
-                                        <a href="#" className="flex items-center justify-between text-xl font-bold text-gray-900 group">
+                                        </button>
+                                        <button onClick={() => scrollTo('help')} className="flex items-center justify-between text-xl font-bold text-gray-900 group text-left">
                                             {t.landingPage.help}
                                             <ChevronRight className="w-5 h-5 text-gray-300 group-hover:text-black transition-colors" />
-                                        </a>
+                                        </button>
                                     </div>
 
                                     <div className="flex flex-col gap-4">
@@ -287,7 +295,7 @@ export function LandingPage({ onNavigate }: LandingPageProps) {
                 </motion.section>
 
                 {/* Feature 1: Spend */}
-                <section className="py-20 lg:py-24 bg-gray-50">
+                <section id="products" className="py-20 lg:py-24 bg-gray-50">
                     <div className="max-w-7xl mx-auto px-6 text-center mb-2">
                         <motion.h2 {...fadeInProps} variants={fadeInVariants} className="text-3xl lg:text-6xl font-black tracking-tighter mb-6">{t.landingPage.elevateSpending}</motion.h2>
                         <motion.p {...fadeInProps} variants={fadeInVariants} className="text-lg lg:text-xl text-gray-600 max-w-2xl mx-auto">{t.landingPage.cardSubtitle}</motion.p>
@@ -467,7 +475,7 @@ export function LandingPage({ onNavigate }: LandingPageProps) {
                 </section>
 
                 {/* Feature 3: Security */}
-                <section className="py-20 lg:py-32 bg-white overflow-hidden">
+                <section id="company" className="py-20 lg:py-32 bg-white overflow-hidden">
                     <div className="max-w-7xl mx-auto px-6 grid lg:grid-cols-2 items-center gap-12 lg:gap-20 text-center lg:text-left">
                         <motion.div
                             initial={{ opacity: 0, x: -50 }}
@@ -683,7 +691,7 @@ export function LandingPage({ onNavigate }: LandingPageProps) {
                                 </ul>
                             </div>
 
-                            <div>
+                            <div id="help">
                                 <p className="font-bold text-sm uppercase mb-6 tracking-widest">{t.landingPage.footerSupport}</p>
                                 <ul className="flex flex-col gap-4 text-gray-500 text-sm font-semibold">
                                     <li><a href="#" className="hover:text-black transition-colors">{t.landingPage.footerHelp}</a></li>
