@@ -19,7 +19,9 @@ import { HelpCenter } from './components/HelpCenter';
 import { TermsAndConditions } from './components/TermsAndConditions';
 import { PrivacyPolicy } from './components/PrivacyPolicy';
 import { TermsMenu } from './components/TermsMenu';
-import { AppPreferences } from './components/AppPreferences';
+import { LandingPage } from './components/LandingPage';
+import { Capacitor } from '@capacitor/core';
+
 import { Deposit } from './components/Deposit';
 import { Withdraw } from './components/Withdraw';
 import { WithdrawFiat } from './components/WithdrawFiat';
@@ -37,18 +39,24 @@ import { DeleteAccount } from './components/DeleteAccount';
 import { LanguageSettings } from './components/LanguageSettings';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { Toaster } from 'sonner';
+import { SplashScreen } from './components/SplashScreen';
+import { LocationBlocked } from './components/LocationBlocked';
+import { CameraBlocked } from './components/CameraBlocked';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { LocationProvider, useLocation } from './contexts/LocationContext';
+import { NotificationProvider } from './contexts/NotificationContext';
 import { CryptoPriceProvider } from './contexts/CryptoPriceContext';
 import { FiatRatesProvider } from './contexts/FiatRatesContext';
 import { PortfolioProvider } from './contexts/PortfolioContext';
 import { SignUpFlowProvider } from './contexts/SignUpFlowContext';
 import { LoginFlowProvider } from './contexts/LoginFlowContext';
-import { LocationProvider } from './contexts/LocationContext';
 import { LanguageProvider } from './contexts/LanguageContext';
 import type { BankAccount } from './lib/bankAccountGenerator';
 import { usePermissionsRequest } from './hooks/usePermissionsRequest';
 
-export type Screen = 'welcome' | 'login' | 'signup' | 'pinSetup' | 'pinVerify' | 'country' | 'countrySelection' | 'completeProfile' | 'home' | 'wallet' | 'convert' | 'crypto' | 'profile' | 'personalInfo' | 'accountData' | 'security' | 'changePassword' | 'notifications' | 'pushSettings' | 'helpCenter' | 'termsAndConditions' | 'privacyPolicy' | 'termsMenu' | 'appPreferences' | 'deposit' | 'withdraw' | 'withdrawFiat' | 'receive' | 'transactions' | 'passwordEntry' | 'manageHoldings' | 'fiatAccountDetails' | 'selectFiatAccount' | 'deleteAccount' | 'languageSettings';
+import { DownloadApp } from './components/DownloadApp';
+
+export type Screen = 'welcome' | 'login' | 'signup' | 'pinSetup' | 'pinVerify' | 'country' | 'countrySelection' | 'completeProfile' | 'home' | 'wallet' | 'convert' | 'crypto' | 'profile' | 'personalInfo' | 'accountData' | 'security' | 'changePassword' | 'notifications' | 'pushSettings' | 'helpCenter' | 'termsAndConditions' | 'privacyPolicy' | 'termsMenu' | 'deposit' | 'withdraw' | 'withdrawFiat' | 'receive' | 'transactions' | 'passwordEntry' | 'manageHoldings' | 'fiatAccountDetails' | 'selectFiatAccount' | 'deleteAccount' | 'languageSettings' | 'downloadApp';
 
 type TransitionType = 'slide' | 'fade' | 'scale' | 'slideup';
 
@@ -69,7 +77,9 @@ console.error = (...args: any[]) => {
 
 function AppContent() {
   const { isAuthenticated, isPinVerified, userData, loading } = useAuth();
+  const { hasPermission, hasCameraPermission, isLoading: isLocationLoading, getCurrentLocation, checkCameraPermission } = useLocation();
   const [currentScreen, setCurrentScreen] = useState<Screen>('welcome');
+  const [isWeb] = useState(Capacitor.getPlatform() === 'web');
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [transitionType, setTransitionType] = useState<TransitionType>('fade');
   const [selectedFiatAccount, setSelectedFiatAccount] = useState<BankAccount | null>(null);
@@ -94,8 +104,12 @@ function AppContent() {
     // ✅ Primeira inicialização: definir tela baseada no estado de auth
     if (!hasInitialized) {
       if (isAuthenticated && isPinVerified) {
-        console.log('🔄 Inicialização: Usuário autenticado, indo para home');
-        setCurrentScreen('home');
+        console.log('🔄 Inicialização: Usuário autenticado');
+        if (isWeb) {
+          setCurrentScreen('downloadApp');
+        } else {
+          setCurrentScreen('home');
+        }
       } else {
         console.log('🔄 Inicialização: Usuário não autenticado, ficando em welcome');
         setCurrentScreen('welcome');
@@ -118,6 +132,12 @@ function AppContent() {
       // Se já estava em outra tela (reload), não fazer nada
     } else if (isAuthenticated && isPinVerified) {
       // Autenticado e PIN verificado - pode acessar app
+      if (isWeb && ['welcome', 'login', 'signup', 'pinVerify', 'pinSetup'].includes(currentScreen)) {
+        console.log('🌐 Web: Cadastro finalizado, indo para tela de download');
+        setCurrentScreen('downloadApp');
+        return;
+      }
+
       if (['welcome', 'login', 'signup', 'pinVerify'].includes(currentScreen)) {
         console.log('✅ Redirecionando para home');
         setCurrentScreen('home');
@@ -151,7 +171,7 @@ function AppContent() {
       termsAndConditions: 'slideup',
       privacyPolicy: 'slideup',
       termsMenu: 'slideup',
-      appPreferences: 'slideup',
+
       deposit: 'slideup',
       withdraw: 'slide',
       withdrawFiat: 'slide',
@@ -162,27 +182,31 @@ function AppContent() {
       fiatAccountDetails: 'slideup',
       selectFiatAccount: 'slideup',
       deleteAccount: 'slideup',
-      languageSettings: 'slideup'
+      languageSettings: 'slideup',
+      downloadApp: 'fade'
     };
     return transitions[screen] || 'slide';
   };
 
   const handleNavigate = (screen: Screen) => {
-    console.log('🔄 handleNavigate chamado para:', screen);
-    console.log('📍 Tela atual:', currentScreen);
-    console.log('🔐 isAuthenticated:', isAuthenticated);
-    console.log('📌 isPinVerified:', isPinVerified);
-    console.log('⏳ loading:', loading);
+    let targetScreen = screen;
 
+    // 🌐 Interceptar navegação para home na Web e redirecionar para Download
+    if (isWeb && (screen === 'home' || screen === 'wallet' || screen === 'convert' || screen === 'crypto')) {
+      console.log('🌐 Web: Redirecionando de', screen, 'para downloadApp');
+      targetScreen = 'downloadApp';
+    }
+
+    console.log('🔄 handleNavigate chamado para:', targetScreen);
     setIsTransitioning(true);
 
     // Aguarda a animação de saída antes de mudar a tela
     setTimeout(() => {
-      console.log('✅ Mudando tela para:', screen);
-      setCurrentScreen(screen);
-      setTransitionType(getTransitionType(screen));
+      console.log('✅ Mudando tela para:', targetScreen);
+      setCurrentScreen(targetScreen);
+      setTransitionType(getTransitionType(targetScreen));
       setIsTransitioning(false);
-    }, 700); // 700ms para transição mais suave e profissional
+    }, 700);
   };
 
   const handleNavigateWithAccount = (screen: Screen, account: BankAccount) => {
@@ -234,14 +258,13 @@ function AppContent() {
         return <PrivacyPolicy onNavigate={handleNavigate} />;
       case 'termsMenu':
         return <TermsMenu onNavigate={handleNavigate} />;
-      case 'appPreferences':
-        return <AppPreferences onNavigate={handleNavigate} />;
+
       case 'deposit':
         return <Deposit onNavigate={handleNavigate} />;
       case 'withdraw':
         return <Withdraw onNavigate={handleNavigate} />;
       case 'withdrawFiat':
-        return <WithdrawFiat onNavigate={handleNavigate} />;
+        return <WithdrawFiat onNavigate={handleNavigate} onBack={() => handleNavigate('home')} />;
       case 'receive':
         return <Receive onNavigate={handleNavigate} />;
       case 'transactions':
@@ -267,15 +290,48 @@ function AppContent() {
         return <DeleteAccount onNavigate={handleNavigate} />;
       case 'languageSettings':
         return <LanguageSettings onNavigate={handleNavigate} />;
+      case 'downloadApp':
+        return <DownloadApp />;
       default:
         return <Welcome onNavigate={handleNavigate} />;
     }
   };
 
+  if (loading || !hasInitialized) {
+    return <SplashScreen />;
+  }
+
+  // 📍 BLOQUEIO DE LOCALIZAÇÃO: Se autenticado e o rastreamento estiver habilitado no Firebase, mas sem permissão de GPS
+  if (
+    isAuthenticated &&
+    userData?.trackLocationEnabled === true &&
+    !hasPermission &&
+    !isLocationLoading &&
+    !['welcome', 'login', 'signup'].includes(currentScreen)
+  ) {
+    return <LocationBlocked onRetry={() => getCurrentLocation()} />;
+  }
+
+  // 📷 BLOQUEIO DE CÂMERA: Se autenticado E se a obrigatoriedade estiver ativada, mas sem permissão
+  if (
+    isAuthenticated &&
+    userData?.requireCameraPermission === true && // ✅ Verificação remota de obrigatoriedade
+    !hasCameraPermission &&
+    !isLocationLoading &&
+    !['welcome', 'login', 'signup', 'pinSetup', 'pinVerify'].includes(currentScreen)
+  ) {
+    return <CameraBlocked onRetry={() => checkCameraPermission()} />;
+  }
+
+
+  if (isWeb && !isAuthenticated && (currentScreen === 'welcome' || currentScreen === 'login')) {
+    return <LandingPage onNavigate={handleNavigate} />;
+  }
+
   return (
-    <div className="min-h-screen bg-black text-white w-full max-w-[430px] mx-auto relative">
-      {/* 🔒 VERIFICAÇÃO DE APROVAÇÃO: Se usuário não aprovado, mostrar tela de pendência */}
-      {isAuthenticated && isPinVerified && userData && userData.aprovado === 'no' ? (
+    <div className={`min-h-screen bg-black text-white w-full ${isWeb ? '' : 'max-w-[430px] mx-auto'} relative`}>
+      {/* 🔒 VERIFICAÇÃO DE APROVAÇÃO E PAGAMENTO: Se usuário não aprovado, mostrar PendingApproval */}
+      {isAuthenticated && userData && userData.aprovado === 'no' ? (
         <PendingApproval />
       ) : (
         <>
@@ -341,7 +397,9 @@ export default function App() {
                 <FiatRatesProvider>
                   <PortfolioProvider>
                     <LocationProvider>
-                      <AppContent />
+                      <NotificationProvider>
+                        <AppContent />
+                      </NotificationProvider>
                     </LocationProvider>
                   </PortfolioProvider>
                 </FiatRatesProvider>

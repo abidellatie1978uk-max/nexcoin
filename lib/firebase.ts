@@ -32,7 +32,7 @@ setPersistence(auth, browserLocalPersistence)
 
 // ✅ Initialize Cloud Firestore com configurações otimizadas
 // Usa cache persistente para melhor performance e menos erros de conexão
-let db;
+let db: any;
 try {
   // Tentar pegar instância existente primeiro
   db = getFirestore(app);
@@ -54,9 +54,9 @@ const originalConsoleError = console.error;
 console.error = (...args) => {
   // Filtrar erros do Firestore WebChannel
   if (
-    typeof args[0] === 'string' && 
-    (args[0].includes('WebChannelConnection') || 
-     args[0].includes('@firebase/firestore'))
+    typeof args[0] === 'string' &&
+    (args[0].includes('WebChannelConnection') ||
+      args[0].includes('@firebase/firestore'))
   ) {
     // Silenciar esses erros - são esperados em iframe
     return;

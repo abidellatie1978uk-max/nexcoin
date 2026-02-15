@@ -193,21 +193,29 @@ html {
 }
 
 /* Mobile-only application styles */
-html,
-body,
-#root {
-  max-width: 430px;
-  margin: 0 auto;
+html {
+  height: 100%;
+  margin: 0;
   overflow-x: hidden;
+  background: #000;
+}
+
+body {
+  min-height: 100%;
+  margin: 0;
+  overflow-x: hidden;
+  background: #000;
+}
+
+#root {
+  min-height: 100%;
+  margin: 0;
   background: #000;
 }
 
 body {
   touch-action: pan-y;
   -webkit-tap-highlight-color: transparent;
-  user-select: none;
-  -webkit-user-select: none;
-  -webkit-touch-callout: none;
   overscroll-behavior: none;
 }
 

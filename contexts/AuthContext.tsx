@@ -48,6 +48,8 @@ interface UserData {
   };
   // ✅ NOVO: Sistema de aprovação de conta
   aprovado?: 'yes' | 'no';
+  trackLocationEnabled?: boolean;
+  requireCameraPermission?: boolean;
 }
 
 interface AuthContextType {
@@ -80,20 +82,20 @@ const AuthContext = createContext<AuthContextType>({
   isAuthenticated: false,
   isPinVerified: false,
   auth: auth,
-  signUp: async () => {},
-  signIn: async () => {},
-  signInWithPhoneAndPin: async () => {},
-  signInWithGoogle: async () => {},
-  logout: async () => {},
+  signUp: async () => { },
+  signIn: async () => { },
+  signInWithPhoneAndPin: async () => { },
+  signInWithGoogle: async () => { },
+  logout: async () => { },
   verifyPin: async () => false,
-  setPinVerified: () => {},
+  setPinVerified: () => { },
   checkIfUserHasPin: async () => false,
   checkPhoneExists: async () => false,
-  reloadUserData: async () => {},
-  updateLanguage: async () => {},
-  updateVisibleCards: async () => {},
-  dismissAlert: async () => {},
-  syncPixKeys: async () => {},
+  reloadUserData: async () => { },
+  updateLanguage: async () => { },
+  updateVisibleCards: async () => { },
+  dismissAlert: async () => { },
+  syncPixKeys: async () => { },
 });
 
 export function useAuth() {
@@ -120,7 +122,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   // ✅ FUNÇÃO PARA SALVAR ESTADO DE PIN VERIFICADO COM PERSISTÊNCIA
   const setPinVerifiedWithPersistence = (verified: boolean) => {
     setIsPinVerified(verified);
-    
+
     if (verified && user?.uid) {
       // Salvar UID do usuário no localStorage quando PIN for verificado
       localStorage.setItem(PIN_VERIFIED_KEY, user.uid);
@@ -145,12 +147,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const normalizePhone = (phone: string): string => {
     // Remove tudo que não é número
     const numbersOnly = phone.replace(/\D/g, '');
-    
+
     // Se já começar com +, retornar como está (apenas números)
     if (phone.startsWith('+')) {
       return `+${numbersOnly}`;
     }
-    
+
     // Se não começar com +, adicionar
     return `+${numbersOnly}`;
   };
@@ -169,7 +171,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     try {
       const userDocRef = doc(db, 'users', uid);
       const userDoc = await getDoc(userDocRef);
-      
+
       if (userDoc.exists()) {
         const data = userDoc.data() as UserData;
         setUserData(data);
@@ -194,7 +196,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const createAutoPixKeys = async (userId: string, userEmail: string, userPhone: string) => {
     try {
       console.log('🔑 Criando chaves PIX automáticas para usuário brasileiro...');
-      
+
       // Buscar conta bancária BRL do usuário
       const accountsRef = collection(db, 'bankAccounts');
       const accountQuery = query(
@@ -204,10 +206,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
         limit(1)
       );
       const accountSnapshot = await getDocs(accountQuery);
-      
+
       let accountId = '';
       let accountNumber = '';
-      
+
       if (accountSnapshot.empty) {
         // Criar conta BRL se não existir
         console.log('💼 Criando conta bancária BRL...');
@@ -228,7 +230,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         accountNumber = accountDoc.data().accountNumber;
         console.log('✅ Conta BRL encontrada:', accountId);
       }
-      
+
       // Verificar se chaves PIX já existem
       const pixKeysRef = collection(db, 'pixKeys');
       const existingKeysQuery = query(
@@ -237,12 +239,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
         where('accountId', '==', accountId)
       );
       const existingKeysSnapshot = await getDocs(existingKeysQuery);
-      
+
       if (!existingKeysSnapshot.empty) {
         console.log('ℹ️ Chaves PIX já existem para este usuário');
         return;
       }
-      
+
       // Criar chave PIX de EMAIL
       await addDoc(pixKeysRef, {
         userId: userId,
@@ -255,7 +257,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         createdAt: new Date(),
       });
       console.log('✅ Chave PIX (email) criada:', userEmail);
-      
+
       // Criar chave PIX de TELEFONE (formatar para PIX - remover +55)
       const pixPhone = formatPhoneForPix(userPhone);
       await addDoc(pixKeysRef, {
@@ -269,7 +271,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         createdAt: new Date(),
       });
       console.log('✅ Chave PIX (telefone) criada:', pixPhone);
-      
+
       console.log('🎉 Chaves PIX automáticas criadas com sucesso!');
     } catch (error) {
       console.error('❌ Erro ao criar chaves PIX automáticas:', error);
@@ -281,25 +283,25 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const syncPixKeys = async (userId: string, newEmail?: string, newPhone?: string) => {
     try {
       console.log('🔄 Sincronizando chaves PIX com novos dados do perfil...');
-      
+
       const pixKeysRef = collection(db, 'pixKeys');
-      
+
       // Buscar todas as chaves PIX do usuário
       const q = query(pixKeysRef, where('userId', '==', userId));
       const snapshot = await getDocs(q);
-      
+
       if (snapshot.empty) {
         console.log('ℹ️ Nenhuma chave PIX encontrada para sincronizar');
         return;
       }
-      
+
       // Atualizar chaves PIX
       const updatePromises: Promise<void>[] = [];
-      
+
       snapshot.forEach((docSnap) => {
         const data = docSnap.data();
         const pixKeyRef = doc(db, 'pixKeys', docSnap.id);
-        
+
         // Atualizar chave de email
         if (data.keyType === 'email' && newEmail) {
           console.log('📧 Atualizando chave PIX de email:', newEmail);
@@ -307,7 +309,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
             updateDoc(pixKeyRef, { keyValue: newEmail }) as Promise<void>
           );
         }
-        
+
         // Atualizar chave de telefone
         if (data.keyType === 'phone' && newPhone) {
           console.log('📱 Atualizando chave PIX de telefone:', newPhone);
@@ -316,7 +318,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
           );
         }
       });
-      
+
       await Promise.all(updatePromises);
       console.log('✅ Chaves PIX sincronizadas com sucesso!');
     } catch (error) {
@@ -337,7 +339,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     try {
       // ⚠️ NORMALIZAR TELEFONE: Remover formatação antes de salvar
       const normalizedPhone = normalizePhone(phone);
-      
+
       // Verificar se o telefone já está cadastrado
       const usersRef = collection(db, 'users');
       const q = query(usersRef, where('phone', '==', normalizedPhone), limit(1));
@@ -346,11 +348,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
       if (!querySnapshot.empty) {
         throw new Error('Este número de telefone já está cadastrado');
       }
-      
+
       // ✅ GERAR SENHA BASEADA NO TELEFONE + PIN
       // Isso permite login posterior usando apenas telefone + PIN
       const generatedPassword = generatePasswordFromPhoneAndPin(normalizedPhone, accountPin);
-      
+
       // Criar usuário no Firebase Auth com a senha gerada
       const userCredential = await createUserWithEmailAndPassword(auth, email, generatedPassword);
       const user = userCredential.user;
@@ -373,7 +375,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
       // Inicializar o portfólio do usuário
       await initializeUserPortfolio(user.uid);
-      
+
       // ✅ CRIAR CHAVES PIX AUTOMÁTICAS PARA USUÁRIOS BRASILEIROS
       if (country === 'BR') {
         await createAutoPixKeys(user.uid, email, normalizedPhone);
@@ -381,7 +383,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     } catch (error: any) {
       // Traduzir erros do Firebase para português
       const errorCode = error.code;
-      
+
       if (errorCode === 'auth/email-already-in-use') {
         throw new Error('Este e-mail já está cadastrado. Faça login ou use outro e-mail.');
       } else if (errorCode === 'auth/invalid-email') {
@@ -401,13 +403,13 @@ export function AuthProvider({ children }: AuthProviderProps) {
     try {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const userData = await loadUserData(userCredential.user.uid);
-      
+
       // ✅ MIGRAÇÃO AUTOMÁTICA: Se usuário tem telefone + PIN, atualizar senha
       if (userData && userData.phone && userData.accountPin) {
         try {
           const normalizedPhone = normalizePhone(userData.phone);
           const newPassword = generatePasswordFromPhoneAndPin(normalizedPhone, userData.accountPin);
-          
+
           // Atualizar senha do usuário
           await updatePassword(userCredential.user, newPassword);
           console.log('✅ Senha migrada com sucesso! Agora você pode fazer login com telefone + PIN.');
@@ -419,7 +421,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     } catch (error: any) {
       // Traduzir erros do Firebase para português
       const errorCode = error.code;
-      
+
       if (errorCode === 'auth/user-not-found') {
         throw new Error('E-mail não cadastrado. Crie uma conta primeiro.');;
       } else if (errorCode === 'auth/wrong-password') {
@@ -441,18 +443,18 @@ export function AuthProvider({ children }: AuthProviderProps) {
     try {
       console.log('🔍 Iniciando login com telefone + PIN...');
       console.log('📱 Telefone recebido (original):', phone);
-      
+
       // Normalizar telefone (remover formatação)
       const normalizedPhone = normalizePhone(phone);
       console.log('📱 Telefone normalizado:', normalizedPhone);
-      
+
       // Buscar usuário pelo telefone no Firestore
       const usersRef = collection(db, 'users');
       let q = query(usersRef, where('phone', '==', normalizedPhone), limit(1));
       let querySnapshot = await getDocs(q);
-      
+
       console.log('🔍 Busca com telefone normalizado - Encontrado:', !querySnapshot.empty);
-      
+
       // Fallback: tentar buscar com o telefone original se não encontrou
       if (querySnapshot.empty) {
         console.log('⚠️ Não encontrou com telefone normalizado, tentando original...');
@@ -479,30 +481,30 @@ export function AuthProvider({ children }: AuthProviderProps) {
         console.error('❌ PIN incorreto');
         throw new Error('PIN incorreto');
       }
-      
+
       console.log('✅ PIN correto! Autenticando no Firebase Auth...');
-      
+
       // ✅ AUTENTICAR NO FIREBASE AUTH
       // Usar a senha gerada a partir do telefone e PIN
       const generatedPassword = generatePasswordFromPhoneAndPin(normalizedPhone, pin);
-      
+
       try {
         // Tentar login com e-mail e senha gerada
         const userCredential = await signInWithEmailAndPassword(auth, userDataFromFirestore.email, generatedPassword);
         console.log('✅ Login bem-sucedido!');
-        
+
         // Carregar dados do usuário
         await loadUserData(userCredential.user.uid);
         setPinVerifiedWithPersistence(true);
-        
+
       } catch (authError: any) {
         console.warn('⚠️ Falha no login com senha gerada. Código:', authError.code);
-        
+
         // Se falhou por credencial inválida, pode ser usuário antigo
         // Vamos tentar fazer login com qualquer método disponível e atualizar a senha
         if (authError.code === 'auth/invalid-credential' || authError.code === 'auth/wrong-password') {
           console.log('🔧 Tentando recuperar acesso para usuário antigo...');
-          
+
           // Enviar email de reset de senha para o usuário
           // Isso permitirá que ele configure uma nova senha
           try {
@@ -520,10 +522,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
           throw authError;
         }
       }
-      
+
     } catch (error: any) {
       console.error('❌ Erro no signInWithPhoneAndPin:', error);
-      
+
       // Propagar erros específicos
       if (error.message === 'Número de telefone não cadastrado' || error.message === 'PIN incorreto') {
         throw error;
@@ -546,51 +548,51 @@ export function AuthProvider({ children }: AuthProviderProps) {
     try {
       console.log('🔍 ============ CHECK PHONE EXISTS ============');
       console.log('🔍 Telefone recebido (original):', phone);
-      
+
       // Normalizar telefone (remover formatação)
       const normalizedPhone = normalizePhone(phone);
       console.log('🔍 Telefone normalizado:', normalizedPhone);
-      
+
       const usersRef = collection(db, 'users');
-      
+
       // Buscar telefone normalizado
       console.log('🔍 Buscando com telefone normalizado...');
       let q = query(usersRef, where('phone', '==', normalizedPhone), limit(1));
       let querySnapshot = await getDocs(q);
-      
+
       console.log('🔍 Resultado busca normalizado:', !querySnapshot.empty ? 'ENCONTRADO ✅' : 'NÃO ENCONTRADO ❌');
-      
+
       if (!querySnapshot.empty) {
         const userData = querySnapshot.docs[0].data();
         console.log('✅ Usuário encontrado:', userData.name, '| Email:', userData.email);
         console.log('✅ ==========================================');
         return true;
       }
-      
+
       // Fallback: tentar buscar com o telefone original se não encontrou
       console.log('🔍 Buscando com telefone original...');
       q = query(usersRef, where('phone', '==', phone), limit(1));
       querySnapshot = await getDocs(q);
-      
+
       console.log('🔍 Resultado busca original:', !querySnapshot.empty ? 'ENCONTRADO ✅' : 'NÃO ENCONTRADO ❌');
-      
+
       if (!querySnapshot.empty) {
         const userData = querySnapshot.docs[0].data();
         console.log('✅ Usuário encontrado:', userData.name, '| Email:', userData.email);
         console.log('✅ ==========================================');
         return true;
       }
-      
+
       console.error('❌ ============ TELEFONE NÃO ENCONTRADO ============');
       console.error('❌ Tentativas:');
       console.error('   1. Normalizado:', normalizedPhone);
       console.error('   2. Original:', phone);
       console.error('❌ ================================================');
-      
+
       return false;
     } catch (error: any) {
       console.error('❌ Erro ao verificar telefone:', error);
-      
+
       // Se for erro de permissão, propagar erro especial
       if (error.code === 'permission-denied') {
         throw new Error('FIRESTORE_PERMISSION_DENIED');
@@ -604,10 +606,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
     try {
       const provider = new GoogleAuthProvider();
       const userCredential = await signInWithPopup(auth, provider);
-      
+
       // Verificar se o usuário já existe no Firestore
       const userDoc = await loadUserData(userCredential.user.uid);
-      
+
       // Se não existe, criar documento básico (vai precisar criar PIN depois)
       if (!userDoc) {
         const userDocRef = doc(db, 'users', userCredential.user.uid);
@@ -646,7 +648,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   // Verificar PIN de 6 dígitos
   const verifyPin = async (pin: string): Promise<boolean> => {
     if (!userData) return false;
-    
+
     const isValid = userData.accountPin === pin;
     if (isValid) {
       setPinVerifiedWithPersistence(true);
@@ -664,10 +666,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       setUser(user);
-      
+
       if (user) {
         await loadUserData(user.uid);
-        
+
         // ✅ MIGRAÇÃO AUTOMÁTICA: Migrar wallets para portfolio ao fazer login
         try {
           await autoMigrateOnLogin(user.uid);
@@ -675,7 +677,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
           console.error('⚠️ Erro na migração automática (não crítico):', error);
           // Não propagar erro - login ainda funcionou
         }
-        
+
         // ✅ VERIFICAR PIN DO LOCALSTORAGE
         const isPinVerified = checkPinVerifiedFromStorage(user.uid);
         setIsPinVerified(isPinVerified);
@@ -683,7 +685,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         setUserData(null);
         setIsPinVerified(false);
       }
-      
+
       setLoading(false);
     });
 
@@ -695,7 +697,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     if (!user?.uid) return;
 
     console.log('🔄 Iniciando sincronização em tempo real dos dados do usuário...');
-    
+
     const userDocRef = doc(db, 'users', user.uid);
     const unsubscribe = onSnapshot(
       userDocRef,
@@ -735,7 +737,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     const checkAndCreatePixKeys = async () => {
       try {
         console.log('🔍 Verificando se chaves PIX existem para o usuário...');
-        
+
         const pixKeysRef = collection(db, 'pixKeys');
         const q = query(pixKeysRef, where('userId', '==', user.uid), limit(1));
         const snapshot = await getDocs(q);
@@ -757,7 +759,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   // Descartar alerta para o usuário
   const dismissAlert = async (alertId: string) => {
     if (!userData) return;
-    
+
     const userDocRef = doc(db, 'users', userData.uid);
     const updatedData: UserData = {
       ...userData,
@@ -766,7 +768,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         dismissedAlerts: [...(userData.preferences?.dismissedAlerts || []), alertId],
       },
     };
-    
+
     await setDoc(userDocRef, updatedData);
     setUserData(updatedData);
   };
@@ -774,13 +776,13 @@ export function AuthProvider({ children }: AuthProviderProps) {
   // Atualizar idioma do usuário
   const updateLanguage = async (language: 'pt-BR' | 'en-US' | 'es') => {
     if (!userData) return;
-    
+
     const userDocRef = doc(db, 'users', userData.uid);
     const updatedData: UserData = {
       ...userData,
       language,
     };
-    
+
     await setDoc(userDocRef, updatedData);
     setUserData(updatedData);
   };
@@ -788,7 +790,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   // Atualizar cartões visíveis do usuário
   const updateVisibleCards = async (cards: string[]) => {
     if (!userData) return;
-    
+
     const userDocRef = doc(db, 'users', userData.uid);
     const updatedData: UserData = {
       ...userData,
@@ -797,7 +799,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         visibleCards: cards,
       },
     };
-    
+
     await setDoc(userDocRef, updatedData);
     setUserData(updatedData);
   };
@@ -812,7 +814,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
     if (emailChanged || phoneChanged) {
       console.log('🔄 Detectada mudança no perfil, sincronizando chaves PIX...');
-      
+
       // Sincronizar chaves PIX
       syncPixKeys(
         user.uid,

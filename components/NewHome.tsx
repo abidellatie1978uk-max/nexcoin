@@ -20,7 +20,7 @@ import { FiatAccountsCarousel } from './FiatAccountsCarousel';
 import { FormattedAmount } from './FormattedAmount';
 import { FirestoreSetupInstructions } from './FirestoreSetupInstructions'; // ✅ Importar componente de instruções
 import type { Screen } from '../App';
-import type { BankAccount } from './AccountData';
+import { BankAccount } from '../lib/bankAccountGenerator';
 
 interface NewHomeProps {
   onNavigate: (screen: Screen) => void;
@@ -470,7 +470,7 @@ export function NewHome({ onNavigate, onNavigateWithAccount }: NewHomeProps) {
                 <FormattedAmount
                   value={animatedValue}
                   symbol={getCurrencySymbol(displayCurrency)}
-                  className="text-4xl font-light tabular-nums"
+                  className="text-4xl font-normal tabular-nums"
                 />
               </button>
               <span className="text-base font-medium text-white/50">
