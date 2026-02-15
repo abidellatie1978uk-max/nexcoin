@@ -9,7 +9,7 @@ import { Capacitor } from '@capacitor/core';
 import { StatusBar, Style } from '@capacitor/status-bar';
 import { SplashScreen } from '@capacitor/splash-screen';
 import { Keyboard } from '@capacitor/keyboard';
-import { App as CapApp } from '@capacitor/app';
+import { App as CapApp, URLOpenListenerEvent, BackButtonListenerEvent } from '@capacitor/app';
 
 /**
  * Inicializa configurações do Capacitor quando o app estiver rodando em mobile
@@ -51,13 +51,13 @@ export async function initializeCapacitor() {
     });
 
     // Listener para deep links (opcional para futuro)
-    CapApp.addListener('appUrlOpen', data => {
+    CapApp.addListener('appUrlOpen', (data: URLOpenListenerEvent) => {
       console.log('🔗 App aberto via URL:', data.url);
       // Aqui você pode adicionar lógica para navegação baseada em deep links
     });
 
     // Listener para botão voltar do Android
-    CapApp.addListener('backButton', ({ canGoBack }) => {
+    CapApp.addListener('backButton', ({ canGoBack }: BackButtonListenerEvent) => {
       console.log('🔙 Botão voltar pressionado');
       if (!canGoBack) {
         // Se não pode voltar, perguntar se quer sair do app
@@ -112,7 +112,7 @@ export async function getDeviceInfo() {
     const { Device } = await import('@capacitor/device');
     const info = await Device.getInfo();
     const batteryInfo = await Device.getBatteryInfo();
-    
+
     return {
       ...info,
       battery: batteryInfo,
@@ -148,8 +148,8 @@ export async function hapticImpact(style: 'light' | 'medium' | 'heavy' = 'medium
 
   try {
     const { Haptics, ImpactStyle } = await import('@capacitor/haptics');
-    
-    let impactStyle: ImpactStyle;
+
+    let impactStyle;
     switch (style) {
       case 'light':
         impactStyle = ImpactStyle.Light;
@@ -160,7 +160,7 @@ export async function hapticImpact(style: 'light' | 'medium' | 'heavy' = 'medium
       default:
         impactStyle = ImpactStyle.Medium;
     }
-    
+
     await Haptics.impact({ style: impactStyle });
   } catch (error) {
     console.error('Erro ao executar haptic:', error);
