@@ -124,7 +124,7 @@ export function LandingPage({ onNavigate }: LandingPageProps) {
                             </div>
                             <button
                                 onClick={() => onNavigate('signup')}
-                                className="bg-black text-white px-6 py-2 rounded-full font-bold hover:bg-zinc-900 transition-colors"
+                                className="hidden lg:block bg-black text-white px-6 py-2 rounded-full font-bold hover:bg-zinc-900 transition-colors"
                             >
                                 {t.landingPage.openAccount}
                             </button>
