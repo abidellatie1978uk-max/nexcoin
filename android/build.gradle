@@ -7,7 +7,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:8.13.2'
+        classpath 'com.android.tools.build:gradle:9.0.0'
         classpath 'com.google.gms:google-services:4.4.0'
 
         // NOTE: Do not place your application dependencies here; they belong
@@ -22,8 +22,33 @@ allprojects {
         google()
         mavenCentral()
     }
+    apply plugin: 'eclipse'
 }
 
 task clean(type: Delete) {
     delete rootProject.buildDir
+}
+
+subprojects {
+    afterEvaluate { project ->
+        if (project.hasProperty('android')) {
+            project.android {
+                if (it.hasProperty('buildTypes')) {
+                    buildTypes.all { buildType ->
+                        def proguardList = buildType.proguardFiles
+                        if (proguardList != null) {
+                            def newFiles = proguardList.collect { file ->
+                                if (file.name == 'proguard-android.txt') {
+                                    return getDefaultProguardFile('proguard-android-optimize.txt')
+                                }
+                                return file
+                            }
+                            buildType.proguardFiles = newFiles
+                        }
+
+                    }
+                }
+            }
+        }
+    }
 }
