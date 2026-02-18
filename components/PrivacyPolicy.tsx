@@ -32,7 +32,7 @@ export function PrivacyPolicy({ onNavigate }: PrivacyPolicyProps) {
         <section className="space-y-3">
           <h2 className="text-lg font-semibold">1. Introdução</h2>
           <p className="text-sm text-gray-400 leading-relaxed">
-            O NexCoin valoriza sua privacidade. Esta Política de Privacidade descreve como coletamos, usamos, armazenamos e protegemos suas informações pessoais quando você usa nossos serviços.
+            O Ethertron valoriza sua privacidade. Esta Política de Privacidade descreve como coletamos, usamos, armazenamos e protegemos suas informações pessoais quando você usa nossos serviços.
           </p>
         </section>
 
@@ -197,13 +197,13 @@ export function PrivacyPolicy({ onNavigate }: PrivacyPolicyProps) {
         <section className="space-y-3">
           <h2 className="text-lg font-semibold">12. Contato</h2>
           <p className="text-sm text-gray-400 leading-relaxed">
-            Se você tiver dúvidas sobre esta Política de Privacidade ou sobre como tratamos seus dados, entre em contato através da Central de Ajuda ou envie um e-mail para privacy@nexcoin.com.
+            Se você tiver dúvidas sobre esta Política de Privacidade ou sobre como tratamos seus dados, entre em contato através da Central de Ajuda ou envie um e-mail para privacy@ethertron.com.
           </p>
         </section>
 
         <div className="bg-zinc-900 rounded-2xl p-4 mt-8">
           <p className="text-xs text-gray-400 text-center">
-            Ao usar o NexCoin, você concorda com esta Política de Privacidade
+            Ao usar o Ethertron, você concorda com esta Política de Privacidade
           </p>
         </div>
       </div>

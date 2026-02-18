@@ -67,7 +67,7 @@ export function NewProfile({ onNavigate }: NewProfileProps) {
       title: t.settings,
       items: [
         { icon: Globe, label: t.language, action: () => onNavigate('languageSettings') },
-        { icon: Settings, label: t.appPreferences, action: () => onNavigate('appPreferences') },
+        // { icon: Settings, label: t.appPreferences, action: () => onNavigate('appPreferences') }, // Removido
         { icon: LogOut, label: t.logout, action: handleLogout, danger: true },
       ],
     },
@@ -142,7 +142,7 @@ export function NewProfile({ onNavigate }: NewProfileProps) {
 
         {/* Version */}
         <div className="text-center mt-6 text-sm text-gray-500">
-          NexCoin v1.0.0
+          Ethertron v1.0.0
         </div>
       </div>
     </div>

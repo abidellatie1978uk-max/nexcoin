@@ -102,7 +102,7 @@ export function LandingPage({ onNavigate }: LandingPageProps) {
                 <nav className={`sticky top-0 w-full z-50 transition-all duration-300 ${isScrolled ? 'bg-white/90 backdrop-blur-md border-b border-gray-100 py-3' : 'bg-white py-5'}`}>
                     <div className="max-w-7xl mx-auto px-6 flex justify-between items-center">
                         <div className="flex items-center gap-12">
-                            <h1 className="text-2xl font-black italic tracking-tighter text-black">NexCoin</h1>
+                            <h1 className="text-2xl font-black italic tracking-tighter text-black">Ethertron</h1>
                             <div className="hidden lg:flex gap-8 text-sm font-semibold text-gray-600">
                                 <button onClick={() => scrollTo('products')} className="hover:text-black transition-colors">{t.landingPage.products}</button>
                                 <button onClick={() => scrollTo('company')} className="hover:text-black transition-colors">{t.landingPage.company}</button>
@@ -313,7 +313,7 @@ export function LandingPage({ onNavigate }: LandingPageProps) {
                         <div className="flex flex-col lg:flex-row gap-8 lg:gap-12 px-6 items-start">
                             {[
                                 {
-                                    name: "NexCoin Platinum",
+                                    name: "Ethertron Platinum",
                                     color: "bg-[linear-gradient(135deg,#a8a9ad_0%,#d1d2d5_20%,#f1f2f6_40%,#ffffff_50%,#f1f2f6_60%,#d1d2d5_80%,#a8a9ad_100%)]",
                                     text: "text-zinc-900/80",
                                     rotation: "lg:-rotate-2",
@@ -324,7 +324,7 @@ export function LandingPage({ onNavigate }: LandingPageProps) {
                                     features: ["Taxa Zero", "Cashback 0.5%", "Ativos em até 12h"]
                                 },
                                 {
-                                    name: "NexCoin Black",
+                                    name: "Ethertron Black",
                                     color: "bg-gradient-to-br from-[#0f0f0f] via-[#2c2c2c] to-[#000000]",
                                     text: "text-white/90",
                                     rotation: "lg:scale-105 z-20",
@@ -335,7 +335,7 @@ export function LandingPage({ onNavigate }: LandingPageProps) {
                                     features: ["Cashback 1.5%", "Proteção Pro", "Ativos em até 6h"]
                                 },
                                 {
-                                    name: "NexCoin Elite",
+                                    name: "Ethertron Elite",
                                     color: "bg-[linear-gradient(135deg,#b88a44_0%,#e1b66b_20%,#fdf5b7_40%,#ffffff_50%,#fdf5b7_60%,#e1b66b_80%,#b88a44_100%)]",
                                     text: "text-amber-950/80",
                                     rotation: "lg:rotate-2",
@@ -379,7 +379,7 @@ export function LandingPage({ onNavigate }: LandingPageProps) {
                                         <div className="relative z-10" style={{ transform: 'translateZ(50px)' }}>
                                             <div className="flex justify-between items-start mb-6">
                                                 <div className="flex flex-col">
-                                                    <p className={`text-xl lg:text-2xl font-black tracking-tight uppercase ${card.text}`}>NexCoin</p>
+                                                    <p className={`text-xl lg:text-2xl font-black tracking-tight uppercase ${card.text}`}>Ethertron</p>
                                                     <p className={`text-[9px] font-bold tracking-[0.4em] uppercase opacity-70 ${card.text}`}>{card.name.split(' ')[1]}</p>
                                                 </div>
 
@@ -665,7 +665,7 @@ export function LandingPage({ onNavigate }: LandingPageProps) {
                     <div className="max-w-7xl mx-auto px-6">
                         <div className="grid grid-cols-2 lg:grid-cols-5 gap-12 mb-20">
                             <div className="col-span-2">
-                                <h1 className="text-3xl font-black italic mb-8">NexCoin</h1>
+                                <h1 className="text-3xl font-black italic mb-8">Ethertron</h1>
                                 <p className="text-gray-500 max-w-xs mb-8">{t.landingPage.footerTagline}</p>
                                 <div className="flex gap-4">
                                 </div>

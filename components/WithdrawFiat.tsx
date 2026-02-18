@@ -7,7 +7,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useFiatBalances } from '../hooks/useFiatBalances';
 import { useTransactions } from '../hooks/useTransactions';
 import { updateFiatBalance } from '../lib/fiatBalanceUtils';
-import { validatePixKey as validatePixKeyNexCoin, processPixTransfer, generatePixTransactionId } from '../lib/pixTransferUtils'; // ✅ Importar funções de transferência entre usuários
+import { validatePixKey as validatePixKeyEthertron, processPixTransfer, generatePixTransactionId } from '../lib/pixTransferUtils'; // ✅ Importar funções de transferência entre usuários
 import { collection, query, where, getDocs, onSnapshot } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import type { BankAccount } from '../lib/bankAccountGenerator';
@@ -18,6 +18,7 @@ import { FormattedAmount } from './FormattedAmount';
 
 interface WithdrawFiatProps {
   onNavigate: (screen: Screen) => void;
+  onBack?: () => void;
 }
 
 type Country = 'BR' | 'US' | 'EU' | 'GB';
@@ -35,7 +36,7 @@ export function WithdrawFiat({ onNavigate }: WithdrawFiatProps) {
   const { rates } = useFiatRates();
   const { portfolio } = usePortfolio();
   const { user } = useAuth();
-  const { fiatBalances, getBalance } = useFiatBalances();
+  const { balances: fiatBalances, getBalance } = useFiatBalances();
   const { addTransaction } = useTransactions();
   const [accounts, setAccounts] = useState<BankAccount[]>([]);
   const [isLoadingAccounts, setIsLoadingAccounts] = useState(true);
@@ -203,7 +204,7 @@ export function WithdrawFiat({ onNavigate }: WithdrawFiatProps) {
 
     const accountsRef = collection(db, 'bankAccounts');
     const q = query(accountsRef, where('userId', '==', user.uid));
-    
+
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const accountsData = snapshot.docs.map(doc => ({
         ...doc.data(),
@@ -282,12 +283,12 @@ export function WithdrawFiat({ onNavigate }: WithdrawFiatProps) {
   const formatAccountBalance = (currency: string): string => {
     const symbol = currencySymbols[currency] || currency;
     const balance = getBalance(currency);
-    
+
     const formattedValue = balance.toLocaleString('pt-BR', {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2
     });
-    
+
     return `${symbol} ${formattedValue}`;
   };
 
@@ -301,32 +302,32 @@ export function WithdrawFiat({ onNavigate }: WithdrawFiatProps) {
   const handleAmountChange = (value: string) => {
     // Remove tudo exceto números
     const cleaned = value.replace(/\D/g, '');
-    
+
     if (cleaned === '') {
       setAmount('');
       return;
     }
-    
+
     // Converte para número (centavos)
     const numberValue = parseInt(cleaned, 10);
-    
+
     // Divide por 100 para obter o valor em reais
     let realValue = numberValue / 100;
-    
+
     // Obter saldo disponível da moeda atual
     const availableFiatBalance = getBalance(currentCountry.currency);
-    
+
     // Limitar ao saldo disponível
     if (realValue > availableFiatBalance) {
       realValue = availableFiatBalance;
     }
-    
+
     // Formata no padrão brasileiro
     const formatted = realValue.toLocaleString('pt-BR', {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
     });
-    
+
     setAmount(formatted);
   };
 
@@ -370,10 +371,10 @@ export function WithdrawFiat({ onNavigate }: WithdrawFiatProps) {
     }
 
     // Se chegou aqui, a chave não é válida
-    return { 
-      isValid: false, 
-      type: null, 
-      error: 'Tipo de chave PIX não reconhecido. Use CPF, CNPJ, E-mail, Telefone ou Chave Aleatória.' 
+    return {
+      isValid: false,
+      type: null,
+      error: 'Tipo de chave PIX não reconhecido. Use CPF, CNPJ, E-mail, Telefone ou Chave Aleatória.'
     };
   };
 
@@ -381,11 +382,11 @@ export function WithdrawFiat({ onNavigate }: WithdrawFiatProps) {
   const handlePixKeyChange = (value: string) => {
     // 1. Converter para minúsculas
     let processedValue = value.toLowerCase();
-    
+
     // 2. Remover caracteres especiais de telefone: -, (, ), espaços
     // Isso ajuda quando o usuário cola um número formatado como: +55 (11) 98765-4321
     processedValue = processedValue.replace(/[\s\-()]/g, '');
-    
+
     setPixKey(processedValue);
     const validation = validatePixKey(processedValue);
     setPixKeyType(validation.type);
@@ -400,13 +401,13 @@ export function WithdrawFiat({ onNavigate }: WithdrawFiatProps) {
 
     // Converter valor formatado de volta para número
     const amountNum = parseFloat(amount.replace(/\./g, '').replace(',', '.'));
-    
+
     console.log('💰 ============ VALIDAÇÃO DE TRANSFERÊNCIA PIX ============');
     console.log('💰 Valor digitado (formatado):', amount);
     console.log('💰 Valor convertido (número):', amountNum);
     console.log('💰 Moeda:', currentCountry.currency);
     console.log('💰 Valor mínimo permitido:', currentMethod?.minAmount);
-    
+
     if (!amountNum || amountNum < (currentMethod?.minAmount || 0)) {
       toast.error(`Valor mínimo: ${currentCountry.symbol} ${currentMethod?.minAmount}`);
       return;
@@ -415,19 +416,19 @@ export function WithdrawFiat({ onNavigate }: WithdrawFiatProps) {
     // ✅ CORREÇÃO: Verificar saldo disponível usando TANTO fiatBalances QUANTO portfolio convertido
     const fiatBalance = getBalance(currentCountry.currency);
     const portfolioBalanceConverted = convertToLocalCurrency(availableBalance);
-    
+
     console.log('💰 ====== DEBUG DE SALDOS ======');
     console.log('💰 Saldo Fiat (Firestore):', fiatBalance);
     console.log('💰 Saldo Portfolio (USDT):', availableBalance);
     console.log('💰 Saldo Portfolio Convertido:', portfolioBalanceConverted);
     console.log('💰 Taxa de conversão:', rates[currentCountry.currency]);
-    
+
     // Usar o maior saldo disponível entre fiat e portfolio convertido
     const availableFiatBalance = Math.max(fiatBalance, portfolioBalanceConverted);
-    
+
     console.log('💰 ✅ Saldo disponível TOTAL para transferência:', availableFiatBalance);
     console.log('💰 Comparação:', amountNum, '>', availableFiatBalance, '=', amountNum > availableFiatBalance);
-    
+
     if (amountNum > availableFiatBalance) {
       console.error('❌ SALDO INSUFICIENTE!');
       console.error('❌ Tentou transferir:', amountNum);
@@ -436,17 +437,17 @@ export function WithdrawFiat({ onNavigate }: WithdrawFiatProps) {
       toast.error(`Saldo insuficiente. Disponível: ${currentCountry.symbol} ${formatAmount(availableFiatBalance)}`);
       return;
     }
-    
+
     console.log('✅ Validação de saldo OK!');
     console.log('💰 ====================================================');
-    
+
     // Validar campos específicos
     if (selectedCountry === 'BR' && selectedMethod === 'pix') {
       if (!pixKey) {
         toast.error('Informe a chave PIX');
         return;
       }
-      
+
       // Validar tipo de chave PIX
       const validation = validatePixKey(pixKey);
       if (!validation.isValid) {
@@ -454,7 +455,7 @@ export function WithdrawFiat({ onNavigate }: WithdrawFiatProps) {
         return;
       }
     }
-    
+
     if (selectedCountry === 'BR' && selectedMethod === 'bank' && (!bankData.bank || !bankData.agency || !bankData.account || !bankData.name)) {
       toast.error('Preencha todos os dados bancários');
       return;
@@ -474,24 +475,24 @@ export function WithdrawFiat({ onNavigate }: WithdrawFiatProps) {
 
     // Processar transferência
     setIsProcessing(true);
-    
+
     try {
-      // ✅ TRATAMENTO ESPECIAL PARA PIX - Verificar se é transferência entre usuários NexCoin
+      // ✅ TRATAMENTO ESPECIAL PARA PIX - Verificar se é transferência entre usuários Ethertron
       if (selectedCountry === 'BR' && selectedMethod === 'pix') {
-        console.log('🔍 Verificando se chave PIX pertence a um usuário NexCoin...');
-        
-        // Validar chave PIX no sistema NexCoin
-        const pixValidation = await validatePixKeyNexCoin(pixKey, user.uid);
-        
+        console.log('🔍 Verificando se chave PIX pertence a um usuário Ethertron...');
+
+        // Validar chave PIX no sistema Ethertron
+        const pixValidation = await validatePixKeyEthertron(pixKey, user.uid);
+
         if (pixValidation.isValid && pixValidation.userId) {
           // ✅ Chave PIX encontrada! Fazer transferência entre usuários
-          console.log('✅ Chave PIX encontrada no sistema NexCoin');
+          console.log('✅ Chave PIX encontrada no sistema Ethertron');
           console.log(`📤 Remetente: ${user.uid}`);
           console.log(`📥 Destinatário: ${pixValidation.userId} (${pixValidation.userName})`);
-          
+
           // Gerar ID de transação
           const txId = generatePixTransactionId();
-          
+
           // Processar transferência entre usuários
           const transferResult = await processPixTransfer({
             fromUserId: user.uid,
@@ -504,28 +505,28 @@ export function WithdrawFiat({ onNavigate }: WithdrawFiatProps) {
             transactionId: txId,
             createdAt: new Date(),
           });
-          
+
           if (!transferResult.success) {
             throw new Error(transferResult.error || 'Erro ao processar transferência PIX');
           }
-          
+
           console.log('✅ Transferência PIX entre usuários concluída!');
           toast.success(`Transferência enviada para ${pixValidation.userName}!`);
-          
+
           setTransactionId(txId);
           setIsProcessing(false);
           setShowSuccess(true);
           return; // ✅ Sair da função aqui para não executar o fluxo antigo
         } else {
-          // ⚠️ Chave PIX não encontrada no sistema NexCoin
-          console.warn('⚠️ Chave PIX não encontrada no sistema NexCoin');
-          toast.error(pixValidation.error || 'Chave PIX não encontrada no sistema NexCoin. Apenas transferências entre usuários NexCoin são suportadas no momento.');
+          // ⚠️ Chave PIX não encontrada no sistema Ethertron
+          console.warn('⚠️ Chave PIX não encontrada no sistema Ethertron');
+          toast.error(pixValidation.error || 'Chave PIX não encontrada no sistema Ethertron. Apenas transferências entre usuários Ethertron são suportadas no momento.');
           setIsProcessing(false);
           return;
         }
       }
-      
-      // ⚠️ FLUXO ANTIGO (para outros métodos que não são PIX entre usuários NexCoin)
+
+      // ⚠️ FLUXO ANTIGO (para outros métodos que não são PIX entre usuários Ethertron)
       // 1. Preparar descrição baseada no método
       let transactionDescription = '';
       if (selectedCountry === 'BR' && selectedMethod === 'pix') {
@@ -581,11 +582,11 @@ export function WithdrawFiat({ onNavigate }: WithdrawFiatProps) {
 
       console.log('✅ Transferência processada com sucesso');
       toast.success('Transferência realizada com sucesso!');
-      
+
       // Mostrar tela de sucesso
       setIsProcessing(false);
       setShowSuccess(true);
-      
+
     } catch (error: any) {
       console.error('❌ Erro ao processar transferência:', error);
       toast.error(error.message || 'Erro ao processar transferência');
@@ -602,8 +603,8 @@ export function WithdrawFiat({ onNavigate }: WithdrawFiatProps) {
       return (
         <div className="min-h-screen bg-black text-white flex flex-col pb-24">
           <header className="px-6 pt-6 pb-4">
-            <button 
-              onClick={() => setSelectedMethod(null)} 
+            <button
+              onClick={() => setSelectedMethod(null)}
               className="w-10 h-10 rounded-full bg-zinc-900 flex items-center justify-center hover:bg-zinc-800 transition-colors mb-6"
             >
               <ArrowLeft className="w-5 h-5" />
@@ -732,18 +733,18 @@ export function WithdrawFiat({ onNavigate }: WithdrawFiatProps) {
             </div>
 
             <div className="bg-zinc-900 rounded-2xl p-4 space-y-3">
-              <input type="text" placeholder="Banco" value={bankData.bank} onChange={(e) => setBankData({...bankData, bank: e.target.value})} className="w-full bg-zinc-800 text-white rounded-xl px-4 py-3 outline-none placeholder-gray-500" />
+              <input type="text" placeholder="Banco" value={bankData.bank} onChange={(e) => setBankData({ ...bankData, bank: e.target.value })} className="w-full bg-zinc-800 text-white rounded-xl px-4 py-3 outline-none placeholder-gray-500" />
               <div className="grid grid-cols-2 gap-3">
-                <input type="text" placeholder="Código" value={bankData.bankCode} onChange={(e) => setBankData({...bankData, bankCode: e.target.value})} className="bg-zinc-800 text-white rounded-xl px-4 py-3 outline-none placeholder-gray-500" />
-                <input type="text" placeholder="Agência" value={bankData.agency} onChange={(e) => setBankData({...bankData, agency: e.target.value})} className="bg-zinc-800 text-white rounded-xl px-4 py-3 outline-none placeholder-gray-500" />
+                <input type="text" placeholder="Código" value={bankData.bankCode} onChange={(e) => setBankData({ ...bankData, bankCode: e.target.value })} className="bg-zinc-800 text-white rounded-xl px-4 py-3 outline-none placeholder-gray-500" />
+                <input type="text" placeholder="Agência" value={bankData.agency} onChange={(e) => setBankData({ ...bankData, agency: e.target.value })} className="bg-zinc-800 text-white rounded-xl px-4 py-3 outline-none placeholder-gray-500" />
               </div>
-              <input type="text" placeholder="Conta" value={bankData.account} onChange={(e) => setBankData({...bankData, account: e.target.value})} className="w-full bg-zinc-800 text-white rounded-xl px-4 py-3 outline-none placeholder-gray-500" />
-              <select value={bankData.accountType} onChange={(e) => setBankData({...bankData, accountType: e.target.value})} className="w-full bg-zinc-800 text-white rounded-xl px-4 py-3 outline-none">
+              <input type="text" placeholder="Conta" value={bankData.account} onChange={(e) => setBankData({ ...bankData, account: e.target.value })} className="w-full bg-zinc-800 text-white rounded-xl px-4 py-3 outline-none placeholder-gray-500" />
+              <select value={bankData.accountType} onChange={(e) => setBankData({ ...bankData, accountType: e.target.value })} className="w-full bg-zinc-800 text-white rounded-xl px-4 py-3 outline-none">
                 <option value="Conta Corrente">Conta Corrente</option>
                 <option value="Conta Poupança">Conta Poupança</option>
               </select>
-              <input type="text" placeholder="Nome completo" value={bankData.name} onChange={(e) => setBankData({...bankData, name: e.target.value})} className="w-full bg-zinc-800 text-white rounded-xl px-4 py-3 outline-none placeholder-gray-500" />
-              <input type="text" placeholder="CPF/CNPJ" value={bankData.document} onChange={(e) => setBankData({...bankData, document: e.target.value})} className="w-full bg-zinc-800 text-white rounded-xl px-4 py-3 outline-none placeholder-gray-500" />
+              <input type="text" placeholder="Nome completo" value={bankData.name} onChange={(e) => setBankData({ ...bankData, name: e.target.value })} className="w-full bg-zinc-800 text-white rounded-xl px-4 py-3 outline-none placeholder-gray-500" />
+              <input type="text" placeholder="CPF/CNPJ" value={bankData.document} onChange={(e) => setBankData({ ...bankData, document: e.target.value })} className="w-full bg-zinc-800 text-white rounded-xl px-4 py-3 outline-none placeholder-gray-500" />
             </div>
 
             <button onClick={handleSubmit} disabled={isProcessing} className="w-full bg-white text-black font-bold py-4 rounded-xl hover:bg-gray-200 transition-colors disabled:opacity-50">
@@ -790,14 +791,14 @@ export function WithdrawFiat({ onNavigate }: WithdrawFiatProps) {
             </div>
 
             <div className="bg-zinc-900 rounded-2xl p-4 space-y-3">
-              <input type="text" placeholder="Routing Number" value={usAccountData.routingNumber} onChange={(e) => setUsAccountData({...usAccountData, routingNumber: e.target.value})} className="w-full bg-zinc-800 text-white rounded-xl px-4 py-3 outline-none placeholder-gray-500" />
-              <input type="text" placeholder="Account Number" value={usAccountData.accountNumber} onChange={(e) => setUsAccountData({...usAccountData, accountNumber: e.target.value})} className="w-full bg-zinc-800 text-white rounded-xl px-4 py-3 outline-none placeholder-gray-500" />
-              <select value={usAccountData.accountType} onChange={(e) => setUsAccountData({...usAccountData, accountType: e.target.value})} className="w-full bg-zinc-800 text-white rounded-xl px-4 py-3 outline-none">
+              <input type="text" placeholder="Routing Number" value={usAccountData.routingNumber} onChange={(e) => setUsAccountData({ ...usAccountData, routingNumber: e.target.value })} className="w-full bg-zinc-800 text-white rounded-xl px-4 py-3 outline-none placeholder-gray-500" />
+              <input type="text" placeholder="Account Number" value={usAccountData.accountNumber} onChange={(e) => setUsAccountData({ ...usAccountData, accountNumber: e.target.value })} className="w-full bg-zinc-800 text-white rounded-xl px-4 py-3 outline-none placeholder-gray-500" />
+              <select value={usAccountData.accountType} onChange={(e) => setUsAccountData({ ...usAccountData, accountType: e.target.value })} className="w-full bg-zinc-800 text-white rounded-xl px-4 py-3 outline-none">
                 <option value="Checking">Checking</option>
                 <option value="Savings">Savings</option>
               </select>
-              <input type="text" placeholder="Account holder name" value={usAccountData.name} onChange={(e) => setUsAccountData({...usAccountData, name: e.target.value})} className="w-full bg-zinc-800 text-white rounded-xl px-4 py-3 outline-none placeholder-gray-500" />
-              <input type="text" placeholder="Address" value={usAccountData.address} onChange={(e) => setUsAccountData({...usAccountData, address: e.target.value})} className="w-full bg-zinc-800 text-white rounded-xl px-4 py-3 outline-none placeholder-gray-500" />
+              <input type="text" placeholder="Account holder name" value={usAccountData.name} onChange={(e) => setUsAccountData({ ...usAccountData, name: e.target.value })} className="w-full bg-zinc-800 text-white rounded-xl px-4 py-3 outline-none placeholder-gray-500" />
+              <input type="text" placeholder="Address" value={usAccountData.address} onChange={(e) => setUsAccountData({ ...usAccountData, address: e.target.value })} className="w-full bg-zinc-800 text-white rounded-xl px-4 py-3 outline-none placeholder-gray-500" />
             </div>
 
             <div className="bg-zinc-900 rounded-2xl p-4 space-y-2">
@@ -851,10 +852,10 @@ export function WithdrawFiat({ onNavigate }: WithdrawFiatProps) {
             </div>
 
             <div className="bg-zinc-900 rounded-2xl p-4 space-y-3">
-              <input type="text" placeholder="IBAN" value={euAccountData.iban} onChange={(e) => setEuAccountData({...euAccountData, iban: e.target.value})} className="w-full bg-zinc-800 text-white rounded-xl px-4 py-3 outline-none placeholder-gray-500 font-mono text-sm" />
-              <input type="text" placeholder="BIC/SWIFT (optional)" value={euAccountData.bic} onChange={(e) => setEuAccountData({...euAccountData, bic: e.target.value})} className="w-full bg-zinc-800 text-white rounded-xl px-4 py-3 outline-none placeholder-gray-500" />
-              <input type="text" placeholder="Beneficiary name" value={euAccountData.name} onChange={(e) => setEuAccountData({...euAccountData, name: e.target.value})} className="w-full bg-zinc-800 text-white rounded-xl px-4 py-3 outline-none placeholder-gray-500" />
-              <input type="text" placeholder="Address" value={euAccountData.address} onChange={(e) => setEuAccountData({...euAccountData, address: e.target.value})} className="w-full bg-zinc-800 text-white rounded-xl px-4 py-3 outline-none placeholder-gray-500" />
+              <input type="text" placeholder="IBAN" value={euAccountData.iban} onChange={(e) => setEuAccountData({ ...euAccountData, iban: e.target.value })} className="w-full bg-zinc-800 text-white rounded-xl px-4 py-3 outline-none placeholder-gray-500 font-mono text-sm" />
+              <input type="text" placeholder="BIC/SWIFT (optional)" value={euAccountData.bic} onChange={(e) => setEuAccountData({ ...euAccountData, bic: e.target.value })} className="w-full bg-zinc-800 text-white rounded-xl px-4 py-3 outline-none placeholder-gray-500" />
+              <input type="text" placeholder="Beneficiary name" value={euAccountData.name} onChange={(e) => setEuAccountData({ ...euAccountData, name: e.target.value })} className="w-full bg-zinc-800 text-white rounded-xl px-4 py-3 outline-none placeholder-gray-500" />
+              <input type="text" placeholder="Address" value={euAccountData.address} onChange={(e) => setEuAccountData({ ...euAccountData, address: e.target.value })} className="w-full bg-zinc-800 text-white rounded-xl px-4 py-3 outline-none placeholder-gray-500" />
             </div>
 
             <div className="bg-zinc-900 rounded-2xl p-4 space-y-2">
@@ -908,10 +909,10 @@ export function WithdrawFiat({ onNavigate }: WithdrawFiatProps) {
             </div>
 
             <div className="bg-zinc-900 rounded-2xl p-4 space-y-3">
-              <input type="text" placeholder="Sort Code (12-34-56)" value={ukAccountData.sortCode} onChange={(e) => setUkAccountData({...ukAccountData, sortCode: e.target.value})} className="w-full bg-zinc-800 text-white rounded-xl px-4 py-3 outline-none placeholder-gray-500" />
-              <input type="text" placeholder="Account Number" value={ukAccountData.accountNumber} onChange={(e) => setUkAccountData({...ukAccountData, accountNumber: e.target.value})} className="w-full bg-zinc-800 text-white rounded-xl px-4 py-3 outline-none placeholder-gray-500" />
-              <input type="text" placeholder="Account holder name" value={ukAccountData.name} onChange={(e) => setUkAccountData({...ukAccountData, name: e.target.value})} className="w-full bg-zinc-800 text-white rounded-xl px-4 py-3 outline-none placeholder-gray-500" />
-              <input type="text" placeholder="Address" value={ukAccountData.address} onChange={(e) => setUkAccountData({...ukAccountData, address: e.target.value})} className="w-full bg-zinc-800 text-white rounded-xl px-4 py-3 outline-none placeholder-gray-500" />
+              <input type="text" placeholder="Sort Code (12-34-56)" value={ukAccountData.sortCode} onChange={(e) => setUkAccountData({ ...ukAccountData, sortCode: e.target.value })} className="w-full bg-zinc-800 text-white rounded-xl px-4 py-3 outline-none placeholder-gray-500" />
+              <input type="text" placeholder="Account Number" value={ukAccountData.accountNumber} onChange={(e) => setUkAccountData({ ...ukAccountData, accountNumber: e.target.value })} className="w-full bg-zinc-800 text-white rounded-xl px-4 py-3 outline-none placeholder-gray-500" />
+              <input type="text" placeholder="Account holder name" value={ukAccountData.name} onChange={(e) => setUkAccountData({ ...ukAccountData, name: e.target.value })} className="w-full bg-zinc-800 text-white rounded-xl px-4 py-3 outline-none placeholder-gray-500" />
+              <input type="text" placeholder="Address" value={ukAccountData.address} onChange={(e) => setUkAccountData({ ...ukAccountData, address: e.target.value })} className="w-full bg-zinc-800 text-white rounded-xl px-4 py-3 outline-none placeholder-gray-500" />
             </div>
 
             <button onClick={handleSubmit} disabled={isProcessing} className="w-full bg-white text-black font-bold py-4 rounded-xl hover:bg-gray-200 transition-colors disabled:opacity-50">
@@ -966,8 +967,8 @@ export function WithdrawFiat({ onNavigate }: WithdrawFiatProps) {
   return (
     <div className="min-h-screen bg-black text-white flex flex-col pb-24">
       <header className="px-6 pt-6 pb-4">
-        <button 
-          onClick={() => onNavigate('home')} 
+        <button
+          onClick={() => onNavigate('home')}
           className="w-10 h-10 rounded-full bg-zinc-900 flex items-center justify-center hover:bg-zinc-800 transition-colors mb-6"
         >
           <ArrowLeft className="w-5 h-5" />
@@ -993,7 +994,7 @@ export function WithdrawFiat({ onNavigate }: WithdrawFiatProps) {
             {accounts.map((account) => {
               const badge = getPaymentBadge(account);
               const isSelected = selectedAccount?.id === account.id;
-              
+
               return (
                 <button
                   key={account.id}
@@ -1014,15 +1015,14 @@ export function WithdrawFiat({ onNavigate }: WithdrawFiatProps) {
                     const mappedCountry = countryMap[account.country] || 'BR';
                     setSelectedCountry(mappedCountry);
                   }}
-                  className={`w-full bg-gradient-to-br from-zinc-800/90 via-zinc-900/95 to-black backdrop-blur-xl rounded-2xl p-4 border transition-all active:scale-[0.98] text-left relative overflow-hidden group ${
-                    isSelected
-                      ? 'ring-2 ring-white border-white/30'
-                      : 'border-zinc-700/60 hover:border-zinc-600'
-                  }`}
+                  className={`w-full bg-gradient-to-br from-zinc-800/90 via-zinc-900/95 to-black backdrop-blur-xl rounded-2xl p-4 border transition-all active:scale-[0.98] text-left relative overflow-hidden group ${isSelected
+                    ? 'ring-2 ring-white border-white/30'
+                    : 'border-zinc-700/60 hover:border-zinc-600'
+                    }`}
                 >
                   {/* Efeito de brilho glassmorphism */}
                   <div className="absolute inset-0 bg-gradient-to-br from-white/[0.05] via-transparent to-transparent pointer-events-none"></div>
-                  
+
                   {/* Conteúdo da conta */}
                   <div className="flex items-center justify-between relative z-10">
                     {/* Lado esquerdo: Moeda e Badge */}
@@ -1032,7 +1032,7 @@ export function WithdrawFiat({ onNavigate }: WithdrawFiatProps) {
                         <div className="text-lg font-semibold text-white mb-1">
                           {account.currency}
                         </div>
-                        
+
                         {/* Badge (Pix ou número da conta) */}
                         <div className="flex items-center gap-2">
                           {badge.icon && (
@@ -1044,7 +1044,7 @@ export function WithdrawFiat({ onNavigate }: WithdrawFiatProps) {
                         </div>
                       </div>
                     </div>
-                    
+
                     {/* Lado direito: Saldo */}
                     <div className="text-right ml-3">
                       <div className="text-base font-semibold text-white tabular-nums">
@@ -1070,14 +1070,14 @@ export function WithdrawFiat({ onNavigate }: WithdrawFiatProps) {
           <div className="text-xs text-gray-400 mb-1">Saldo disponível para transferência</div>
           <div className="text-white">
             {selectedAccount ? (
-              <FormattedAmount 
-                value={formatAmount(getBalance(selectedAccount.currency))} 
-                symbol={currencySymbols[selectedAccount.currency]} 
+              <FormattedAmount
+                value={formatAmount(getBalance(selectedAccount.currency))}
+                symbol={currencySymbols[selectedAccount.currency]}
               />
             ) : (
-              <FormattedAmount 
-                value={formatAmount(getBalance(currentCountry.currency))} 
-                symbol={currentCountry.symbol} 
+              <FormattedAmount
+                value={formatAmount(getBalance(currentCountry.currency))}
+                symbol={currentCountry.symbol}
               />
             )}
           </div>

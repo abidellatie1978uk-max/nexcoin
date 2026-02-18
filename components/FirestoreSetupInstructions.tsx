@@ -88,7 +88,7 @@ service cloud.firestore {
               Acesse o Firebase Console
             </h3>
             <a
-              href="https://console.firebase.google.com/project/nexcoin-1f42f/firestore/rules"
+              href="https://console.firebase.google.com/project/ethertron-app/firestore/rules"
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-2 bg-blue-500/20 backdrop-blur-md rounded-xl px-4 py-3 border border-blue-500/30 hover:bg-blue-500/30 transition-all"
@@ -117,7 +117,7 @@ service cloud.firestore {
               <span className="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center text-xs">3</span>
               Cole estas regras
             </h3>
-            
+
             {/* Code Block */}
             <div className="relative">
               <pre className="bg-black/40 rounded-xl p-4 border border-white/10 overflow-x-auto text-xs text-white/80 font-mono">

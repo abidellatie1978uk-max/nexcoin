@@ -7,9 +7,9 @@ import { getStorage } from "firebase/storage";
 // Your web app's Firebase configuration
 const firebaseConfig = {
   apiKey: "AIzaSyBv8ljlrTY9LsoPUZPQpw1YaX2W6D5_O54",
-  authDomain: "nexcoin-1f42f.firebaseapp.com",
-  projectId: "nexcoin-1f42f",
-  storageBucket: "nexcoin-1f42f.firebasestorage.app",
+  authDomain: "ethertron-app.firebaseapp.com",
+  projectId: "ethertron-app",
+  storageBucket: "ethertron-app.firebasestorage.app",
   messagingSenderId: "575773698878",
   appId: "1:575773698878:web:29261adabbe23c039f1a6f"
 };

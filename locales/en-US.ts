@@ -9,17 +9,17 @@ export default {
   'common.copy': 'Copy',
   'common.share': 'Share',
   'common.max': 'Max',
-  
+
   // Welcome
   'welcome.createAccount': 'Create account',
   'welcome.login': 'Log in',
   'welcome.termsText': 'By continuing, you agree to our Terms of Service and Privacy Policy.',
-  
+
   // Login
-  'login.title': 'NexCoin',
+  'login.title': 'Ethertron',
   'login.subtitle': 'Login',
   'login.welcome': 'Welcome back!',
-  'login.description': 'Enter the phone number associated with your NexCoin account.',
+  'login.description': 'Enter the phone number associated with your Ethertron account.',
   'login.phonePlaceholder': 'Phone number',
   'login.lostAccess': 'Lost access to my phone',
   'login.continue': 'Continue',
@@ -31,7 +31,7 @@ export default {
   'login.signUp': 'Sign Up',
   'login.invalidPhone': 'Invalid phone number (minimum 10 digits)',
   'login.phoneNotFound': 'This phone number is not registered',
-  
+
   // Sign Up
   'signup.title': 'Create account',
   'signup.description': 'Fill in your details to get started',
@@ -56,20 +56,20 @@ export default {
   'signup.invalidPhone': 'Invalid phone number (minimum 10 digits)',
   'signup.passwordRequirements': 'Password must have at least 8 characters, 1 uppercase letter and 1 special character',
   'signup.passwordMismatch': 'Passwords do not match',
-  
+
   // Password Entry
   'passwordEntry.title': 'Enter password',
   'passwordEntry.back': 'Back',
   'passwordEntry.digit': 'Digit',
   'passwordEntry.forgotPassword': 'Forgot your password?',
   'passwordEntry.incorrectPassword': 'Incorrect password. Try again.',
-  
+
   // Country Selection
   'country.title': 'Select your country',
   'country.description': 'Choose the country where you reside',
   'country.currency': 'Preferred currency',
   'country.selectCurrency': 'Select your currency',
-  
+
   // Security Promotion
   'security.title': 'Security first',
   'security.subtitle': 'Protect your account with advanced features',
@@ -81,7 +81,7 @@ export default {
   'security.twoFactorDesc': 'Two-step verification',
   'security.start': 'Get started',
   'security.skip': 'Skip for now',
-  
+
   // Home
   'home.totalBalance': 'Total Balance',
   'home.myWallet': 'My Wallet',
@@ -93,7 +93,7 @@ export default {
   'home.viewAll': 'View all',
   'home.deposit': 'Deposit',
   'home.withdraw': 'Withdraw',
-  
+
   // Wallet
   'wallet.title': 'Wallet',
   'wallet.convert': 'Convert',
@@ -105,7 +105,7 @@ export default {
   'wallet.euro': 'Euro',
   'wallet.sterling': 'Pound Sterling',
   'wallet.stablecoin': 'Stablecoin',
-  
+
   // Deposit
   'deposit.title': 'Deposit',
   'deposit.chooseMethod': 'Choose method',
@@ -141,7 +141,7 @@ export default {
   'deposit.international': 'International transfer',
   'deposit.domesticUS': 'US domestic transfer',
   'deposit.euroZone': 'Euro zone transfer',
-  
+
   // Withdraw
   'withdraw.title': 'Withdraw',
   'withdraw.chooseMethod': 'Choose method',
@@ -160,14 +160,14 @@ export default {
   'withdraw.bankWarning': 'Verify all bank details. Processing may take 1 to 3 business days.',
   'withdraw.instantNoFee': 'Instant - No fee',
   'withdraw.fee': 'Fee',
-  
+
   // Receive
   'receive.title': 'Receive USDT',
   'receive.walletAddress': 'Wallet Address',
   'receive.copy': 'Copy',
   'receive.share': 'Share',
   'receive.network': 'Network',
-  
+
   // Convert
   'convert.title': 'Convert',
   'convert.from': 'From',
@@ -178,7 +178,7 @@ export default {
   'convert.preview': 'Preview conversion',
   'convert.confirm': 'Confirm conversion',
   'convert.success': 'Conversion completed successfully!',
-  
+
   // Crypto
   'crypto.title': 'Cryptocurrencies',
   'crypto.search': 'Search cryptocurrency...',
@@ -186,7 +186,7 @@ export default {
   'crypto.volume': '24h Volume',
   'crypto.price': 'Price',
   'crypto.change': 'Change',
-  
+
   // Profile
   'profile.title': 'Profile',
   'profile.editProfile': 'Edit profile',
@@ -200,8 +200,8 @@ export default {
   'profile.settings': 'Settings',
   'profile.appPreferences': 'App preferences',
   'profile.logout': 'Logout',
-  'profile.version': 'NexCoin v1.0.0',
-  
+  'profile.version': 'Ethertron v1.0.0',
+
   // Transactions
   'transactions.title': 'Transactions',
   'transactions.all': 'All',
@@ -210,14 +210,14 @@ export default {
   'transactions.completed': 'Completed',
   'transactions.pending': 'Pending',
   'transactions.failed': 'Failed',
-  
+
   // Bottom Navigation
   'nav.home': 'Home',
   'nav.wallet': 'Wallet',
   'nav.convert': 'Convert',
   'nav.crypto': 'Crypto',
   'nav.profile': 'Profile',
-  
+
   // Languages
   'language.portuguese': 'Português (Brasil)',
   'language.english': 'English (US)',

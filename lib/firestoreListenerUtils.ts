@@ -29,7 +29,7 @@ export function safeOnSnapshot<T>(
 
     try {
       unsubscribe = onSnapshot(
-        ref,
+        ref as any,
         (snapshot) => {
           retryCount = 0; // Reset retry count on success
           onNext(snapshot);
@@ -53,7 +53,7 @@ export function safeOnSnapshot<T>(
             retryCount++;
             const delay = retryDelay * Math.pow(2, retryCount - 1); // Exponential backoff
             console.log(`🔄 Tentando reconectar (${retryCount}/${maxRetries}) em ${delay}ms...`);
-            
+
             setTimeout(() => {
               if (!isUnsubscribed) {
                 setupListener();

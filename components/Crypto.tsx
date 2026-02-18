@@ -38,7 +38,7 @@ export function Crypto({ onNavigate }: CryptoProps) {
   const [isListExpanded, setIsListExpanded] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [favorites, setFavorites] = useState<string[]>([]);
-  
+
   // ✅ Carregar favoritos do Firestore
   useEffect(() => {
     const loadFavorites = async () => {
@@ -46,7 +46,7 @@ export function Crypto({ onNavigate }: CryptoProps) {
         setFavorites([]);
         return;
       }
-      
+
       try {
         const favoritesDoc = await getDoc(doc(db, 'users', user.uid, 'preferences', 'crypto-favorites'));
         if (favoritesDoc.exists()) {
@@ -64,7 +64,7 @@ export function Crypto({ onNavigate }: CryptoProps) {
         setFavorites([]);
       }
     };
-    
+
     loadFavorites();
   }, [user]);
 
@@ -78,17 +78,17 @@ export function Crypto({ onNavigate }: CryptoProps) {
     const newFavorites = favorites.includes(cryptoId)
       ? favorites.filter(id => id !== cryptoId)
       : [...favorites, cryptoId];
-    
+
     // Atualizar estado local imediatamente
     setFavorites(newFavorites);
-    
+
     // Salvar no Firestore
     try {
       await setDoc(doc(db, 'users', user.uid, 'preferences', 'crypto-favorites'), {
         favorites: newFavorites,
         updatedAt: new Date(),
       });
-      
+
       if (newFavorites.includes(cryptoId)) {
         toast.success('Adicionado aos favoritos');
       } else {
@@ -205,20 +205,20 @@ export function Crypto({ onNavigate }: CryptoProps) {
     // Simular 24 horas de dados (24 pontos)
     const basePrice = crypto.price;
     const changePercent = crypto.changePercent;
-    
+
     const data = [];
     for (let i = 0; i < 24; i++) {
       // Criar variação progressiva ao longo do dia (HOJE)
       const progress = i / 23; // 0 a 1
       const randomVariation = (Math.random() - 0.5) * (changePercent / 5); // Variação aleatória pequena
       const priceChange = (changePercent * progress / 100) + randomVariation;
-      
+
       // Simular dados de 5 dias atrás (linha de fundo)
       // Assumir que 5 dias atrás tinha uma variação diferente (menor ou negativa)
       const pastChangePercent = changePercent * 0.3; // 30% da variação atual (menos volátil)
       const pastRandomVariation = (Math.random() - 0.5) * (pastChangePercent / 5);
       const pastPriceChange = (pastChangePercent * progress / 100) + pastRandomVariation;
-      
+
       data.push({
         time: `${i}h`,
         price: basePrice * (1 + priceChange / 100),
@@ -227,18 +227,18 @@ export function Crypto({ onNavigate }: CryptoProps) {
         pricePast: basePrice * 0.95 * (1 + pastPriceChange / 100), // 5% menor que hoje
       });
     }
-    
+
     return data;
   };
 
   // ✅ Auto-play do carrossel
   useEffect(() => {
     if (topGainers.length === 0 || isPaused) return;
-    
+
     const interval = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % topGainers.length);
     }, 5000); // Trocar a cada 5 segundos
-    
+
     return () => clearInterval(interval);
   }, [topGainers.length, isPaused]);
 
@@ -274,22 +274,22 @@ export function Crypto({ onNavigate }: CryptoProps) {
   // ✅ Aplicar filtros de busca e favoritos
   const filteredCryptos = useMemo(() => {
     let result = availableCryptos;
-    
+
     // Filtro de busca
     if (searchTerm.trim()) {
       const search = searchTerm.toLowerCase();
-      result = result.filter(crypto => 
+      result = result.filter(crypto =>
         crypto.name.toLowerCase().includes(search) ||
         crypto.symbol.toLowerCase().includes(search) ||
         crypto.id.toLowerCase().includes(search)
       );
     }
-    
+
     // Filtro de favoritos
     if (activeTab === 'favorites') {
       result = result.filter(c => c.isFavorite);
     }
-    
+
     return result;
   }, [availableCryptos, searchTerm, activeTab, favorites]);
 
@@ -311,11 +311,11 @@ export function Crypto({ onNavigate }: CryptoProps) {
     setIsAdding(true);
     try {
       const amount = parseFloat(balanceToAdd);
-      
+
       // Verificar se já existe no portfólio
       const existingHolding = portfolio.holdings.find(h => h.coinId === addBalanceModal.crypto!.id);
       const newAmount = existingHolding ? existingHolding.amount + amount : amount;
-      
+
       // addOrUpdateCrypto(symbol, coinId, amount, name?)
       await addOrUpdateCrypto(
         addBalanceModal.crypto.symbol,
@@ -323,11 +323,11 @@ export function Crypto({ onNavigate }: CryptoProps) {
         newAmount,
         addBalanceModal.crypto.name
       );
-      
+
       toast.success('Saldo adicionado com sucesso!', {
         description: `+${formatCrypto(amount)} ${addBalanceModal.crypto.symbol}`,
       });
-      
+
       setAddBalanceModal({ show: false, crypto: null });
       setBalanceToAdd('');
     } catch (error) {
@@ -366,7 +366,7 @@ export function Crypto({ onNavigate }: CryptoProps) {
             >
               {t.cryptoPage.all}
             </button>
-            
+
             <button
               onClick={() => setActiveTab('favorites')}
               className={activeTab === 'favorites' ? 'flex-1 py-3 rounded-full font-semibold transition-colors bg-white text-black' : `flex-1 py-3 rounded-full font-semibold transition-colors text-gray-400 ${glassEffect}`}
@@ -389,7 +389,7 @@ export function Crypto({ onNavigate }: CryptoProps) {
               >
                 {/* Background Gradient Effect */}
                 <div className="absolute inset-0 bg-gradient-to-br from-[#34c759]/10 via-transparent to-[#34c759]/5 pointer-events-none" />
-                
+
                 {/* Header Compacto */}
                 <div className="relative z-10 flex items-center justify-between mb-3">
                   <div className="flex items-center gap-2">
@@ -419,9 +419,9 @@ export function Crypto({ onNavigate }: CryptoProps) {
                         {topGainers[currentSlide].price < 1 ? (
                           <>$ {topGainers[currentSlide].price.toLocaleString('pt-BR', { minimumFractionDigits: 6, maximumFractionDigits: 6 })}</>
                         ) : (
-                          <FormattedAmount 
-                            value={topGainers[currentSlide].price} 
-                            symbol="$" 
+                          <FormattedAmount
+                            value={topGainers[currentSlide].price}
+                            symbol="$"
                             className="text-lg font-light"
                           />
                         )}
@@ -462,13 +462,13 @@ export function Crypto({ onNavigate }: CryptoProps) {
                             padding: '6px 10px',
                           }}
                           labelStyle={{ display: 'none' }}
-                          formatter={(value: any, name: string) => {
+                          formatter={(value: any, name: any) => {
                             if (name === 'price') return [`$${value.toFixed(2)}`, 'Hoje'];
                             if (name === 'pricePast') return [`$${value.toFixed(2)}`, '5 dias atrás'];
                             return ['', ''];
                           }}
                         />
-                        
+
                         {/* Área de 5 dias atrás (renderizada primeiro = fica atrás) - LARANJA */}
                         <Area
                           type="monotone"
@@ -482,7 +482,7 @@ export function Crypto({ onNavigate }: CryptoProps) {
                           animationEasing="ease-in-out"
                           isAnimationActive={true}
                         />
-                        
+
                         {/* Área atual (hoje) - renderizada por último = fica na frente - VERDE */}
                         <Area
                           type="monotone"
@@ -569,7 +569,7 @@ export function Crypto({ onNavigate }: CryptoProps) {
                             <div className="text-sm text-gray-400">{crypto.symbol}</div>
                           </div>
                         </div>
-                        <button 
+                        <button
                           className="text-gray-400 hover:text-yellow-500 transition-colors"
                           onClick={(e) => {
                             e.stopPropagation();
@@ -581,9 +581,8 @@ export function Crypto({ onNavigate }: CryptoProps) {
                       </div>
                       <div className="flex items-center justify-between">
                         <div className="text-lg font-semibold">{crypto.price}</div>
-                        <div className={`flex items-center gap-1 text-sm font-medium ${
-                          crypto.trend === 'up' ? 'text-green-500' : crypto.trend === 'down' ? 'text-red-500' : 'text-gray-400'
-                        }`}>
+                        <div className={`flex items-center gap-1 text-sm font-medium ${crypto.trend === 'up' ? 'text-green-500' : crypto.trend === 'down' ? 'text-red-500' : 'text-gray-400'
+                          }`}>
                           {crypto.trend === 'up' && <TrendingUp className="w-4 h-4" />}
                           {crypto.trend === 'down' && <TrendingDown className="w-4 h-4" />}
                           {crypto.change}
@@ -619,11 +618,11 @@ export function Crypto({ onNavigate }: CryptoProps) {
 
       {/* Add Balance Modal */}
       {addBalanceModal.show && (
-        <div 
+        <div
           className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 px-6"
           onClick={() => setAddBalanceModal({ show: false, crypto: null })}
         >
-          <div 
+          <div
             className="bg-white/5 backdrop-blur-md rounded-3xl p-6 w-full max-w-md border border-white/10 shadow-[0_0_40px_rgba(255,255,255,0.1)]"
             onClick={(e) => e.stopPropagation()}
           >

@@ -262,7 +262,7 @@ export function Receive({ onNavigate }: ReceiveProps) {
                   <p className="text-white font-semibold mb-2">Como funciona</p>
                   <p className="text-white/70 text-sm leading-relaxed">
                     Compartilhe este endereço ou QR Code com quem vai enviar criptomoedas para você.
-                    Quando a transação for confirmada na blockchain, os depósitos aparecem automaticamente na sua carteira NexCoin.
+                    Quando a transação for confirmada na blockchain, os depósitos aparecem automaticamente na sua carteira Ethertron.
                     O tempo de confirmação varia de acordo com a rede: pode levar de segundos a alguns minutos.
                   </p>
                 </div>
@@ -436,8 +436,8 @@ export function Receive({ onNavigate }: ReceiveProps) {
                       setIsNetworkDropdownOpen(false);
                     }}
                     className={`w-full p-4 flex items-center justify-between transition-all ${selectedNetwork === network.id
-                        ? 'bg-white/10'
-                        : 'hover:bg-white/5'
+                      ? 'bg-white/10'
+                      : 'hover:bg-white/5'
                       } ${index !== networks.length - 1 ? 'border-b border-white/5' : ''}`}
                   >
                     <div className="flex items-center gap-3">

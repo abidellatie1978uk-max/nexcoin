@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { collection, query, where, onSnapshot } from 'firebase/firestore';
+import { collection, query, where, onSnapshot, addDoc, deleteDoc, doc } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -76,8 +76,36 @@ export function usePixKeys() {
     };
   }, [user?.uid]);
 
+  const addPixKey = async (newKey: Omit<PixKey, 'id' | 'createdAt'>) => {
+    try {
+      if (!user?.uid) throw new Error('Usuário não autenticado');
+
+      const docRef = await addDoc(collection(db, 'pixKeys'), {
+        ...newKey,
+        userId: user.uid,
+        createdAt: new Date()
+      });
+
+      return docRef.id;
+    } catch (error) {
+      console.error('Erro ao adicionar chave PIX:', error);
+      throw error;
+    }
+  };
+
+  const deletePixKey = async (keyId: string) => {
+    try {
+      await deleteDoc(doc(db, 'pixKeys', keyId));
+    } catch (error) {
+      console.error('Erro ao remover chave PIX:', error);
+      throw error;
+    }
+  };
+
   return {
     pixKeys,
     isLoading,
+    addPixKey,
+    deletePixKey
   };
 }

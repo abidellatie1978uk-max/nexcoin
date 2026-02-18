@@ -38,7 +38,7 @@ export async function validateWalletAddress(
         isValid: false,
         userId: null,
         userName: null,
-        error: 'Endereço não encontrado. Certifique-se de que o destinatário possui uma conta NexCoin.',
+        error: 'Endereço não encontrado. Certifique-se de que o destinatário possui uma conta Ethertron.',
       };
     }
 
@@ -133,7 +133,7 @@ export async function processCryptoTransfer(
     // Usar uma transação para garantir atomicidade
     const transactionResult = await runTransaction(db, async (transaction) => {
       // ✅ TODAS AS LEITURAS PRIMEIRO (antes de qualquer escrita)
-      
+
       // 1. Buscar saldo do remetente (usando symbol como ID do documento)
       const fromPortfolioRef = doc(db, 'users', fromUserId, 'portfolio', coinSymbol);
       const fromPortfolioDoc = await transaction.get(fromPortfolioRef);
@@ -143,7 +143,7 @@ export async function processCryptoTransfer(
       const toPortfolioDoc = await transaction.get(toPortfolioRef);
 
       // ✅ VALIDAÇÕES (após todas as leituras)
-      
+
       if (!fromPortfolioDoc.exists()) {
         throw new Error('Você não possui saldo desta criptomoeda');
       }
@@ -155,7 +155,7 @@ export async function processCryptoTransfer(
       }
 
       // ✅ TODAS AS ESCRITAS AGORA (após todas as leituras)
-      
+
       // 3. Debitar do remetente (valor + taxa)
       const newFromBalance = fromBalance - totalDebit;
       transaction.update(fromPortfolioRef, {
@@ -194,7 +194,7 @@ export async function processCryptoTransfer(
 
     // 5. Registrar transações no histórico de ambos os usuários
     const transactionId = `txn_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
-    
+
     // Transação do remetente (débito)
     const fromTransactionRef = doc(collection(db, 'users', fromUserId, 'transactions'));
     await setDoc(fromTransactionRef, {
@@ -230,7 +230,7 @@ export async function processCryptoTransfer(
       feeCurrency: coinSymbol, // ✅ Adicionar campo feeCurrency
       network,
       fromUserId,
-      fromAddress: transferData.fromAddress || 'NexCoin User',
+      fromAddress: transferData.fromAddress || 'Ethertron User',
       status: 'completed',
       transactionHash: transferData.transactionHash,
       transactionId,

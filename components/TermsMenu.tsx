@@ -35,7 +35,7 @@ export function TermsMenu({ onNavigate }: TermsMenuProps) {
             <div className="flex-1">
               <h3 className="font-semibold mb-1">Termos de Uso</h3>
               <p className="text-sm text-gray-400">
-                Leia os termos e condições de uso do NexCoin
+                Leia os termos e condições de uso do Ethertron
               </p>
             </div>
           </div>

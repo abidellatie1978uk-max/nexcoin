@@ -91,7 +91,7 @@ export function CountrySelection({
       {/* Header */}
       <div className="w-full max-w-md mx-auto pt-4 pb-8">
         <h1 className="text-2xl font-bold tracking-tight text-center mb-2">
-          NexCoin
+          Ethertron
         </h1>
       </div>
 
@@ -190,11 +190,10 @@ export function CountrySelection({
               key={currency.id}
               type="button"
               onClick={() => setSelectedCurrency(currency.id)}
-              className={`w-full bg-zinc-900 rounded-2xl p-4 flex items-center justify-between transition-all duration-300 ${
-                selectedCurrency === currency.id
-                  ? "ring-1 ring-inset ring-white/60"
-                  : "hover:bg-zinc-800"
-              }`}
+              className={`w-full bg-zinc-900 rounded-2xl p-4 flex items-center justify-between transition-all duration-300 ${selectedCurrency === currency.id
+                ? "ring-1 ring-inset ring-white/60"
+                : "hover:bg-zinc-800"
+                }`}
             >
               <div className="flex items-center gap-3">
                 <FlagIcon
@@ -224,11 +223,10 @@ export function CountrySelection({
       <button
         type="button"
         onClick={handleContinue}
-        className={`w-full py-4 rounded-full font-semibold transition-all duration-300 ${
-          selectedCountry && selectedCurrency
-            ? "bg-white text-black hover:opacity-90 active:scale-[0.98]"
-            : "bg-zinc-800 text-gray-500 cursor-not-allowed"
-        }`}
+        className={`w-full py-4 rounded-full font-semibold transition-all duration-300 ${selectedCountry && selectedCurrency
+          ? "bg-white text-black hover:opacity-90 active:scale-[0.98]"
+          : "bg-zinc-800 text-gray-500 cursor-not-allowed"
+          }`}
         disabled={!selectedCountry || !selectedCurrency}
       >
         Continuar

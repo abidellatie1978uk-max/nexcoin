@@ -1,9 +1,9 @@
-import { 
-  collection, 
-  addDoc, 
-  query, 
-  where, 
-  orderBy, 
+import {
+  collection,
+  addDoc,
+  query,
+  where,
+  orderBy,
   getDocs,
   doc,
   updateDoc,
@@ -52,7 +52,7 @@ export async function createNotification(
       metadata: metadata || {},
       createdAt: serverTimestamp()
     });
-    
+
     console.log('✅ Notification created:', { userId, type, title });
   } catch (error) {
     console.error('❌ Error creating notification:', error);
@@ -71,10 +71,10 @@ export async function getUserNotifications(userId: string): Promise<Notification
       where('userId', '==', userId),
       orderBy('timestamp', 'desc')
     );
-    
+
     const querySnapshot = await getDocs(q);
     const notifications: NotificationData[] = [];
-    
+
     querySnapshot.forEach((doc) => {
       const data = doc.data();
       notifications.push({
@@ -88,7 +88,7 @@ export async function getUserNotifications(userId: string): Promise<Notification
         metadata: data.metadata || {}
       });
     });
-    
+
     console.log(`✅ Loaded ${notifications.length} notifications for user ${userId}`);
     return notifications;
   } catch (error) {
@@ -107,7 +107,7 @@ export async function markNotificationAsRead(notificationId: string): Promise<vo
       read: true,
       readAt: serverTimestamp()
     });
-    
+
     console.log('✅ Notification marked as read:', notificationId);
   } catch (error) {
     console.error('❌ Error marking notification as read:', error);
@@ -126,17 +126,17 @@ export async function markAllNotificationsAsRead(userId: string): Promise<void> 
       where('userId', '==', userId),
       where('read', '==', false)
     );
-    
+
     const querySnapshot = await getDocs(q);
     const batch = writeBatch(db);
-    
+
     querySnapshot.forEach((document) => {
       batch.update(document.ref, {
         read: true,
         readAt: serverTimestamp()
       });
     });
-    
+
     await batch.commit();
     console.log(`✅ Marked ${querySnapshot.size} notifications as read`);
   } catch (error) {
@@ -170,10 +170,10 @@ export async function notifyWithdrawal(userId: string, amount: number, currency:
 }
 
 export async function notifyConversion(
-  userId: string, 
-  fromAmount: number, 
-  fromCurrency: string, 
-  toAmount: number, 
+  userId: string,
+  fromAmount: number,
+  fromCurrency: string,
+  toAmount: number,
   toCurrency: string
 ): Promise<void> {
   await createNotification(
@@ -220,7 +220,7 @@ export async function notifyAppUpdate(userId: string): Promise<void> {
     userId,
     'info',
     'Atualização disponível',
-    'Nova versão do NexCoin disponível',
+    'Nova versão do Ethertron disponível',
     { type: 'app_update' }
   );
 }

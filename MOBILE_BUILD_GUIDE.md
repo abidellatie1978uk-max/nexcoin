@@ -1,6 +1,6 @@
-# 🚀 Guia de Compilação Mobile - NexCoin
+# 🚀 Guia de Compilação Mobile - Ethertron
 
-Este guia explica como compilar o aplicativo NexCoin para Android e iOS usando Capacitor.
+Este guia explica como compilar o aplicativo Ethertron para Android e iOS usando Capacitor.
 
 ## 📋 Pré-requisitos
 
@@ -41,8 +41,8 @@ npm install @capacitor/app @capacitor/haptics @capacitor/keyboard @capacitor/sta
 npx cap init
 
 # Quando perguntado:
-# - App name: NexCoin
-# - App ID (bundle ID): com.nexcoin.app
+# - App name: Ethertron
+# - App ID (bundle ID): com.ethertron.app
 # - Web asset directory: dist
 ```
 
@@ -56,8 +56,8 @@ Criar arquivo `capacitor.config.ts` na raiz do projeto:
 import { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'com.nexcoin.app',
-  appName: 'NexCoin',
+  appId: 'com.ethertron.app',
+  appName: 'Ethertron',
   webDir: 'dist',
   server: {
     androidScheme: 'https',
@@ -186,7 +186,7 @@ No Android Studio:
 #### Gerar Keystore (primeira vez):
 
 ```bash
-keytool -genkey -v -keystore nexcoin-release.keystore -alias nexcoin -keyalg RSA -keysize 2048 -validity 10000
+keytool -genkey -v -keystore ethertron-release.keystore -alias ethertron -keyalg RSA -keysize 2048 -validity 10000
 ```
 
 #### Configurar gradle:
@@ -198,9 +198,9 @@ android {
     ...
     signingConfigs {
         release {
-            storeFile file("../../nexcoin-release.keystore")
+            storeFile file("../../ethertron-release.keystore")
             storePassword "SUA_SENHA"
-            keyAlias "nexcoin"
+            keyAlias "ethertron"
             keyPassword "SUA_SENHA"
         }
     }
@@ -246,8 +246,8 @@ npx cap open ios
 
 1. Selecione o projeto `App` no navegador
 2. Em `General`:
-   - Display Name: NexCoin
-   - Bundle Identifier: com.nexcoin.app
+   - Display Name: Ethertron
+   - Bundle Identifier: com.ethertron.app
    - Version: 1.0.0
    - Minimum Deployments: iOS 13.0
 3. Em `Signing & Capabilities`:
@@ -265,19 +265,19 @@ Editar `ios/App/App/Info.plist`:
 <dict>
     <!-- Permissões de Câmera -->
     <key>NSCameraUsageDescription</key>
-    <string>NexCoin precisa acessar sua câmera para escanear QR codes e tirar fotos de perfil.</string>
+    <string>Ethertron precisa acessar sua câmera para escanear QR codes e tirar fotos de perfil.</string>
     
     <!-- Permissões de Galeria -->
     <key>NSPhotoLibraryUsageDescription</key>
-    <string>NexCoin precisa acessar suas fotos para você adicionar imagens de perfil.</string>
+    <string>Ethertron precisa acessar suas fotos para você adicionar imagens de perfil.</string>
     
     <!-- Permissões de Biometria -->
     <key>NSFaceIDUsageDescription</key>
-    <string>NexCoin usa Face ID para autenticar transações de forma segura.</string>
+    <string>Ethertron usa Face ID para autenticar transações de forma segura.</string>
     
     <!-- Outras configurações -->
     <key>CFBundleDisplayName</key>
-    <string>NexCoin</string>
+    <string>Ethertron</string>
     
     <key>UIStatusBarStyle</key>
     <string>UIStatusBarStyleLightContent</string>
@@ -454,7 +454,7 @@ Antes de publicar:
 adb logcat
 
 # Ver logs do dispositivo iOS
-xcrun simctl spawn booted log stream --predicate 'process == "NexCoin"'
+xcrun simctl spawn booted log stream --predicate 'process == "Ethertron"'
 
 # Limpar cache do Capacitor
 npx cap sync --clean
@@ -477,5 +477,5 @@ npx cap sync
 
 ---
 
-**Autor:** Equipe NexCoin  
+**Autor:** Equipe Ethertron  
 **Última Atualização:** Fevereiro 2026

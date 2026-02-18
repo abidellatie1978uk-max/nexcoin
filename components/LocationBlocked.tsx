@@ -16,7 +16,7 @@ export function LocationBlocked({ onRetry }: LocationBlockedProps) {
             </h1>
 
             <p className="text-gray-400 mb-8 leading-relaxed">
-                Para sua segurança e proteção contra fraudes, o NexCoin exige acesso à sua localização.
+                Para sua segurança e proteção contra fraudes, o Ethertron exige acesso à sua localização.
                 Por favor, habilite o GPS nas configurações do seu dispositivo e clique em tentar novamente.
             </p>
 

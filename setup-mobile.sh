@@ -1,9 +1,9 @@
 #!/bin/bash
 
-# 🚀 Script de Configuração Mobile - NexCoin
+# 🚀 Script de Configuração Mobile - Ethertron
 # Este script automatiza a configuração do Capacitor para Android e iOS
 
-echo "🚀 Configurando NexCoin para Mobile..."
+echo "🚀 Configurando Ethertron para Mobile..."
 echo ""
 
 # Cores para output
@@ -44,8 +44,8 @@ cat > capacitor.config.ts << 'EOF'
 import { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'com.nexcoin.app',
-  appName: 'NexCoin',
+  appId: 'com.ethertron.app',
+  appName: 'Ethertron',
   webDir: 'dist',
   server: {
     androidScheme: 'https',

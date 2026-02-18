@@ -16,7 +16,7 @@ export function CameraBlocked({ onRetry }: CameraBlockedProps) {
             </h1>
 
             <p className="text-gray-400 mb-8 leading-relaxed">
-                O NexCoin exige acesso à câmera para verificação de identidade (KYC) e segurança da sua conta.
+                O Ethertron exige acesso à câmera para verificação de identidade (KYC) e segurança da sua conta.
                 Por favor, habilite a permissão de câmera nas configurações do seu dispositivo e clique em tentar novamente.
             </p>
 

@@ -39,7 +39,7 @@ export function WithdrawAddress({ crypto, network, onBack }: WithdrawAddressProp
   const [transactionDate, setTransactionDate] = useState('');
   const [copiedHash, setCopiedHash] = useState(false);
   const [copiedAddress, setCopiedAddress] = useState(false);
-  const [recipientInfo, setRecipientInfo] = useState<{ isValid: boolean; userName: string | null; error?: string } | null>(null);
+  const [recipientInfo, setRecipientInfo] = useState<{ isValid: boolean; userName: string | null; userId?: string | null; error?: string } | null>(null);
   const { prices } = useCryptoPrices();
   const { user } = useAuth();
   const { getAddressForNetwork } = useWalletAddresses();
@@ -328,7 +328,7 @@ export function WithdrawAddress({ crypto, network, onBack }: WithdrawAddressProp
           <div className="text-sm text-yellow-200/90">
             <p className="font-semibold mb-1">Atenção</p>
             <p className="text-xs text-yellow-200/70">
-              Verifique cuidadosamente o endereço e a rede antes de enviar. Apenas endereços cadastrados na NexCoin são aceitos.
+              Verifique cuidadosamente o endereço e a rede antes de enviar. Apenas endereços cadastrados na Ethertron são aceitos.
             </p>
           </div>
         </div>
@@ -355,7 +355,7 @@ export function WithdrawAddress({ crypto, network, onBack }: WithdrawAddressProp
         </button>
         {!recipientInfo?.isValid && walletAddress && !isValidating && (
           <p className="text-center text-xs text-gray-400 mt-2">
-            O endereço precisa estar cadastrado na NexCoin
+            O endereço precisa estar cadastrado na Ethertron
           </p>
         )}
       </div>

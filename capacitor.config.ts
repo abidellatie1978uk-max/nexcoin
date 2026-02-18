@@ -1,8 +1,8 @@
 import { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-    appId: 'com.nexcoin.app',
-    appName: 'NexCoin',
+    appId: 'com.ethertron.app',
+    appName: 'Ethertron',
     webDir: 'dist',
     server: {
         androidScheme: 'https',

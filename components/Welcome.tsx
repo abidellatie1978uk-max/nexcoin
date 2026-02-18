@@ -83,9 +83,9 @@ export function Welcome({ onNavigate }: WelcomeProps) {
 
             {/* Main logo */}
             <h1
-              className="text-3xl font-black relative nexcoin-logo-text"
+              className="text-3xl font-black relative ethertron-logo-text"
             >
-              NexCoin
+              Ethertron
             </h1>
 
             {/* Underline accent */}

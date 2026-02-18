@@ -27,7 +27,7 @@ export function usePermissionsRequest() {
       isAuthenticated,
       isPinVerified,
       hasUserData: !!userData,
-      userId: userData?.userId,
+      uid: userData?.uid,
       permissionsRequested: userData?.permissionsRequested,
       hasRequestedRef: hasRequestedRef.current,
       isIOSSafari: iOS
@@ -38,22 +38,22 @@ export function usePermissionsRequest() {
       console.log('⏸️ Não autenticado, aguardando...');
       return;
     }
-    
+
     if (!isPinVerified) {
       console.log('⏸️ PIN não verificado, aguardando...');
       return;
     }
-    
+
     if (!userData) {
       console.log('⏸️ Sem userData, aguardando...');
       return;
     }
-    
+
     if (hasRequestedRef.current) {
       console.log('⏸️ Já solicitou nesta sessão');
       return;
     }
-    
+
     if (userData.permissionsRequested) {
       console.log('⏸️ Já solicitou anteriormente (Firestore)');
       return;
@@ -72,7 +72,7 @@ export function usePermissionsRequest() {
 
     async function requestPermissions() {
       console.log('🔐 === INICIANDO SOLICITAÇÃO DE PERMISSÕES ===');
-      
+
       const results = {
         location: 'not_requested',
         camera: 'not_requested'
@@ -118,14 +118,14 @@ export function usePermissionsRequest() {
         // 2️⃣ SOLICITAR CÂMERA (pop-up nativo do navegador)
         console.log('📷 Solicitando permissão de CÂMERA (nativo)');
         try {
-          const stream = await navigator.mediaDevices.getUserMedia({ 
+          const stream = await navigator.mediaDevices.getUserMedia({
             video: { facingMode: 'user' }, // Priorizar câmera frontal
-            audio: false 
+            audio: false
           });
-          
+
           console.log('✅ Câmera concedida');
           results.camera = 'granted';
-          
+
           // Fechar stream imediatamente
           stream.getTracks().forEach(track => track.stop());
         } catch (error: any) {
@@ -146,10 +146,10 @@ export function usePermissionsRequest() {
 
         // 3️⃣ SALVAR RESULTADOS NO FIRESTORE
         console.log('💾 Salvando permissões:', results);
-        
-        if (userData?.userId) {
+
+        if (userData?.uid) {
           try {
-            const userRef = doc(db, 'users', userData.userId);
+            const userRef = doc(db, 'users', userData.uid);
             await updateDoc(userRef, {
               permissionsRequested: true,
               locationPermission: results.location,

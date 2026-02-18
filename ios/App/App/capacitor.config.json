@@ -1,6 +1,6 @@
 {
-	"appId": "com.nexcoin.app",
-	"appName": "NexCoin",
+	"appId": "com.ethertron.app",
+	"appName": "Ethertron",
 	"webDir": "dist",
 	"server": {
 		"androidScheme": "https",

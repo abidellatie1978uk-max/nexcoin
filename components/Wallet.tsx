@@ -56,7 +56,7 @@ export function Wallet({ onNavigate }: WalletProps) {
     setIsAdding(true);
     try {
       const newAmount = addBalanceModal.holding.amount + parseFloat(balanceToAdd);
-      
+
       // addOrUpdateCrypto(symbol, coinId, amount, name?)
       await addOrUpdateCrypto(
         addBalanceModal.holding.symbol,
@@ -64,11 +64,11 @@ export function Wallet({ onNavigate }: WalletProps) {
         newAmount,
         addBalanceModal.holding.name
       );
-      
+
       toast.success(t.balanceAddedSuccess, {
         description: `+${balanceToAdd} ${addBalanceModal.holding.symbol}`,
       });
-      
+
       setAddBalanceModal({ show: false, holding: null });
       setBalanceToAdd('');
     } catch (error) {
@@ -88,11 +88,11 @@ export function Wallet({ onNavigate }: WalletProps) {
     setIsDeleting(true);
     try {
       await removeCrypto(deleteConfirmModal.holding.symbol);
-      
+
       toast.success('Ativo removido com sucesso!', {
         description: `${deleteConfirmModal.holding.symbol}`,
       });
-      
+
       setDeleteConfirmModal({ show: false, holding: null });
     } catch (error) {
       console.error('Erro ao remover ativo:', error);
@@ -110,7 +110,7 @@ export function Wallet({ onNavigate }: WalletProps) {
         <header className="px-6 pt-8 pb-6">
           <div className="flex items-center justify-between mb-6">
             <h1 className="text-lg">{t.wallet}</h1>
-            <button 
+            <button
               onClick={() => setShowBalance(!showBalance)}
               className="w-10 h-10 rounded-full bg-white/5 backdrop-blur-md flex items-center justify-center hover:bg-white/10 transition-colors border border-white/10 shadow-[0_0_20px_rgba(255,255,255,0.05),0_4px_15px_rgba(0,0,0,0.4),inset_0_1px_1px_rgba(255,255,255,0.15),inset_0_-1px_1px_rgba(0,0,0,0.25)]"
             >
@@ -120,7 +120,7 @@ export function Wallet({ onNavigate }: WalletProps) {
 
           {/* Action Buttons */}
           <div className="grid grid-cols-3 gap-3 mb-8">
-            <button 
+            <button
               onClick={() => onNavigate('receive')}
               className="flex flex-col items-center gap-2"
             >
@@ -129,8 +129,8 @@ export function Wallet({ onNavigate }: WalletProps) {
               </div>
               <span className="text-sm font-light text-white">{t.receive}</span>
             </button>
-            
-            <button 
+
+            <button
               onClick={() => onNavigate('convert')}
               className="flex flex-col items-center gap-2"
             >
@@ -139,8 +139,8 @@ export function Wallet({ onNavigate }: WalletProps) {
               </div>
               <span className="text-sm font-light text-white">{t.convert}</span>
             </button>
-            
-            <button 
+
+            <button
               onClick={() => onNavigate('withdraw')}
               className="flex flex-col items-center gap-2"
             >
@@ -196,14 +196,14 @@ export function Wallet({ onNavigate }: WalletProps) {
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
-                              setDeleteConfirmModal({ show: true, holding: { symbol: holding.symbol, name: holding.name, amount: holding.amount } });
+                              setDeleteConfirmModal({ show: true, holding: { symbol: holding.symbol, name: holding.name || holding.symbol, amount: holding.amount } });
                             }}
                             className="absolute top-3 right-3 w-9 h-9 rounded-full bg-red-600/80 backdrop-blur-md flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600 z-10"
                             title="Remover ativo"
                           >
                             <Trash2 className="w-4 h-4 text-white" />
                           </button>
-                          
+
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-3">
                               <CryptoIcon symbol={holding.symbol} size="md" />
@@ -233,7 +233,7 @@ export function Wallet({ onNavigate }: WalletProps) {
                   <div className="flex items-center justify-between mb-4">
                     <h2 className="text-lg font-semibold">Criptomoedas</h2>
                   </div>
-                  
+
                   <div className="space-y-4">
                     {portfolio.holdings
                       .filter(h => h.symbol !== 'USDT')
@@ -253,14 +253,14 @@ export function Wallet({ onNavigate }: WalletProps) {
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();
-                                setDeleteConfirmModal({ show: true, holding: { symbol: holding.symbol, name: holding.name, amount: holding.amount } });
+                                setDeleteConfirmModal({ show: true, holding: { symbol: holding.symbol, name: holding.name || holding.symbol, amount: holding.amount } });
                               }}
                               className="absolute top-3 right-3 w-9 h-9 rounded-full bg-red-600/80 backdrop-blur-md flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600 z-10"
                               title="Remover ativo"
                             >
                               <Trash2 className="w-4 h-4 text-white" />
                             </button>
-                            
+
                             <div className="flex items-center justify-between">
                               <div className="flex items-center gap-3">
                                 <CryptoIcon symbol={holding.symbol} size="md" />
@@ -282,7 +282,7 @@ export function Wallet({ onNavigate }: WalletProps) {
                         );
                       })}
                   </div>
-                  
+
                   {/* Dica para adicionar mais ativos */}
                   <div className="mt-4 p-4 bg-white/5 backdrop-blur-md rounded-2xl border border-white/10 text-center">
                     <p className="text-sm text-white/50">
@@ -320,11 +320,11 @@ export function Wallet({ onNavigate }: WalletProps) {
 
       {/* Add Balance Modal */}
       {addBalanceModal.show && (
-        <div 
+        <div
           className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 px-6"
           onClick={() => setAddBalanceModal({ show: false, holding: null })}
         >
-          <div 
+          <div
             className="bg-white/5 backdrop-blur-md rounded-3xl p-6 w-full max-w-md border border-white/10 shadow-[0_0_40px_rgba(255,255,255,0.1)]"
             onClick={(e) => e.stopPropagation()}
           >
@@ -409,11 +409,11 @@ export function Wallet({ onNavigate }: WalletProps) {
 
       {/* Delete Confirm Modal */}
       {deleteConfirmModal.show && (
-        <div 
+        <div
           className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 px-6"
           onClick={() => setDeleteConfirmModal({ show: false, holding: null })}
         >
-          <div 
+          <div
             className="bg-white/5 backdrop-blur-md rounded-3xl p-6 w-full max-w-md border border-white/10 shadow-[0_0_40px_rgba(255,255,255,0.1)]"
             onClick={(e) => e.stopPropagation()}
           >

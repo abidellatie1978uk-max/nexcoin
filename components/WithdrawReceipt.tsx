@@ -31,7 +31,7 @@ export function WithdrawReceipt({ onNavigate, transactionData }: WithdrawReceipt
     document.body.appendChild(textArea);
     textArea.focus();
     textArea.select();
-    
+
     try {
       document.execCommand('copy');
       setCopiedField(field);
@@ -39,13 +39,13 @@ export function WithdrawReceipt({ onNavigate, transactionData }: WithdrawReceipt
     } catch (err) {
       console.error('Erro ao copiar:', err);
     }
-    
+
     document.body.removeChild(textArea);
   };
 
   const handleShare = async () => {
     // Texto formatado do comprovante
-    const shareText = `🎯 Comprovante de Transferência NexCoin
+    const shareText = `🎯 Comprovante de Transferência Ethertron
 
 💰 Valor: ${transactionData.symbol} ${transactionData.amount}
 💳 Moeda: ${transactionData.currency}
@@ -59,7 +59,7 @@ export function WithdrawReceipt({ onNavigate, transactionData }: WithdrawReceipt
 ⏱️ Processamento: ${transactionData.processingTime}
 📅 Data: ${transactionData.date}
 
-✨ NexCoin - Seu banco digital de criptomoedas`;
+✨ Ethertron - Seu banco digital de criptomoedas`;
 
     setShareStatus('sharing');
 
@@ -75,10 +75,10 @@ export function WithdrawReceipt({ onNavigate, transactionData }: WithdrawReceipt
         document.body.appendChild(textArea);
         textArea.focus();
         textArea.select();
-        
+
         const successful = document.execCommand('copy');
         document.body.removeChild(textArea);
-        
+
         if (successful) {
           console.log('✅ Comprovante copiado para área de transferência');
           setShareStatus('copied');
@@ -98,16 +98,16 @@ export function WithdrawReceipt({ onNavigate, transactionData }: WithdrawReceipt
     try {
       // ESTRATÉGIA 1: Web Share API (funciona apenas em HTTPS e mobile)
       // Verificar se está disponível E se pode compartilhar
-      if (isSecureContext && 
-          navigator.share && 
-          typeof navigator.canShare === 'function' && 
-          navigator.canShare({ text: shareText })) {
+      if (isSecureContext &&
+        navigator.share &&
+        typeof navigator.canShare === 'function' &&
+        navigator.canShare({ text: shareText })) {
         try {
           await navigator.share({
-            title: '🎯 Comprovante de Transferência - NexCoin',
+            title: '🎯 Comprovante de Transferência - Ethertron',
             text: shareText,
           });
-          
+
           console.log('✅ Comprovante compartilhado com sucesso');
           setShareStatus('idle');
           return;
@@ -118,16 +118,16 @@ export function WithdrawReceipt({ onNavigate, transactionData }: WithdrawReceipt
             setShareStatus('idle');
             return;
           }
-          
+
           // Se deu outro erro, continuar para próximo método
           console.log('ℹ️ Web Share API não disponível, usando método alternativo...');
         }
       }
 
       // ESTRATÉGIA 2: Clipboard API (funciona apenas em HTTPS)
-      if (isSecureContext && 
-          navigator.clipboard && 
-          typeof navigator.clipboard.writeText === 'function') {
+      if (isSecureContext &&
+        navigator.clipboard &&
+        typeof navigator.clipboard.writeText === 'function') {
         try {
           await navigator.clipboard.writeText(shareText);
           console.log('✅ Comprovante copiado para área de transferência');
@@ -151,7 +151,7 @@ export function WithdrawReceipt({ onNavigate, transactionData }: WithdrawReceipt
 
     } catch (error: any) {
       console.error('❌ Erro inesperado:', error);
-      
+
       // Última tentativa com execCommand
       const success = copyWithExecCommand(shareText);
       if (!success) {
@@ -165,13 +165,13 @@ export function WithdrawReceipt({ onNavigate, transactionData }: WithdrawReceipt
     <div className="min-h-screen bg-black text-white flex flex-col pb-24">
       {/* Header */}
       <header className="px-6 pt-6 pb-4">
-        <button 
-          onClick={() => onNavigate('home')} 
+        <button
+          onClick={() => onNavigate('home')}
           className="w-10 h-10 rounded-full bg-zinc-900 flex items-center justify-center hover:bg-zinc-800 transition-colors mb-6"
         >
           <ArrowLeft className="w-5 h-5" />
         </button>
-        
+
         {/* Success Icon */}
         <div className="flex flex-col items-center mb-6">
           <div className="w-20 h-20 bg-green-500/20 rounded-full flex items-center justify-center mb-4 relative">
@@ -224,25 +224,25 @@ export function WithdrawReceipt({ onNavigate, transactionData }: WithdrawReceipt
         {/* Transfer Details */}
         <div className="bg-zinc-900 rounded-2xl p-4 space-y-3">
           <h3 className="text-xs text-gray-400 font-semibold mb-3">Detalhes da transferência</h3>
-          
+
           <div className="flex justify-between text-sm">
             <span className="text-gray-400">Método</span>
             <span className="font-semibold">{transactionData.method}</span>
           </div>
           <div className="h-px bg-zinc-800"></div>
-          
+
           <div className="flex justify-between text-sm">
             <span className="text-gray-400">Taxa</span>
             <span className="font-semibold">{transactionData.symbol} {transactionData.fee.toFixed(2)}</span>
           </div>
           <div className="h-px bg-zinc-800"></div>
-          
+
           <div className="flex justify-between text-sm">
             <span className="text-gray-400">Processamento</span>
             <span className="font-semibold text-yellow-500">{transactionData.processingTime}</span>
           </div>
           <div className="h-px bg-zinc-800"></div>
-          
+
           <div className="flex justify-between text-sm">
             <span className="text-gray-400">Data</span>
             <span className="font-semibold">{transactionData.date}</span>
@@ -282,11 +282,10 @@ export function WithdrawReceipt({ onNavigate, transactionData }: WithdrawReceipt
         <button
           onClick={handleShare}
           disabled={shareStatus === 'sharing'}
-          className={`w-full font-semibold py-4 rounded-xl transition-colors flex items-center justify-center gap-2 ${
-            shareStatus === 'copied'
-              ? 'bg-green-500 text-white'
-              : 'bg-zinc-900 text-white hover:bg-zinc-800'
-          } ${shareStatus === 'sharing' ? 'opacity-50 cursor-not-allowed' : ''}`}
+          className={`w-full font-semibold py-4 rounded-xl transition-colors flex items-center justify-center gap-2 ${shareStatus === 'copied'
+            ? 'bg-green-500 text-white'
+            : 'bg-zinc-900 text-white hover:bg-zinc-800'
+            } ${shareStatus === 'sharing' ? 'opacity-50 cursor-not-allowed' : ''}`}
         >
           {shareStatus === 'sharing' ? (
             <>
@@ -305,7 +304,7 @@ export function WithdrawReceipt({ onNavigate, transactionData }: WithdrawReceipt
             </>
           )}
         </button>
-        
+
         <button
           onClick={() => onNavigate('home')}
           className="w-full bg-white text-black font-semibold py-4 rounded-xl hover:bg-gray-200 transition-colors"

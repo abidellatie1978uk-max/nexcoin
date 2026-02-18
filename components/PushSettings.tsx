@@ -27,7 +27,18 @@ export function PushSettings({ onNavigate }: PushSettingsProps) {
   const [pushPriceAlerts, setPushPriceAlerts] = useState(false);
   const [pushMarketNews, setPushMarketNews] = useState(false);
 
-  const settingsSections = [
+  interface SettingItem {
+    icon: any;
+    label: string;
+    description: string;
+    value: boolean;
+    onChange: (value: boolean) => void;
+    main?: boolean;
+    disabled?: boolean;
+    nested?: boolean;
+  }
+
+  const settingsSections: Array<{ title: string; items: SettingItem[] }> = [
     {
       title: 'Geral',
       items: [
@@ -167,13 +178,12 @@ export function PushSettings({ onNavigate }: PushSettingsProps) {
                 {section.items.map((item, itemIdx) => {
                   const Icon = item.icon;
                   const isDisabled = item.disabled || false;
-                  
+
                   return (
                     <div key={item.label}>
                       <div
-                        className={`px-4 py-3 ${item.nested ? 'pl-12' : ''} ${
-                          isDisabled ? 'opacity-50' : ''
-                        }`}
+                        className={`px-4 py-3 ${item.nested ? 'pl-12' : ''} ${isDisabled ? 'opacity-50' : ''
+                          }`}
                       >
                         <div className="flex items-center justify-between">
                           <div className="flex items-start gap-3 flex-1">
@@ -188,18 +198,15 @@ export function PushSettings({ onNavigate }: PushSettingsProps) {
                           <button
                             onClick={() => !isDisabled && item.onChange(!item.value)}
                             disabled={isDisabled}
-                            className={`w-12 h-6 rounded-full transition-colors flex-shrink-0 ml-3 ${
-                              isDisabled 
-                                ? 'cursor-not-allowed' 
+                            className={`w-12 h-6 rounded-full transition-colors flex-shrink-0 ml-3 ${isDisabled
+                                ? 'cursor-not-allowed'
                                 : ''
-                            } ${
-                              item.value && !isDisabled ? 'bg-white/20' : 'bg-zinc-700'
-                            }`}
+                              } ${item.value && !isDisabled ? 'bg-white/20' : 'bg-zinc-700'
+                              }`}
                           >
                             <div
-                              className={`w-5 h-5 bg-white rounded-full mt-0.5 transition-transform ${
-                                item.value ? 'translate-x-6' : 'translate-x-0.5'
-                              }`}
+                              className={`w-5 h-5 bg-white rounded-full mt-0.5 transition-transform ${item.value ? 'translate-x-6' : 'translate-x-0.5'
+                                }`}
                             />
                           </button>
                         </div>

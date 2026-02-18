@@ -16,7 +16,7 @@ export function PixKeyManager({ onBack, onKeyGenerated }: PixKeyManagerProps) {
 
   // Gerar chave PIX aleatória (UUID v4)
   const generateRandomPixKey = () => {
-    const uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    const uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
       const r = Math.random() * 16 | 0;
       const v = c === 'x' ? r : (r & 0x3 | 0x8);
       return v.toString(16);
@@ -74,6 +74,7 @@ export function PixKeyManager({ onBack, onKeyGenerated }: PixKeyManagerProps) {
   };
 
   const handleConfirmKey = () => {
+    if (!selectedType) return;
     const keyToUse = selectedType === 'random' ? generatedKey : customKey;
     if (!keyToUse) {
       alert('Informe uma chave válida');
@@ -118,7 +119,7 @@ export function PixKeyManager({ onBack, onKeyGenerated }: PixKeyManagerProps) {
     document.body.appendChild(textArea);
     textArea.focus();
     textArea.select();
-    
+
     try {
       document.execCommand('copy');
       setCopiedKey(true);
@@ -126,7 +127,7 @@ export function PixKeyManager({ onBack, onKeyGenerated }: PixKeyManagerProps) {
     } catch (err) {
       console.error('Erro ao copiar:', err);
     }
-    
+
     document.body.removeChild(textArea);
   };
 
@@ -143,8 +144,8 @@ export function PixKeyManager({ onBack, onKeyGenerated }: PixKeyManagerProps) {
     return (
       <div className="min-h-screen bg-black text-white flex flex-col pb-24">
         <header className="px-6 pt-6 pb-4">
-          <button 
-            onClick={onBack} 
+          <button
+            onClick={onBack}
             className="w-10 h-10 rounded-full bg-zinc-900 flex items-center justify-center hover:bg-zinc-800 transition-colors mb-6"
           >
             <ArrowLeft className="w-5 h-5" />
@@ -204,12 +205,12 @@ export function PixKeyManager({ onBack, onKeyGenerated }: PixKeyManagerProps) {
   return (
     <div className="min-h-screen bg-black text-white flex flex-col pb-24">
       <header className="px-6 pt-6 pb-4">
-        <button 
+        <button
           onClick={() => {
             setSelectedType(null);
             setCustomKey('');
             setGeneratedKey('');
-          }} 
+          }}
           className="w-10 h-10 rounded-full bg-zinc-900 flex items-center justify-center hover:bg-zinc-800 transition-colors mb-6"
         >
           <ArrowLeft className="w-5 h-5" />
@@ -242,8 +243,8 @@ export function PixKeyManager({ onBack, onKeyGenerated }: PixKeyManagerProps) {
                 <div className="flex-1 bg-zinc-800 rounded-xl px-4 py-3 text-sm font-mono text-gray-300 overflow-hidden">
                   <div className="truncate">{generatedKey}</div>
                 </div>
-                <button 
-                  onClick={() => copyToClipboard(generatedKey)} 
+                <button
+                  onClick={() => copyToClipboard(generatedKey)}
                   className="flex-shrink-0 w-12 h-12 rounded-xl bg-zinc-800 hover:bg-zinc-700 flex items-center justify-center transition-all active:scale-95"
                 >
                   {copiedKey ? <Check className="w-5 h-5 text-green-500" /> : <Copy className="w-5 h-5 text-gray-400" />}

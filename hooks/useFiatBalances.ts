@@ -33,7 +33,7 @@ export function useFiatBalances() {
         console.log('📡 Snapshot de saldos fiat recebido - Total:', snapshot.size);
 
         const balancesList: FiatBalance[] = [];
-        snapshot.forEach((doc) => {
+        snapshot.forEach((doc: any) => {
           const data = doc.data();
           balancesList.push({
             currency: data.currency || doc.id,
@@ -53,13 +53,13 @@ export function useFiatBalances() {
         retryDelay: 1000,
         onError: (error) => {
           console.error('❌ Erro no listener de saldos fiat:', error);
-          
+
           // Detectar erro de permissão
           if (error.code === 'permission-denied') {
             console.warn('⚠️ ERRO DE PERMISSÃO: Configure as regras do Firestore!');
             setHasPermissionError(true);
           }
-          
+
           setIsLoading(false);
         }
       }

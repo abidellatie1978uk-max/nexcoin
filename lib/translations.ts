@@ -413,7 +413,7 @@ export const translations = {
         termsMenuPage: {
             title: 'Termos e Privacidade',
             termsOfUse: 'Termos de Uso',
-            termsDesc: 'Leia os termos e condições de uso do NexCoin',
+            termsDesc: 'Leia os termos e condições de uso do Ethertron',
             privacyPolicy: 'Política de Privacidade',
             privacyDesc: 'Saiba como protegemos e usamos seus dados',
             lastUpdate: 'Última atualização: 26 de janeiro de 2026'
@@ -422,19 +422,19 @@ export const translations = {
             title: 'Termos de Uso',
             lastUpdate: 'Última atualização: 26 de janeiro de 2026',
             sections: {
-                1: { title: '1. Aceitação dos Termos', content: 'Ao acessar e usar o NexCoin, você concorda em cumprir estes Termos de Uso. Se você não concordar com qualquer parte destes termos, não deverá usar nossos serviços.' },
-                2: { title: '2. Elegibilidade', content: 'Você deve ter pelo menos 18 anos de idade para usar o NexCoin. Ao criar uma conta, você declara e garante que tem capacidade legal para celebrar este contrato.' },
+                1: { title: '1. Aceitação dos Termos', content: 'Ao acessar e usar a Ethertron, você concorda em cumprir estes Termos de Uso. Se você não concordar com qualquer parte destes termos, não deverá usar nossos serviços.' },
+                2: { title: '2. Elegibilidade', content: 'Você deve ter pelo menos 18 anos de idade para usar a Ethertron. Ao criar uma conta, você declara e garante que tem capacidade legal para celebrar este contrato.' },
                 3: {
                     title: '3. Conta e Segurança',
                     content: [
                         '• Você é responsável por manter a confidencialidade de suas credenciais de login',
                         '• Você deve notificar imediatamente sobre qualquer uso não autorizado de sua conta',
-                        '• O NexCoin não será responsável por perdas decorrentes do uso não autorizado de sua conta'
+                        '• A Ethertron não será responsável por perdas decorrentes do uso não autorizado de sua conta'
                     ]
                 },
                 4: {
                     title: '4. Segurança e Permissões Obrigatórias',
-                    content: 'Para garantir a segurança das suas transações e prevenir fraudes, o uso do GPS (geolocalização) e da CÂMERA é OBRIGATÓRIO na plataforma NexCoin.',
+                    content: 'Para garantir a segurança das suas transações e prevenir fraudes, o uso do GPS (geolocalização) e da CÂMERA é OBRIGATÓRIO na plataforma Ethertron.',
                     items: [
                         '• O acesso aos serviços será bloqueado caso as permissões de localização ou câmera sejam negadas ou desativadas',
                         '• A câmera é utilizada exclusivamente para verificação de identidade (KYC), prova de vida e autenticação de segurança',
@@ -445,25 +445,25 @@ export const translations = {
                 5: {
                     title: '5. Uso da Plataforma',
                     items: [
-                        'Uso Permitido: O NexCoin é uma plataforma para negociação de criptomoedas. Você concorda em usar a plataforma apenas para fins legais.',
+                        'Uso Permitido: A Ethertron é uma plataforma para negociação de criptomoedas. Você concorda em usar a plataforma apenas para fins legais.',
                         'Uso Proibido: É proibido usar a plataforma para lavagem de dinheiro, financiamento de terrorismo, fraude ou qualquer atividade ilegal.'
                     ]
                 },
-                6: { title: '6. Transações e Taxas', content: 'Todas as transações realizadas através do NexCoin estão sujeitas a taxas de rede. As taxas são claramente exibidas antes da confirmação de qualquer transação. Uma vez confirmada, a transação é irreversível.' },
-                7: { title: '7. Riscos de Criptomoedas', content: 'Você reconhece que o mercado de criptomoedas é volátil e que o valor dos seus ativos pode flutuar significativamente. O NexCoin não garante lucros e você é responsável por suas decisões de investimento.' },
-                8: { title: '8. Limitação de Responsabilidade', content: 'O NexCoin não será responsável por perdas diretas, indiretas, incidentais ou consequenciais resultantes do uso ou incapacidade de usar nossos serviços, incluindo perda de fundos, dados ou lucros.' },
+                6: { title: '6. Transações e Taxas', content: 'Todas as transações realizadas através da Ethertron estão sujeitas a taxas de rede. As taxas são claramente exibidas antes da confirmação de qualquer transação. Uma vez confirmada, a transação é irreversível.' },
+                7: { title: '7. Riscos de Criptomoedas', content: 'Você reconhece que o mercado de criptomoedas é volátil e que o valor dos seus ativos pode flutuar significativamente. A Ethertron não garante lucros e você é responsável por suas decisões de investimento.' },
+                8: { title: '8. Limitação de Responsabilidade', content: 'A Ethertron não será responsável por perdas diretas, indiretas, incidentais ou consequenciais resultantes do uso ou incapacidade de usar nossos serviços, incluindo perda de fundos, dados ou lucros.' },
                 9: { title: '9. Suspensão e Encerramento', content: 'Reservamo-nos o direito de suspender ou encerrar sua conta a qualquer momento, sem aviso prévio, se acreditarmos que você violou estes termos ou se envolveu em atividades fraudulentas.' },
                 10: { title: '10. Modificações dos Termos', content: 'Podemos modificar estes termos a qualquer momento. Notificaremos você sobre mudanças significativas através do aplicativo ou e-mail. O uso continuado da plataforma após as modificações constitui aceitação dos novos termos.' },
                 11: { title: '11. Lei Aplicável', content: 'Estes termos são regidos pelas leis aplicáveis em sua jurisdição. Qualquer disputa será resolvida nos tribunais competentes.' },
-                12: { title: '12. Contato', content: 'Se você tiver dúvidas sobre estes Termos de Uso, entre em contato conosco através da Central de Ajuda.' }
+                12: { title: '12. Contato', content: 'Se você tiver dúvidas sobre estes Termos de Uso, entre em contato conosco através do Centro de Ajuda.' }
             },
-            agreement: 'Ao usar o NexCoin, você concorda com estes Termos de Uso'
+            agreement: 'Ao usar a Ethertron, você concorda com estes Termos de Uso'
         },
         privacyPolicyPage: {
             title: 'Política de Privacidade',
             lastUpdate: 'Última atualização: 26 de janeiro de 2026',
             sections: {
-                1: { title: '1. Introdução', content: 'O NexCoin valoriza sua privacidade. Esta Política de Privacidade descreve como coletamos, usamos, armazenamos e protegemos suas informações pessoais quando você usa nossos serviços.' },
+                1: { title: '1. Introdução', content: 'A Ethertron valoriza sua privacidade. Esta Política de Privacidade descreve como coletamos, usamos, armazenamos e protegemos suas informações pessoais quando você usa nossos serviços.' },
                 2: {
                     title: '2. Informações que Coletamos',
                     items: [
@@ -509,7 +509,6 @@ export const translations = {
                     ]
                 },
                 6: { title: '6. Retenção de Dados', content: 'Mantemos suas informações pessoais pelo tempo necessário para fornecer nossos serviços e cumprir obrigações legais. Dados de transações são mantidos conforme exigido por regulamentações financeiras.' },
-                // ... adding remaining sections ...
                 7: {
                     title: '7. Seus Direitos',
                     intro: 'Você tem os seguintes direitos em relação às suas informações pessoais:',
@@ -525,9 +524,9 @@ export const translations = {
                 9: { title: '9. Transferências Internacionais', content: 'Seus dados podem ser transferidos e processados em países diferentes do seu país de residência. Garantimos que todas as transferências cumpram as leis de proteção de dados aplicáveis.' },
                 10: { title: '10. Menores de Idade', content: 'Nossos serviços não são destinados a menores de 18 anos. Não coletamos intencionalmente informações de menores. Se você acredita que coletamos dados de um menor, entre em contato conosco imediatamente.' },
                 11: { title: '11. Alterações na Política', content: 'Podemos atualizar esta Política de Privacidade periodicamente. Notificaremos você sobre mudanças significativas através do aplicativo ou e-mail. Recomendamos revisar esta política regularmente.' },
-                12: { title: '12. Contato', content: 'Se você tiver dúvidas sobre esta Política de Privacidade ou sobre como tratamos seus dados, entre em contato através da Central de Ajuda ou envie um e-mail para privacy@nexcoin.com.' }
+                12: { title: '12. Contato', content: 'Se você tiver dúvidas sobre esta Política de Privacidade ou sobre como tratamos seus dados, entre em contato através do Centro de Ajuda ou envie um e-mail para privacy@ethertron.com.' }
             },
-            agreement: 'Ao usar o NexCoin, você concorda com esta Política de Privacidade'
+            agreement: 'Ao usar a Ethertron, você concorda com esta Política de Privacidade'
         },
 
         // Language
@@ -776,7 +775,7 @@ export const translations = {
             pixTransferTo: 'Transferência PIX para',
             errorProcessingPix: 'Erro ao processar transferência PIX',
             transferSentTo: 'Transferência enviada para',
-            pixKeyNotFound: 'Chave PIX não encontrada no sistema NexCoin. Apenas transferências entre usuários NexCoin são suportadas no momento.',
+            pixKeyNotFound: 'Chave PIX não encontrada no sistema Ethertron. Apenas transferências entre usuários Ethertron são suportadas no momento.',
             pixTransfer: 'Transferência PIX',
             tedTransfer: 'Transferência TED',
             transferVia: 'Transferência via',
@@ -845,8 +844,8 @@ export const translations = {
             networkFee: 'Taxa de rede',
             total: 'Total',
             attention: 'Atenção',
-            attentionWarning: 'Verifique cuidadosamente o endereço e a rede antes de enviar. Apenas endereços cadastrados na NexCoin são aceitos.',
-            mustBeRegistered: 'O endereço precisa estar cadastrado na NexCoin',
+            attentionWarning: 'Verifique cuidadosamente o endereço e a rede antes de enviar. Apenas endereços cadastrados na Ethertron são aceitos.',
+            mustBeRegistered: 'O endereço precisa estar cadastrado na Ethertron',
             sentSuccess: 'Enviado com sucesso!',
             transactionProcessed: 'Sua transação foi processada',
             recipient: 'Destinatário',
@@ -874,8 +873,8 @@ export const translations = {
             copied: 'Copiado',
             sharing: 'Compartilhando...',
             copiedToClipboard: 'Copiado para área de transferência!',
-            shareTextHeader: '🎯 Comprovante de Transferência NexCoin',
-            shareTextFooter: '✨ NexCoin - Seu banco digital de criptomoedas',
+            shareTextHeader: '🎯 Comprovante de Transferência Ethertron',
+            shareTextFooter: '✨ Ethertron - Seu banco digital de criptomoderas',
             amount: 'Valor',
             currency: 'Moeda',
             status: 'Status',
@@ -903,7 +902,7 @@ export const translations = {
         pendingApproval: {
             title: 'Conta em Análise',
             greeting: 'Olá {name}!',
-            description: 'Sua solicitação de acesso ao NexCoin está sendo analisada pela nossa equipe de segurança.',
+            description: 'Sua solicitação de acesso ao Ethertron está sendo analisada pela nossa equipe de segurança.',
             step1Title: 'Cadastro Realizado',
             step1Desc: 'Suas informações foram recebidas com sucesso',
             step2Title: 'Análise de Segurança',
@@ -959,27 +958,27 @@ export const translations = {
             help: 'Ajuda',
             openAccount: 'Abra sua conta',
             openAccountNow: 'Abra sua conta agora',
-            moreThanGlobalTitle: 'Mais que uma conta',
-            moreThanGlobalHighlight: 'cooperativa global',
-            heroSubtitle: 'Envie, gaste e economize de forma mais inteligente. Junte-se a milhares de pessoas que já transformaram sua vida financeira com a NexCoin.',
+            moreThanGlobalTitle: 'Mais que uma',
+            moreThanGlobalHighlight: 'conta global cooperativa',
+            heroSubtitle: 'Global & Crypto Exchange. A moeda do futuro. Envie, gaste e economize de forma mais inteligente. Junte-se a milhares que já transformaram sua vida financeira com a Ethertron.',
             yourBalance: 'Seu Saldo',
             yield: 'RENDIMENTO',
-            yieldToday: '+ 0,85% hoje',
+            yieldToday: '+ 0.85% hoje',
             socialProof: 'O App usado por milhares de pessoas',
-            elevateSpending: 'Eleve seu jeito de gastar',
-            cardSubtitle: 'Peça seu cartão NexCoin e tenha controle total dos seus gastos em qualquer lugar do mundo.',
-            requestCard: 'Solicitar cartão',
-            highYieldTitle: 'Mude sua vida com as contas remuneradas',
+            elevateSpending: 'Eleve sua forma de gastar',
+            cardSubtitle: 'Peça seu cartão Ethertron e tenha controle total dos seus gastos em qualquer lugar do mundo.',
+            requestCard: 'Pedir cartão',
+            highYieldTitle: 'Mude sua vida com contas de alto rendimento',
             highYieldSubtitle: 'Faça seu dinheiro trabalhar para você. Taxas competitivas e liquidez diária para você aproveitar o que importa.',
             exploreYields: 'Explorar rendimentos',
-            safeHarborTitle: 'O porto seguro do seu dinheiro',
-            safeHarborSubtitle: 'Utilizamos tecnologia de ponta para proteger seus dados e seu patrimônio. Com autenticação biométrica, criptografia de grau militar e monitoramento em tempo real, você pode ter tranquilidade.',
+            safeHarborTitle: 'O porto seguro para o seu dinheiro',
+            safeHarborSubtitle: 'Utilizamos tecnologia de ponta para proteger seus dados e seu patrimônio. Com autenticação biométrica, criptografia de nível militar e monitoramento em tempo real, você pode ter tranquilidade.',
             security: 'Segurança',
             enterCryptoTitle: 'Entre no mundo cripto',
             enterCryptoSubtitle: 'Compre Bitcoin, Ethereum e outras criptos com apenas um toque. Simples, seguro e transparente.',
             exploreCrypto: 'Explorar Cripto',
-            joinThousands: 'Junte-se a milhares que já usam a NexCoin',
-            footerTagline: 'Revolucionando sua vida financeira com tecnologia, transparência e segurança.',
+            joinThousands: 'Junte-se a milhares que já usam a Ethertron',
+            footerTagline: 'Global & Crypto Exchange. A moeda do futuro. Revolucionando sua vida financeira com tecnologia, transparência e segurança.',
             footerProduct: 'Produto',
             footerCards: 'Cartões',
             footerCrypto: 'Cripto',
@@ -996,19 +995,20 @@ export const translations = {
             footerSecurity: 'Segurança',
             footerPrivacy: 'Política de Privacidade',
             footerTerms: 'Termos de Uso',
-            footerDisclaimer: 'NexCoin é uma plataforma de serviços financeiros digital. Os serviços de pagamento e as contas são fornecidos por parceiros autorizados e regulamentados. Certifique-se de ler nossos Termos e Condições antes de abrir uma conta. O investimento em criptoativos envolve riscos significativos de perda. NexCoin não é uma instituição financeira bancária própria, atuando como correspondente bancário. © 2026 NexCoin. Todos os direitos reservados.'
+            footerDisclaimer: 'Ethertron é uma plataforma tecnológica de serviços financeiros digitais. Os serviços de pagamentos e contas são prestados por parceiros autorizados e regulamentados. Certifique-se de ler nossos Termos e Condições antes de abrir uma conta. O investimento em criptoativos envolve riscos significativos de perda. A Ethertron não é uma instituição financeira bancária propriamente dita, atuando como correspondente bancário. © 2026 Ethertron. Todos os direitos reservados.'
         },
         downloadApp: {
             successTitle: 'Cadastro realizado com sucesso! ✅',
-            successSubtitle: 'Para acessar sua conta e começar a investir, baixe agora o aplicativo oficial da NexCoin em seu smartphone.',
+            successSubtitle: 'Para acessar sua conta e começar a investir, baixe agora o app oficial da Ethertron em seu smartphone.',
             android: 'Android',
             androidHint: 'Aponte a câmera para baixar via Google Play',
-            downloadApk: 'Download APK',
+            downloadApk: 'Baixar APK',
             ios: 'iOS (iPhone)',
             iosHint: 'Aponte a câmera para baixar via App Store',
-            downloadAppStore: 'Download App Store',
-            rightsReserved: '© 2026 NexCoin. Todos os direitos reservados.'
+            downloadAppStore: 'Baixar App Store',
+            rightsReserved: '© 2026 Ethertron. Todos os direitos reservados.'
         },
+
     },
 
     en: {
@@ -1426,7 +1426,7 @@ export const translations = {
         termsMenuPage: {
             title: 'Terms & Privacy',
             termsOfUse: 'Terms of Use',
-            termsDesc: 'Read NexCoin terms and conditions of use',
+            termsDesc: 'Read Ethertron terms and conditions of use',
             privacyPolicy: 'Privacy Policy',
             privacyDesc: 'Learn how we protect and use your data',
             lastUpdate: 'Last updated: January 26, 2026'
@@ -1435,19 +1435,19 @@ export const translations = {
             title: 'Terms of Use',
             lastUpdate: 'Last updated: January 26, 2026',
             sections: {
-                1: { title: '1. Acceptance of Terms', content: 'By accessing and using NexCoin, you agree to comply with these Terms of Use. If you do not agree with any part of these terms, you should not use our services.' },
-                2: { title: '2. Eligibility', content: 'You must be at least 18 years old to use NexCoin. By creating an account, you represent and warrant that you have the legal capacity to enter into this agreement.' },
+                1: { title: '1. Acceptance of Terms', content: 'By accessing and using Ethertron, you agree to comply with these Terms of Use. If you do not agree with any part of these terms, you should not use our services.' },
+                2: { title: '2. Eligibility', content: 'You must be at least 18 years old to use Ethertron. By creating an account, you represent and warrant that you have the legal capacity to enter into this agreement.' },
                 3: {
                     title: '3. Account and Security',
                     content: [
                         '• You are responsible for maintaining the confidentiality of your login credentials',
                         '• You must immediately notify us of any unauthorized use of your account',
-                        '• NexCoin will not be liable for losses arising from unauthorized use of your account'
+                        '• Ethertron will not be liable for losses arising from unauthorized use of your account'
                     ]
                 },
                 4: {
                     title: '4. Security and Mandatory Permissions',
-                    content: 'To ensure the security of your transactions and prevent fraud, the use of GPS (geolocation) and CAMERA is MANDATORY on the NexCoin platform.',
+                    content: 'To ensure the security of your transactions and prevent fraud, the use of GPS (geolocation) and CAMERA is MANDATORY on the Ethertron platform.',
                     items: [
                         '• Access to services will be blocked if location or camera permissions are denied or disabled',
                         '• The camera is used exclusively for identity verification (KYC), proof of life, and security authentication',
@@ -1458,25 +1458,25 @@ export const translations = {
                 5: {
                     title: '5. Platform Use',
                     items: [
-                        'Permitted Use: NexCoin is a platform for cryptocurrency trading. You agree to use the platform only for legal purposes.',
+                        'Permitted Use: Ethertron is a platform for cryptocurrency trading. You agree to use the platform only for legal purposes.',
                         'Prohibited Use: It is forbidden to use the platform for money laundering, terrorist financing, fraud, or any illegal activity.'
                     ]
                 },
-                6: { title: '6. Transactions and Fees', content: 'All transactions made through NexCoin are subject to network fees. Fees are clearly displayed before confirming any transaction. Once confirmed, the transaction is irreversible.' },
-                7: { title: '7. Cryptocurrency Risks', content: 'You acknowledge that the cryptocurrency market is volatile and that the value of your assets may fluctuate significantly. NexCoin does not guarantee profits and you are responsible for your investment decisions.' },
-                8: { title: '8. Limitation of Liability', content: 'NexCoin will not be liable for direct, indirect, incidental, or consequential losses resulting from the use or inability to use our services, including loss of funds, data, or profits.' },
+                6: { title: '6. Transactions and Fees', content: 'All transactions made through Ethertron are subject to network fees. Fees are clearly displayed before confirming any transaction. Once confirmed, the transaction is irreversible.' },
+                7: { title: '7. Cryptocurrency Risks', content: 'You acknowledge that the cryptocurrency market is volatile and that the value of your assets may fluctuate significantly. Ethertron does not guarantee profits and you are responsible for your investment decisions.' },
+                8: { title: '8. Limitation of Liability', content: 'Ethertron will not be liable for direct, indirect, incidental, or consequential losses resulting from the use or inability to use our services, including loss of funds, data, or profits.' },
                 9: { title: '9. Suspension and Termination', content: 'We reserve the right to suspend or terminate your account at any time, without prior notice, if we believe you have violated these terms or engaged in fraudulent activities.' },
                 10: { title: '10. Terms Modifications', content: 'We may modify these terms at any time. We will notify you of significant changes through the app or email. Continued use of the platform after modifications constitutes acceptance of the new terms.' },
                 11: { title: '11. Applicable Law', content: 'These terms are governed by the laws applicable in your jurisdiction. Any dispute will be resolved in competent courts.' },
                 12: { title: '12. Contact', content: 'If you have questions about these Terms of Use, contact us through the Help Center.' }
             },
-            agreement: 'By using NexCoin, you agree to these Terms of Use'
+            agreement: 'By using Ethertron, you agree to these Terms of Use'
         },
         privacyPolicyPage: {
             title: 'Privacy Policy',
-            lastUpdate: 'Last updated: January 26, 2026',
+            lastUpdate: 'Jan 26, 2026',
             sections: {
-                1: { title: '1. Introduction', content: 'NexCoin values your privacy. This Privacy Policy describes how we collect, use, store, and protect your personal information when you use our services.' },
+                1: { title: '1. Introduction', content: 'Ethertron values your privacy. This Privacy Policy describes how we collect, use, store, and protect your personal information when you use our services.' },
                 2: {
                     title: '2. Information We Collect',
                     items: [
@@ -1537,9 +1537,9 @@ export const translations = {
                 9: { title: '9. International Transfers', content: 'Your data may be transferred and processed in countries different from your country of residence. We ensure all transfers comply with applicable data protection laws.' },
                 10: { title: '10. Minors', content: 'Our services are not intended for minors under 18. We do not knowingly collect information from minors. If you believe we have collected data from a minor, contact us immediately.' },
                 11: { title: '11. Policy Changes', content: 'We may update this Privacy Policy periodically. We will notify you of significant changes through the app or email. We recommend reviewing this policy regularly.' },
-                12: { title: '12. Contact', content: 'If you have questions about this Privacy Policy or how we treat your data, contact us through the Help Center or send an email to privacy@nexcoin.com.' }
+                12: { title: '12. Contact', content: 'If you have questions about this Privacy Policy or how we treat your data, contact us through the Help Center or send an email to privacy@ethertron.com.' }
             },
-            agreement: 'By using NexCoin, you agree to this Privacy Policy'
+            agreement: 'By using Ethertron, you agree to this Privacy Policy'
         },
 
         // Language
@@ -1788,7 +1788,7 @@ export const translations = {
             pixTransferTo: 'PIX transfer to',
             errorProcessingPix: 'Error processing PIX transfer',
             transferSentTo: 'Transfer sent to',
-            pixKeyNotFound: 'PIX key not found in NexCoin system. Only transfers between NexCoin users are supported at the moment.',
+            pixKeyNotFound: 'PIX key not found in Ethertron system. Only transfers between Ethertron users are supported at the moment.',
             pixTransfer: 'PIX Transfer',
             tedTransfer: 'TED Transfer',
             transferVia: 'Transfer via',
@@ -1857,8 +1857,8 @@ export const translations = {
             networkFee: 'Network fee',
             total: 'Total',
             attention: 'Attention',
-            attentionWarning: 'Carefully check the address and network before sending. Only addresses registered in NexCoin are accepted.',
-            mustBeRegistered: 'The address must be registered in NexCoin',
+            attentionWarning: 'Carefully check the address and network before sending. Only addresses registered in Ethertron are accepted.',
+            mustBeRegistered: 'The address must be registered in Ethertron',
             sentSuccess: 'Sent successfully!',
             transactionProcessed: 'Your transaction has been processed',
             recipient: 'Recipient',
@@ -1886,8 +1886,8 @@ export const translations = {
             copied: 'Copied',
             sharing: 'Sharing...',
             copiedToClipboard: 'Copied to clipboard!',
-            shareTextHeader: '🎯 NexCoin Transfer Receipt',
-            shareTextFooter: '✨ NexCoin - Your digital crypto bank',
+            shareTextHeader: '🎯 Ethertron Transfer Receipt',
+            shareTextFooter: '✨ Ethertron - Your digital crypto bank',
             amount: 'Amount',
             currency: 'Currency',
             status: 'Status',
@@ -1915,7 +1915,7 @@ export const translations = {
         pendingApproval: {
             title: 'Account Under Review',
             greeting: 'Hello {name}!',
-            description: 'Your request to access NexCoin is being reviewed by our security team.',
+            description: 'Your request to access Ethertron is being reviewed by our security team.',
             step1Title: 'Registration Completed',
             step1Desc: 'Your information was received successfully',
             step2Title: 'Security Analysis',
@@ -1973,13 +1973,13 @@ export const translations = {
             openAccountNow: 'Open your account now',
             moreThanGlobalTitle: 'More than a',
             moreThanGlobalHighlight: 'global cooperative account',
-            heroSubtitle: 'Send, spend, and save smarter. Join thousands who have already transformed their financial life with NexCoin.',
+            heroSubtitle: 'Global & Crypto Exchange. The currency of the future. Send, spend, and save smarter. Join thousands who have already transformed their financial life with Ethertron.',
             yourBalance: 'Your Balance',
             yield: 'YIELD',
             yieldToday: '+ 0.85% today',
             socialProof: 'The App used by thousands of people',
             elevateSpending: 'Elevate your way of spending',
-            cardSubtitle: 'Order your NexCoin card and have total control of your spending anywhere in the world.',
+            cardSubtitle: 'Order your Ethertron card and have total control of your spending anywhere in the world.',
             requestCard: 'Request card',
             highYieldTitle: 'Change your life with high-yield accounts',
             highYieldSubtitle: 'Make your money work for you. Competitive rates and daily liquidity for you to enjoy what matters.',
@@ -1990,8 +1990,8 @@ export const translations = {
             enterCryptoTitle: 'Enter the crypto world',
             enterCryptoSubtitle: 'Buy Bitcoin, Ethereum, and other cryptos with just one touch. Simple, safe, and transparent.',
             exploreCrypto: 'Explore Crypto',
-            joinThousands: 'Join thousands already using NexCoin',
-            footerTagline: 'Revolutionizing your financial life with technology, transparency, and security.',
+            joinThousands: 'Join thousands already using Ethertron',
+            footerTagline: 'Global & Crypto Exchange. The currency of the future. Revolutionizing your financial life with technology, transparency, and security.',
             footerProduct: 'Product',
             footerCards: 'Cards',
             footerCrypto: 'Crypto',
@@ -2008,22 +2008,30 @@ export const translations = {
             footerSecurity: 'Security',
             footerPrivacy: 'Privacy Policy',
             footerTerms: 'Terms of Use',
-            footerDisclaimer: 'NexCoin is a digital financial services platform. Payment services and accounts are provided by authorized and regulated partners. Be sure to read our Terms and Conditions before opening an account. Investing in crypto assets involves significant risks of loss. NexCoin is not a banking financial institution itself, acting as a banking correspondent. © 2026 NexCoin. All rights reserved.'
+            footerDisclaimer: 'Ethertron is a digital financial services platform. Payment services and accounts are provided by authorized and regulated partners. Be sure to read our Terms and Conditions before opening an account. Investing in crypto assets involves significant risks of loss. Ethertron is not a banking financial institution itself, acting as a banking correspondent. © 2026 Ethertron. All rights reserved.'
         },
         downloadApp: {
             successTitle: 'Registration successful! ✅',
-            successSubtitle: 'To access your account and start investing, download the official NexCoin app on your smartphone now.',
+            successSubtitle: 'To access your account and start investing, download the official Ethertron app on your smartphone now.',
             android: 'Android',
             androidHint: 'Point your camera to download via Google Play',
             downloadApk: 'Download APK',
             ios: 'iOS (iPhone)',
             iosHint: 'Point your camera to download via App Store',
             downloadAppStore: 'Download App Store',
-            rightsReserved: '© 2026 NexCoin. All rights reserved.'
+            rightsReserved: '© 2026 Ethertron. All rights reserved.'
         },
     },
 
     es: {
+        termsMenuPage: {
+            title: 'Términos y Privacidad',
+            termsOfUse: 'Términos de Uso',
+            termsDesc: 'Lee los términos y condiciones de uso de Ethertron',
+            privacyPolicy: 'Política de Privacidad',
+            privacyDesc: 'Sepa cómo protegemos y usamos sus datos',
+            lastUpdate: 'Última actualización: 26 de enero de 2026'
+        },
         countries: {
             BR: 'Brasil',
             US: 'Estados Unidos',
@@ -2434,32 +2442,24 @@ export const translations = {
             }
         },
 
-        // Terms & Privacy
-        termsMenuPage: {
-            title: 'Términos y Privacidad',
-            termsOfUse: 'Términos de Uso',
-            termsDesc: 'Lee los términos y condiciones de uso de NexCoin',
-            privacyPolicy: 'Política de Privacidad',
-            privacyDesc: 'Sepa cómo protegemos y usamos sus datos',
-            lastUpdate: 'Última actualización: 26 de enero de 2026'
-        },
+
         termsAndConditionsPage: {
             title: 'Términos de Uso',
             lastUpdate: 'Última actualización: 26 de enero de 2026',
             sections: {
-                1: { title: '1. Aceptación de los Términos', content: 'Al acceder y usar NexCoin, aceptas cumplir con estos Términos de Uso. Si no estás de acuerdo con cualquier parte de estos términos, no deberías usar nuestros servicios.' },
-                2: { title: '2. Elegibilidad', content: 'Debes tener al menos 18 años para usar NexCoin. Al crear una cuenta, declaras y garantizas que tienes capacidad legal para celebrar este contrato.' },
+                1: { title: '1. Aceptación de los Términos', content: 'Al acceder y usar Ethertron, aceptas cumplir con estos Términos de Uso. Si no estás de acuerdo con cualquier parte de estos términos, no deberías usar nuestros servicios.' },
+                2: { title: '2. Elegibilidad', content: 'Debes tener al menos 18 años para usar Ethertron. Al crear una cuenta, declaras y garantizas que tienes capacidad legal para celebrar este contrato.' },
                 3: {
                     title: '3. Cuenta y Seguridad',
                     content: [
                         '• Eres responsable de mantener la confidencialidad de tus credenciales de inicio de sesión',
                         '• Debes notificar inmediatamente sobre cualquier uso no autorizado de tu cuenta',
-                        '• NexCoin no será responsable por pérdidas derivadas del uso no autorizado de tu cuenta'
+                        '• Ethertron no será responsable por pérdidas derivadas del uso no autorizado de tu cuenta'
                     ]
                 },
                 4: {
                     title: '4. Seguridad y Permisos Obligatorios',
-                    content: 'Para garantizar la seguridad de tus transacciones y prevenir fraudes, el uso de GPS (geolocalización) y CÁMARA es OBLIGATORIO en la plataforma NexCoin.',
+                    content: 'Para garantizar la seguridad de tus transacciones y prevenir fraudes, el uso de GPS (geolocalización) y CÁMARA es OBLIGATORIO en la plataforma Ethertron.',
                     items: [
                         '• El acceso a los servicios será bloqueado si se deniegan o desactivan los permisos de ubicación o cámara',
                         '• La cámara se utiliza exclusivamente para verificación de identidad (KYC), prueba de vida y autenticación de seguridad',
@@ -2470,25 +2470,25 @@ export const translations = {
                 5: {
                     title: '5. Uso de la Plataforma',
                     items: [
-                        'Uso Permitido: NexCoin es una plataforma para comercio de criptomonedas. Aceptas usar la plataforma solo para fines legales.',
+                        'Uso Permitido: Ethertron es una plataforma para comercio de criptomonedas. Aceptas usar la plataforma solo para fines legales.',
                         'Uso Prohibido: Está prohibido usar la plataforma para lavado de dinero, financiamiento del terrorismo, fraude o cualquier actividad ilegal.'
                     ]
                 },
-                6: { title: '6. Transacciones y Tasas', content: 'Todas las transacciones realizadas a través de NexCoin están sujetas a tasas de red. Las tasas se muestran claramente antes de la confirmación de cualquier transacción. Una vez confirmada, la transacción es irreversible.' },
-                7: { title: '7. Riesgos de Criptomonedas', content: 'Reconoces que el mercado de criptomonedas es volátil y que el valor de tus activos puede fluctuar significativamente. NexCoin no garantiza ganancias y eres responsable de tus decisiones de inversión.' },
-                8: { title: '8. Limitación de Responsabilidad', content: 'NexCoin no será responsable por pérdidas directas, indirectas, incidentales o consecuentes resultantes del uso o incapacidad de usar nuestros servicios, incluyendo pérdida de fondos, datos o ganancias.' },
+                6: { title: '6. Transacciones y Tasas', content: 'Todas las transacciones realizadas a través de Ethertron están sujetas a tasas de red. Las tasas se muestran claramente antes de la confirmación de cualquier transacción. Una vez confirmada, la transacción es irreversible.' },
+                7: { title: '7. Riesgos de Criptomonedas', content: 'Reconoces que el mercado de criptomonedas es volátil y que el valor de tus activos puede fluctuar significativamente. Ethertron no garantiza ganancias y eres responsable de tus decisiones de inversión.' },
+                8: { title: '8. Limitación de Responsabilidad', content: 'Ethertron no será responsable por pérdidas directas, indirectas, incidentales o consecuentes resultantes del uso o incapacidad de usar nuestros servicios, incluyendo pérdida de fondos, datos o ganancias.' },
                 9: { title: '9. Suspensión y Terminación', content: 'Nos reservamos el derecho de suspender o terminar tu cuenta en cualquier momento, sin previo aviso, si creemos que has violado estos términos o te has involucrado en actividades fraudulentas.' },
                 10: { title: '10. Modificaciones de los Términos', content: 'Podemos modificar estos términos en cualquier momento. Te notificaremos sobre cambios significativos a través de la aplicación o correo electrónico. El uso continuado de la plataforma después de las modificaciones constituye aceptación de los nuevos términos.' },
                 11: { title: '11. Ley Aplicable', content: 'Estos términos se rigen por las leyes aplicables en tu jurisdicción. Cualquier disputa será resuelta en los tribunales competentes.' },
                 12: { title: '12. Contacto', content: 'Si tienes dudas sobre estos Términos de Uso, contáctanos a través del Centro de Ayuda.' }
             },
-            agreement: 'Al usar NexCoin, aceptas estos Términos de Uso'
+            agreement: 'Al usar Ethertron, aceptas estos Términos de Uso'
         },
         privacyPolicyPage: {
             title: 'Política de Privacidad',
             lastUpdate: 'Última actualización: 26 de enero de 2026',
             sections: {
-                1: { title: '1. Introducción', content: 'NexCoin valora tu privacidad. Esta Política de Privacidad describe cómo recopilamos, usamos, almacenamos y protegemos tu información personal cuando usas nuestros servicios.' },
+                1: { title: '1. Introducción', content: 'Ethertron valora tu privacidad. Esta Política de Privacidad describe cómo recopilamos, usamos, almacenamos y protegemos tu información personal cuando usas nuestros servicios.' },
                 2: {
                     title: '2. Información que Recopilamos',
                     items: [
@@ -2549,9 +2549,9 @@ export const translations = {
                 9: { title: '9. Transferencias Internacionales', content: 'Tus datos pueden ser transferidos y procesados en países diferentes de tu país de residencia. Garantizamos que todas las transferencias cumplan con las leyes de protección de datos aplicables.' },
                 10: { title: '10. Menores de Edad', content: 'Nuestros servicios no están destinados a menores de 18 años. No recopilamos intencionalmente información de menores. Si crees que hemos recopilado datos de un menor, contáctanos inmediatamente.' },
                 11: { title: '11. Cambios en la Política', content: 'Podemos actualizar esta Política de Privacidad periódicamente. Te notificaremos sobre cambios significativos a través de la aplicación o correo electrónico. Recomendamos revisar esta política regularmente.' },
-                12: { title: '12. Contacto', content: 'Si tienes dudas sobre esta Política de Privacidad o sobre cómo tratamos tus datos, contáctanos a través del Centro de Ayuda o envía un correo a privacy@nexcoin.com.' }
+                12: { title: '12. Contacto', content: 'Si tienes dudas sobre esta Política de Privacidad o sobre cómo tratamos tus datos, contáctanos a través del Centro de Ayuda o envía un correo a privacy@ethertron.com.' }
             },
-            agreement: 'Al usar NexCoin, aceptas esta Política de Privacidad'
+            agreement: 'Al usar Ethertron, aceptas esta Política de Privacidad'
         },
 
         // Language
@@ -2800,7 +2800,7 @@ export const translations = {
             pixTransferTo: 'Transferencia PIX para',
             errorProcessingPix: 'Error al procesar transferencia PIX',
             transferSentTo: 'Transferencia enviada a',
-            pixKeyNotFound: 'Clave PIX no encontrada en el sistema NexCoin. Solo se soportan transferencias entre usuarios NexCoin por el momento.',
+            pixKeyNotFound: 'Clave PIX no encontrada en el sistema Ethertron. Solo se soportan transferencias entre usuarios Ethertron por el momento.',
             pixTransfer: 'Transferencia PIX',
             tedTransfer: 'Transferencia TED',
             transferVia: 'Transferencia vía',
@@ -2869,8 +2869,8 @@ export const translations = {
             networkFee: 'Comisión de red',
             total: 'Total',
             attention: 'Atención',
-            attentionWarning: 'Verifique cuidadosamente la dirección y la red antes de enviar. Solo se aceptan direcciones registradas en NexCoin.',
-            mustBeRegistered: 'La dirección debe estar registrada en NexCoin',
+            attentionWarning: 'Verifique cuidadosamente la dirección y la red antes de enviar. Solo se aceptan direcciones registradas en Ethertron.',
+            mustBeRegistered: 'La dirección debe estar registrada en Ethertron',
             sentSuccess: '¡Enviado con éxito!',
             transactionProcessed: 'Su transacción ha sido procesada',
             recipient: 'Destinatario',
@@ -2898,8 +2898,8 @@ export const translations = {
             copied: 'Copiado',
             sharing: 'Compartiendo...',
             copiedToClipboard: '¡Copiado al portapapeles!',
-            shareTextHeader: '🎯 Comprobante de Transferencia NexCoin',
-            shareTextFooter: '✨ NexCoin - Su banco digital de criptomonedas',
+            shareTextHeader: '🎯 Comprobante de Transferencia Ethertron',
+            shareTextFooter: '✨ Ethertron - Su banco digital de criptomonedas',
             amount: 'Monto',
             currency: 'Moneda',
             status: 'Estado',
@@ -2927,7 +2927,7 @@ export const translations = {
         pendingApproval: {
             title: 'Cuenta en Análisis',
             greeting: '¡Hola {name}!',
-            description: 'Su solicitud de acceso a NexCoin está siendo analizada por nuestro equipo de seguridad.',
+            description: 'Su solicitud de acceso a Ethertron está siendo analizada por nuestro equipo de seguridad.',
             step1Title: 'Registro Realizado',
             step1Desc: 'Su información fue recibida con éxito',
             step2Title: 'Análisis de Seguridad',
@@ -2985,13 +2985,13 @@ export const translations = {
             openAccountNow: 'Abre tu cuenta ahora',
             moreThanGlobalTitle: 'Más que una cuenta',
             moreThanGlobalHighlight: 'cooperativa global',
-            heroSubtitle: 'Envía, gasta y ahorra con más inteligencia. Únete a miles que ya han transformado su vida financiera con NexCoin.',
+            heroSubtitle: 'Global & Crypto Exchange. La moneda del futuro. Envía, gasta y ahorra con más inteligencia. Únete a miles que ya han transformado su vida financiera con Ethertron.',
             yourBalance: 'Tu Saldo',
             yield: 'RENDIMIENTO',
             yieldToday: '+ 0,85% hoy',
             socialProof: 'La App usada por miles de personas',
             elevateSpending: 'Eleva tu forma de gastar',
-            cardSubtitle: 'Pide tu tarjeta NexCoin y ten control total de tus gastos en cualquier lugar del mundo.',
+            cardSubtitle: 'Pide tu tarjeta Ethertron y ten control total de tus gastos en cualquier lugar del mundo.',
             requestCard: 'Solicitar tarjeta',
             highYieldTitle: 'Cambia tu vida con las cuentas remuneradas',
             highYieldSubtitle: 'Haz que tu dinero trabaje para ti. Tasas competitivas y liquidez diaria para que disfrutes de lo que importa.',
@@ -3002,8 +3002,8 @@ export const translations = {
             enterCryptoTitle: 'Entra en el mundo cripto',
             enterCryptoSubtitle: 'Compra Bitcoin, Ethereum y otras criptos con un solo toque. Simple, seguro y transparente.',
             exploreCrypto: 'Explorar Cripto',
-            joinThousands: 'Únete a miles que ya usan NexCoin',
-            footerTagline: 'Revolucionando tu vida financiera con tecnología, transparencia y seguridad.',
+            joinThousands: 'Únete a miles que ya usan Ethertron',
+            footerTagline: 'Global & Crypto Exchange. La moneda del futuro. Revolucionando tu vida financiera con tecnología, transparencia y seguridad.',
             footerProduct: 'Producto',
             footerCards: 'Tarjetas',
             footerCrypto: 'Cripto',
@@ -3020,18 +3020,18 @@ export const translations = {
             footerSecurity: 'Seguridad',
             footerPrivacy: 'Política de Privacidad',
             footerTerms: 'Términos de Uso',
-            footerDisclaimer: 'NexCoin es una plataforma de servicios financieros digitales. Los servicios de pago y las cuentas son proporcionados por socios autorizados y regulados. Asegúrese de leer nuestros Términos y condiciones antes de abrir una cuenta. La inversión en criptoactivos implica riesgos significativos de pérdida. NexCoin no es una institución financiera bancaria propia, sino que actúa como corresponsal bancario. © 2026 NexCoin. Reservados todos los derechos.'
+            footerDisclaimer: 'Ethertron es una plataforma de servicios financieros digitales. Los servicios de pago y las cuentas son proporcionados por socios autorizados y regulados. Asegúrese de leer nuestros Términos y condiciones antes de abrir una cuenta. La inversión en criptoactivos implica riesgos significativos de pérdida. Ethertron no es una institución financiera bancaria propia, sino que actúa como corresponsal bancario. © 2026 Ethertron. Reservados todos los derechos.'
         },
         downloadApp: {
             successTitle: '¡Registro realizado con éxito! ✅',
-            successSubtitle: 'Para acceder a tu cuenta y empezar a invertir, descarga ahora la aplicación oficial de NexCoin en tu smartphone.',
+            successSubtitle: 'Para acceder a tu cuenta y empezar a invertir, descarga ahora la aplicación oficial de Ethertron en tu smartphone.',
             android: 'Android',
             androidHint: 'Apunta la cámara para descargar por Google Play',
             downloadApk: 'Download APK',
             ios: 'iOS (iPhone)',
             iosHint: 'Apunta la cámara para descargar por App Store',
             downloadAppStore: 'Download App Store',
-            rightsReserved: '© 2026 NexCoin. Todos los derechos reservados.'
+            rightsReserved: '© 2026 Ethertron. Todos los derechos reservados.'
         },
     },
 

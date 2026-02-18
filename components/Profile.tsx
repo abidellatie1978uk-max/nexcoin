@@ -1,11 +1,11 @@
-import React, { 
-  X, 
-  HelpCircle, 
-  User, 
-  Shield, 
-  Eye, 
-  Bell, 
-  Palette, 
+import {
+  X,
+  HelpCircle,
+  User,
+  Shield,
+  Eye,
+  Bell,
+  Palette,
   Accessibility,
   Info,
   ExternalLink,
@@ -21,7 +21,7 @@ import React, {
   Search // ← Novo ícone
 } from 'lucide-react';
 import type { Screen } from '../App';
-import { useState } from 'react';
+import { useState, useEffect, type ReactNode } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { BottomNav } from './BottomNav';
 import { DiagnosticPixKeys } from './DiagnosticPixKeys'; // ← Novo componente
@@ -34,7 +34,7 @@ export function Profile({ onNavigate }: ProfileProps) {
   const { userData, user, logout } = useAuth();
   const [showPersonalInfo, setShowPersonalInfo] = useState(false);
   const [showDiagnostic, setShowDiagnostic] = useState(false); // ← Novo estado
-  
+
   const handleLogout = async () => {
     try {
       console.log('🚪 Fazendo logout...');
@@ -52,7 +52,7 @@ export function Profile({ onNavigate }: ProfileProps) {
     <div className="min-h-screen bg-black text-white">
       <div className="px-6 pt-8 pb-32">{/* Increased bottom padding */}
         {/* Header */}
-        <button 
+        <button
           onClick={() => onNavigate('home')}
           className="w-12 h-12 rounded-full border border-gray-700 flex items-center justify-center mb-8"
         >
@@ -72,7 +72,7 @@ export function Profile({ onNavigate }: ProfileProps) {
         <div className="space-y-4">
           {/* Informações Pessoais - Expandível */}
           <div className={`rounded-2xl overflow-hidden transition-all ${glassEffect}`}>
-            <button 
+            <button
               onClick={() => setShowPersonalInfo(!showPersonalInfo)}
               className="w-full px-4 py-4 flex items-center justify-between hover:bg-white/5 transition-colors"
             >
@@ -84,7 +84,7 @@ export function Profile({ onNavigate }: ProfileProps) {
               </div>
               <ChevronRight className={`w-5 h-5 text-gray-400 transition-transform ${showPersonalInfo ? 'rotate-90' : ''}`} />
             </button>
-            
+
             {/* Conteúdo Expandível */}
             {showPersonalInfo && (
               <div className="px-4 pb-4 space-y-4 border-t border-white/10 pt-4">
@@ -98,7 +98,7 @@ export function Profile({ onNavigate }: ProfileProps) {
                     </div>
                   </div>
                 )}
-                
+
                 {/* Email - só mostra se existir */}
                 {(userData?.email || user?.email) && (
                   <div className="flex items-start gap-3">
@@ -109,7 +109,7 @@ export function Profile({ onNavigate }: ProfileProps) {
                     </div>
                   </div>
                 )}
-                
+
                 {/* Mensagem se não houver dados */}
                 {!userData?.name && !userData?.email && !user?.email && (
                   <div className="text-center py-6">
@@ -122,20 +122,20 @@ export function Profile({ onNavigate }: ProfileProps) {
 
           {/* First Group */}
           <div className={`rounded-2xl overflow-hidden ${glassEffect}`}>
-            <MenuItem icon={<HelpCircle className="w-5 h-5" />} label="Ajuda" onClick={() => {}} />
+            <MenuItem icon={<HelpCircle className="w-5 h-5" />} label="Ajuda" onClick={() => { }} />
           </div>
 
           {/* Second Group */}
           <div className={`rounded-2xl overflow-hidden ${glassEffect}`}>
-            <MenuItem icon={<Shield className="w-5 h-5" />} label="Segurança" onClick={() => {}} />
-            <MenuItem icon={<Eye className="w-5 h-5" />} label="Privacidade" onClick={() => {}} showDivider />
-            <MenuItem icon={<Bell className="w-5 h-5" />} label="Notificações" onClick={() => {}} />
-            <MenuItem icon={<Languages className="w-5 h-5" />} label="Idioma" onClick={() => {}} showDivider />
+            <MenuItem icon={<Shield className="w-5 h-5" />} label="Segurança" onClick={() => { }} />
+            <MenuItem icon={<Eye className="w-5 h-5" />} label="Privacidade" onClick={() => { }} showDivider />
+            <MenuItem icon={<Bell className="w-5 h-5" />} label="Notificações" onClick={() => { }} />
+            <MenuItem icon={<Languages className="w-5 h-5" />} label="Idioma" onClick={() => { }} showDivider />
           </div>
 
           {/* Third Group */}
           <div className={`rounded-2xl overflow-hidden ${glassEffect}`}>
-            <MenuItem icon={<Info className="w-5 h-5" />} label="Sobre nós" onClick={() => {}} />
+            <MenuItem icon={<Info className="w-5 h-5" />} label="Sobre nós" onClick={() => { }} />
             <MenuItem icon={<Search className="w-5 h-5 text-yellow-500" />} label="🔍 Diagnóstico PIX" onClick={() => setShowDiagnostic(true)} showDivider /> {/* ← Novo */}
             <MenuItem icon={<LogOut className="w-5 h-5 text-red-500" />} label="Sair" onClick={handleLogout} showDivider />
           </div>
@@ -143,7 +143,7 @@ export function Profile({ onNavigate }: ProfileProps) {
       </div>
 
       <BottomNav currentScreen="profile" onNavigate={onNavigate} />
-      
+
       {/* Modal de Diagnóstico */}
       {showDiagnostic && <DiagnosticPixKeys onClose={() => setShowDiagnostic(false)} />}
     </div>
@@ -160,7 +160,7 @@ interface MenuItemProps {
 function MenuItem({ icon, label, showDivider = false, onClick }: MenuItemProps) {
   return (
     <>
-      <button 
+      <button
         className="w-full px-4 py-4 flex items-center justify-between hover:bg-zinc-800/50 transition-colors"
         onClick={onClick}
       >

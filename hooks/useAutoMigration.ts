@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { checkIndexHealth } from '../lib/walletAddressUtils';
 import { migrateOwnWalletAddresses } from '../lib/migrateOwnWalletAddresses';
-import { toast } from 'sonner@2.0.3';
+import { toast } from 'sonner';
 
 /**
  * Hook que executa migração automática dos endereços do usuário atual

@@ -5,8 +5,8 @@ export function SplashScreen() {
         <div className="fixed inset-0 bg-black flex items-center justify-center z-50">
             <div className="flex flex-col items-center">
                 <div className="relative inline-block animate-pulse">
-                    <h1 className="text-4xl font-bold italic relative nexcoin-logo-text">
-                        NexCoin
+                    <h1 className="text-4xl font-bold italic relative ethertron-logo-text">
+                        Ethertron
                     </h1>
                     <div
                         className="h-[2px] w-full mx-auto mt-2 rounded-full"

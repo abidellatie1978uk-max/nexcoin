@@ -10,7 +10,7 @@ export function FirestoreRulesHelper() {
     const rulesText = `As regras completas estão no arquivo /firestore.rules na raiz do projeto.
     
 Acesse o Firebase Console e copie TODO o conteúdo do arquivo /firestore.rules:
-https://console.firebase.google.com/project/nexcoin-1f42f/firestore/rules
+https://console.firebase.google.com/project/ethertron-app/firestore/rules
 
 ⚠️ IMPORTANTE: Use as regras completas do arquivo, não este texto resumido!`;
 
@@ -23,7 +23,7 @@ https://console.firebase.google.com/project/nexcoin-1f42f/firestore/rules
   };
 
   const openFirebaseConsole = () => {
-    window.open('https://console.firebase.google.com/project/nexcoin-1f42f/firestore/rules', '_blank');
+    window.open('https://console.firebase.google.com/project/ethertron-app/firestore/rules', '_blank');
   };
 
   const openRulesFile = () => {
@@ -102,7 +102,7 @@ https://console.firebase.google.com/project/nexcoin-1f42f/firestore/rules
                     onClick={openFirebaseConsole}
                     className="text-xs text-blue-400 hover:text-blue-300 underline"
                   >
-                    console.firebase.google.com/project/nexcoin-1f42f/firestore/rules
+                    console.firebase.google.com/project/ethertron-app/firestore/rules
                   </button>
                 </div>
               </div>
@@ -144,7 +144,7 @@ https://console.firebase.google.com/project/nexcoin-1f42f/firestore/rules
             </p>
             <p className="text-xs text-blue-200 leading-relaxed">
               As regras de segurança completas estão no arquivo <span className="font-mono bg-white/10 px-1 rounded">/firestore.rules</span> na raiz do projeto.
-              Esse arquivo contém ~350 linhas com todas as permissões necessárias para o NexCoin funcionar com segurança.
+              Esse arquivo contém ~350 linhas com todas as permissões necessárias para o Ethertron funcionar com segurança.
             </p>
           </div>
 

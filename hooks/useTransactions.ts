@@ -4,7 +4,7 @@ import { db } from '../lib/firebase';
 import { useAuth } from '../contexts/AuthContext';
 import { safeOnSnapshot } from '../lib/firestoreListenerUtils';
 
-export type TransactionType = 
+export type TransactionType =
   | 'send_crypto'        // Envio de cripto
   | 'receive_crypto'     // Recebimento de cripto (depósito)
   | 'crypto_send'        // ✅ NOVO: Envio de cripto (transferência entre usuários)
@@ -24,28 +24,28 @@ export interface Transaction {
   userId: string;
   type: TransactionType;
   status: TransactionStatus;
-  
+
   // Valores
   amount: number;              // Quantidade principal
   currency: string;            // Moeda/cripto principal
-  
+
   // Para conversões e trocas
   fromAmount?: number;
   fromCurrency?: string;
   toAmount?: number;
   toCurrency?: string;
-  
+
   // Taxas
   fee: number;
   feeCurrency: string;
-  
+
   // Informações adicionais
   description: string;
   recipientAddress?: string;   // Endereço de destino (para cripto)
   recipientInfo?: string;       // Informações do destinatário (para fiat)
   transactionHash?: string;     // Hash da transação (para cripto)
   network?: string;             // Rede blockchain
-  
+
   // Metadata
   createdAt: Date;
   completedAt?: Date;
@@ -76,9 +76,9 @@ export function useTransactions() {
     const unsubscribe = safeOnSnapshot(
       q,
       (snapshot) => {
-        const transactionsData = snapshot.docs.map(doc => {
+        const transactionsData = snapshot.docs.map((doc: any) => {
           const data = doc.data();
-          
+
           // ✅ Converter createdAt para Date (suporta Timestamp e Date)
           let createdAt: Date;
           if (data.createdAt?.toDate) {
@@ -94,7 +94,7 @@ export function useTransactions() {
             // Fallback: usar data atual
             createdAt = new Date();
           }
-          
+
           // ✅ Converter completedAt para Date (se existir)
           let completedAt: Date | undefined;
           if (data.completedAt?.toDate) {
@@ -104,7 +104,7 @@ export function useTransactions() {
           } else if (data.completedAt) {
             completedAt = new Date(data.completedAt);
           }
-          
+
           return {
             ...data,
             id: doc.id,
@@ -114,7 +114,7 @@ export function useTransactions() {
         });
 
         // Ordenar no cliente por createdAt (mais recente primeiro)
-        const sortedTransactions = transactionsData.sort((a, b) => 
+        const sortedTransactions = transactionsData.sort((a: Transaction, b: Transaction) =>
           b.createdAt.getTime() - a.createdAt.getTime()
         );
 
@@ -221,19 +221,19 @@ export function useTransactions() {
   const formatTransactionAmount = (tx: Transaction): string => {
     // ✅ Tipos de transações que são crédito (positivas)
     const isPositive = [
-      'receive_crypto', 
+      'receive_crypto',
       'crypto_receive',
       'pix_receive',
-      'deposit_fiat', 
+      'deposit_fiat',
       'convert'
     ].includes(tx.type);
-    
+
     const sign = isPositive ? '+' : '-';
-    
+
     if (tx.type === 'convert' && tx.toAmount && tx.toCurrency) {
       return `${sign} ${formatAmount(tx.toAmount)} ${tx.toCurrency}`;
     }
-    
+
     // Para transações com amount já negativo (como crypto_send), não adicionar sinal duplo
     const absAmount = Math.abs(tx.amount);
     return `${sign} ${formatAmount(absAmount)} ${tx.currency}`;
@@ -244,15 +244,15 @@ export function useTransactions() {
     if (tx.type === 'convert') {
       return '🔄';
     }
-    
+
     if (['send_crypto', 'crypto_send', 'pix_send', 'withdraw_fiat'].includes(tx.type)) {
       return '📤';
     }
-    
+
     if (['receive_crypto', 'crypto_receive', 'pix_receive', 'deposit_fiat'].includes(tx.type)) {
       return '📥';
     }
-    
+
     return '💰';
   };
 
@@ -261,15 +261,15 @@ export function useTransactions() {
     if (tx.type === 'convert') {
       return 'conversao';
     }
-    
+
     if (['send_crypto', 'crypto_send', 'pix_send', 'withdraw_fiat'].includes(tx.type)) {
       return 'saida';
     }
-    
+
     if (['receive_crypto', 'crypto_receive', 'pix_receive', 'deposit_fiat'].includes(tx.type)) {
       return 'entrada';
     }
-    
+
     return 'entrada';
   };
 

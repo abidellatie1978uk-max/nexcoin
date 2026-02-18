@@ -189,7 +189,7 @@ export function SignUp({ onNavigate }: SignUpProps) {
     // Dados de teste automáticos
     const testData = {
       name: 'Usuário Teste',
-      email: `teste${Date.now()}@nexcoin.com`,
+      email: `teste${Date.now()}@ethertron.com`,
       phone: '+5511999999999',
       password: 'Teste123!',
       country: 'BR',

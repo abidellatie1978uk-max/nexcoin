@@ -32,7 +32,7 @@ export function Deposit({ onNavigate }: DepositProps) {
     { symbol: 'USDT', name: 'Tether', id: 'tether' },
     { symbol: 'BTC', name: 'Bitcoin', id: 'bitcoin' },
     { symbol: 'ETH', name: 'Ethereum', id: 'ethereum' },
-    { symbol: 'BNB', name: 'Binance Coin', id: 'binancecoin' },
+    { symbol: 'BNB', name: 'BinancEthertron', id: 'binancecoin' },
     { symbol: 'SOL', name: 'Solana', id: 'solana' },
     { symbol: 'ADA', name: 'Cardano', id: 'cardano' },
     { symbol: 'XRP', name: 'Ripple', id: 'ripple' },
@@ -82,7 +82,7 @@ export function Deposit({ onNavigate }: DepositProps) {
   };
 
   // Filtra criptomoedas pela busca
-  const filteredCryptos = cryptoList.filter(crypto => 
+  const filteredCryptos = cryptoList.filter(crypto =>
     crypto.symbol.toLowerCase().includes(searchTerm.toLowerCase()) ||
     crypto.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -98,7 +98,7 @@ export function Deposit({ onNavigate }: DepositProps) {
     document.body.appendChild(textArea);
     textArea.focus();
     textArea.select();
-    
+
     try {
       document.execCommand('copy');
       setCopiedAddress(true);
@@ -106,7 +106,7 @@ export function Deposit({ onNavigate }: DepositProps) {
     } catch (err) {
       console.error('Erro ao copiar:', err);
     }
-    
+
     document.body.removeChild(textArea);
   };
 
@@ -126,7 +126,7 @@ export function Deposit({ onNavigate }: DepositProps) {
     const generateBytes = (seed: string, length: number): number[] => {
       const bytes: number[] = [];
       let currentSeed = hashString(seed);
-      
+
       for (let i = 0; i < length; i++) {
         // LCG com parâmetros melhores + mistura adicional
         currentSeed = (currentSeed * 1664525 + 1013904223) & 0x7fffffff;
@@ -147,19 +147,19 @@ export function Deposit({ onNavigate }: DepositProps) {
       const alphabet = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
       let num = BigInt('0x' + bytesToHex(bytes));
       let result = '';
-      
+
       while (num > 0) {
         const remainder = Number(num % 58n);
         result = alphabet[remainder] + result;
         num = num / 58n;
       }
-      
+
       // Adiciona '1' para cada byte 0 no início
       for (const byte of bytes) {
         if (byte === 0) result = '1' + result;
         else break;
       }
-      
+
       return result;
     };
 
@@ -173,7 +173,7 @@ export function Deposit({ onNavigate }: DepositProps) {
       return result;
     };
 
-    const seed = `${cryptoSymbol}-${network}-nexcoin-wallet`;
+    const seed = `${cryptoSymbol}-${network}-ethertron-wallet`;
 
     // Tron (TRX) - Endereços começam com T
     if (network === 'Tron') {
@@ -200,10 +200,10 @@ export function Deposit({ onNavigate }: DepositProps) {
     // Ethereum e redes EVM (ETH, USDT, BNB, MATIC, LINK, UNI, AVAX)
     // Todas as redes EVM usam o mesmo formato de endereço 0x...
     if (cryptoSymbol === 'ETH' || network === 'Ethereum' || network === 'Polygon' || network === 'Optimism' ||
-        network === 'BSC' || network === 'Arbitrum' || network === 'Base' || network === 'Avalanche' ||
-        network === 'Fantom' || network === 'zkSync' || network === 'Cronos' ||
-        cryptoSymbol === 'BNB' || cryptoSymbol === 'MATIC' || cryptoSymbol === 'LINK' || 
-        cryptoSymbol === 'UNI' || cryptoSymbol === 'AVAX' || cryptoSymbol === 'USDT') {
+      network === 'BSC' || network === 'Arbitrum' || network === 'Base' || network === 'Avalanche' ||
+      network === 'Fantom' || network === 'zkSync' || network === 'Cronos' ||
+      cryptoSymbol === 'BNB' || cryptoSymbol === 'MATIC' || cryptoSymbol === 'LINK' ||
+      cryptoSymbol === 'UNI' || cryptoSymbol === 'AVAX' || cryptoSymbol === 'USDT') {
       const bytes = generateBytes(seed, 20);
       return '0x' + bytesToHex(bytes);
     }
@@ -264,8 +264,8 @@ export function Deposit({ onNavigate }: DepositProps) {
       <div className="min-h-screen bg-black text-white flex flex-col pb-24">
         {/* Header */}
         <header className="px-6 pt-6 pb-4">
-          <button 
-            onClick={() => setSelectedCrypto(null)} 
+          <button
+            onClick={() => setSelectedCrypto(null)}
             className="w-10 h-10 rounded-full bg-zinc-900 flex items-center justify-center hover:bg-zinc-800 transition-colors mb-6"
           >
             <ArrowLeft className="w-5 h-5" />
@@ -334,9 +334,9 @@ export function Deposit({ onNavigate }: DepositProps) {
               >
                 {/* Selected Network Icon */}
                 <div className="w-10 h-10 rounded-xl bg-blue-500/20 flex items-center justify-center flex-shrink-0">
-                  <CryptoIcon 
-                    symbol={networks.find(n => n.id === selectedNetwork)?.icon || 'ETH'} 
-                    size="sm" 
+                  <CryptoIcon
+                    symbol={networks.find(n => n.id === selectedNetwork)?.icon || 'ETH'}
+                    size="sm"
                   />
                 </div>
 
@@ -348,10 +348,9 @@ export function Deposit({ onNavigate }: DepositProps) {
                 </div>
 
                 {/* Chevron Icon */}
-                <ChevronDown 
-                  className={`w-5 h-5 text-gray-400 transition-transform duration-200 ${
-                    isNetworkDropdownOpen ? 'rotate-180' : ''
-                  }`} 
+                <ChevronDown
+                  className={`w-5 h-5 text-gray-400 transition-transform duration-200 ${isNetworkDropdownOpen ? 'rotate-180' : ''
+                    }`}
                 />
               </button>
 
@@ -359,11 +358,11 @@ export function Deposit({ onNavigate }: DepositProps) {
               {isNetworkDropdownOpen && (
                 <>
                   {/* Backdrop */}
-                  <div 
+                  <div
                     className="fixed inset-0 z-10"
                     onClick={() => setIsNetworkDropdownOpen(false)}
                   />
-                  
+
                   {/* Dropdown List */}
                   <div className="absolute z-20 w-full mt-2 bg-zinc-800/95 backdrop-blur-xl rounded-2xl border border-zinc-700/50 shadow-2xl overflow-hidden">
                     <div className="max-h-80 overflow-y-auto custom-scrollbar">
@@ -371,11 +370,10 @@ export function Deposit({ onNavigate }: DepositProps) {
                         <button
                           key={network.id}
                           onClick={() => handleNetworkChange(network.id)}
-                          className={`w-full p-4 flex items-center gap-4 transition-all border-b border-zinc-700/30 last:border-b-0 ${
-                            selectedNetwork === network.id 
-                              ? 'bg-blue-500/20' 
-                              : 'hover:bg-zinc-700/50'
-                          }`}
+                          className={`w-full p-4 flex items-center gap-4 transition-all border-b border-zinc-700/30 last:border-b-0 ${selectedNetwork === network.id
+                            ? 'bg-blue-500/20'
+                            : 'hover:bg-zinc-700/50'
+                            }`}
                         >
                           {/* Network Icon */}
                           <div className="w-10 h-10 rounded-xl bg-blue-500/20 flex items-center justify-center flex-shrink-0">
@@ -411,8 +409,8 @@ export function Deposit({ onNavigate }: DepositProps) {
     <div className="min-h-screen bg-black text-white flex flex-col pb-24">
       {/* Header */}
       <header className="px-6 pt-6 pb-4 flex items-center gap-4">
-        <button 
-          onClick={() => onNavigate('wallet')} 
+        <button
+          onClick={() => onNavigate('wallet')}
           className="w-10 h-10 rounded-full bg-zinc-900 flex items-center justify-center hover:bg-zinc-800 transition-colors"
         >
           <ArrowLeft className="w-5 h-5" />
@@ -440,7 +438,7 @@ export function Deposit({ onNavigate }: DepositProps) {
           {filteredCryptos.map((crypto) => {
             const balance = getCryptoBalance(crypto.symbol);
             const usdValue = calculateUsdValue(crypto.id, balance);
-            
+
             return (
               <button
                 key={crypto.symbol}

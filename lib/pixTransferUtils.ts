@@ -13,6 +13,18 @@ export interface PixTransferData {
   createdAt: Date;
 }
 
+export interface PixKey {
+  id: string;
+  userId: string;
+  accountId: string;
+  accountNumber: string;
+  currency: string;
+  country: string;
+  keyType: string;
+  keyValue: string;
+  createdAt: any;
+}
+
 /**
  * Valida uma chave PIX e retorna informações do destinatário
  */
@@ -27,10 +39,10 @@ export async function validatePixKey(
 
     // ✅ DETECTAR TIPO DE CHAVE PIX
     const isEmail = pixKey.includes('@');
-    
+
     // ✅ LIMPAR A CHAVE PIX - com regras diferentes para email
     let cleanedPixKey: string;
-    
+
     if (isEmail) {
       // Para EMAIL: manter pontos, apenas remover espaços e converter para minúsculas
       cleanedPixKey = pixKey
@@ -55,13 +67,13 @@ export async function validatePixKey(
 
     // Buscar a chave PIX na coleção pixKeys
     const pixKeysRef = collection(db, 'pixKeys');
-    
+
     // ✅ BUSCAR TODAS AS CHAVES E COMPARAR MANUALMENTE
     console.log('🔍 Buscando todas as chaves PIX no Firestore...');
     const snapshot = await getDocs(pixKeysRef);
-    
+
     console.log('🔍 Total de chaves PIX no sistema:', snapshot.size);
-    
+
     // Mostrar todas as chaves para debug
     console.log('🔍 ============ TODAS AS CHAVES NO SISTEMA ============');
     snapshot.docs.forEach((doc, index) => {
@@ -72,18 +84,18 @@ export async function validatePixKey(
       console.log(`      userId: ${data.userId}`);
     });
     console.log('🔍 ====================================================');
-    
-    let foundKey = null;
+
+    let foundKey: PixKey | null = null;
     for (const docSnapshot of snapshot.docs) {
       const data = docSnapshot.data();
       const storedKey = data.keyValue || '';
-      
+
       // ✅ DETECTAR TIPO DA CHAVE ARMAZENADA
       const storedIsEmail = storedKey.includes('@');
-      
+
       // Limpar a chave armazenada com as MESMAS regras
       let cleanedStoredKey: string;
-      
+
       if (storedIsEmail) {
         // Para EMAIL: manter pontos
         cleanedStoredKey = storedKey
@@ -102,15 +114,15 @@ export async function validatePixKey(
           .replace(/\+/g, '')
           .toLowerCase();
       }
-      
+
       console.log(`🔍 Comparando:`);
       console.log(`   Digitado (limpo): "${cleanedPixKey}"`);
       console.log(`   Armazenado (original): "${storedKey}"`);
       console.log(`   Armazenado (limpo): "${cleanedStoredKey}"`);
       console.log(`   Match: ${cleanedStoredKey === cleanedPixKey ? '✅ SIM' : '❌ NÃO'}`);
-      
+
       if (cleanedStoredKey === cleanedPixKey) {
-        foundKey = { id: docSnapshot.id, ...data };
+        foundKey = { id: docSnapshot.id, ...data } as PixKey;
         console.log('✅ ============ CHAVE ENCONTRADA! ============');
         console.log('✅ Documento ID:', docSnapshot.id);
         console.log('✅ User ID:', data.userId);
@@ -132,7 +144,7 @@ export async function validatePixKey(
         userId: null,
         userName: null,
         pixKeyType: null,
-        error: 'Chave PIX não encontrada no sistema NexCoin',
+        error: 'Chave PIX não encontrada no sistema Ethertron',
       };
     }
 
@@ -217,7 +229,7 @@ export async function processPixTransfer(
       // ========================================
       // FASE 1: TODAS AS LEITURAS PRIMEIRO
       // ========================================
-      
+
       // 1. Buscar saldo do remetente
       const fromBalanceRef = doc(db, 'users', fromUserId, 'fiatBalances', currency);
       const fromBalanceDoc = await transaction.get(fromBalanceRef);

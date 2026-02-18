@@ -5,8 +5,8 @@ import { useLanguage } from '../contexts/LanguageContext';
 
 export function DownloadApp() {
     const { t } = useLanguage();
-    const androidLink = "https://play.google.com/store/apps/details?id=com.nexcoin.app";
-    const iosLink = "https://apps.apple.com/app/nexcoin/id6470000000";
+    const androidLink = "https://play.google.com/store/apps/details?id=com.ethertron.app";
+    const iosLink = "https://apps.apple.com/app/ethertron/id6470000000";
 
     const containerVariants = {
         initial: { opacity: 0 },

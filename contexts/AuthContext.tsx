@@ -50,6 +50,11 @@ interface UserData {
   aprovado?: 'yes' | 'no';
   trackLocationEnabled?: boolean;
   requireCameraPermission?: boolean;
+  permissionsRequested?: boolean;
+  permissionsRequestedAt?: string;
+  locationPermission?: string;
+  cameraPermission?: string;
+  displayName?: string;
 }
 
 interface AuthContextType {
@@ -117,7 +122,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const previousPhone = useRef<string>('');
 
   // ✅ CHAVE PARA PERSISTÊNCIA DO PIN VERIFICADO
-  const PIN_VERIFIED_KEY = 'nexcoin_pin_verified';
+  const PIN_VERIFIED_KEY = 'Ethertron_pin_verified';
 
   // ✅ FUNÇÃO PARA SALVAR ESTADO DE PIN VERIFICADO COM PERSISTÊNCIA
   const setPinVerifiedWithPersistence = (verified: boolean) => {
@@ -162,7 +167,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const generatePasswordFromPhoneAndPin = (phone: string, pin: string): string => {
     // Gera uma senha combinando telefone + PIN + salt
     // O salt deve ser o mesmo sempre para o mesmo usuário
-    const salt = 'NexCoin2024!'; // Salt fixo (em produção, use algo mais seguro)
+    const salt = 'Ethertron2024!'; // Salt fixo (em produção, use algo mais seguro)
     return `${phone}_${pin}_${salt}`;
   };
 

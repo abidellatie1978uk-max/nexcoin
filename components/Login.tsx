@@ -6,6 +6,7 @@ import { useLoginFlow } from '../contexts/LoginFlowContext';
 import { useAuth } from '../contexts/AuthContext';
 import { FlagIcon } from './FlagIcon';
 import { Globe } from 'lucide-react';
+import type { Language } from '../lib/translations';
 
 interface LoginProps {
   onNavigate: (screen: Screen) => void;
@@ -36,8 +37,8 @@ export function Login({ onNavigate }: LoginProps) {
   }, []);
 
   const getLanguages = () => [
-    { code: 'pt-BR' as Language, countryCode: 'BR', name: t.portuguese },
-    { code: 'en-US' as Language, countryCode: 'US', name: t.english },
+    { code: 'pt' as Language, countryCode: 'BR', name: t.portuguese },
+    { code: 'en' as Language, countryCode: 'US', name: t.english },
     { code: 'es' as Language, countryCode: 'ES', name: t.spanish },
   ];
 
@@ -55,7 +56,7 @@ export function Login({ onNavigate }: LoginProps) {
   const formatPhoneNumber = (value: string, countryCode: string) => {
     // Remove tudo que não é número
     const numbers = value.replace(/\D/g, '');
-    
+
     const country = countries.find(c => c.countryCode === countryCode);
     if (!country) return numbers;
 
@@ -66,44 +67,44 @@ export function Login({ onNavigate }: LoginProps) {
         if (numbers.length <= 7) return `(${numbers.slice(0, 2)}) ${numbers.slice(2)}`;
         if (numbers.length <= 11) return `(${numbers.slice(0, 2)}) ${numbers.slice(2, 7)}-${numbers.slice(7)}`;
         return `(${numbers.slice(0, 2)}) ${numbers.slice(2, 7)}-${numbers.slice(7, 11)}`;
-      
+
       case 'US':
         if (numbers.length <= 3) return numbers;
         if (numbers.length <= 6) return `(${numbers.slice(0, 3)}) ${numbers.slice(3)}`;
         return `(${numbers.slice(0, 3)}) ${numbers.slice(3, 6)}-${numbers.slice(6, 10)}`;
-      
+
       case 'GB':
         if (numbers.length <= 4) return numbers;
         if (numbers.length <= 7) return `${numbers.slice(0, 4)} ${numbers.slice(4)}`;
         return `${numbers.slice(0, 4)} ${numbers.slice(4, 7)} ${numbers.slice(7, 11)}`;
-      
+
       case 'FR':
         if (numbers.length <= 2) return numbers;
         if (numbers.length <= 4) return `${numbers.slice(0, 2)} ${numbers.slice(2)}`;
         if (numbers.length <= 6) return `${numbers.slice(0, 2)} ${numbers.slice(2, 4)} ${numbers.slice(4)}`;
         if (numbers.length <= 8) return `${numbers.slice(0, 2)} ${numbers.slice(2, 4)} ${numbers.slice(4, 6)} ${numbers.slice(6)}`;
         return `${numbers.slice(0, 2)} ${numbers.slice(2, 4)} ${numbers.slice(4, 6)} ${numbers.slice(6, 8)} ${numbers.slice(8, 10)}`;
-      
+
       case 'DE':
         if (numbers.length <= 3) return numbers;
         return `${numbers.slice(0, 3)} ${numbers.slice(3, 10)}`;
-      
+
       case 'IT':
         if (numbers.length <= 3) return numbers;
         if (numbers.length <= 6) return `${numbers.slice(0, 3)} ${numbers.slice(3)}`;
         return `${numbers.slice(0, 3)} ${numbers.slice(3, 6)} ${numbers.slice(6, 10)}`;
-      
+
       case 'ES':
         if (numbers.length <= 3) return numbers;
         if (numbers.length <= 5) return `${numbers.slice(0, 3)} ${numbers.slice(3)}`;
         if (numbers.length <= 7) return `${numbers.slice(0, 3)} ${numbers.slice(3, 5)} ${numbers.slice(5)}`;
         return `${numbers.slice(0, 3)} ${numbers.slice(3, 5)} ${numbers.slice(5, 7)} ${numbers.slice(7, 9)}`;
-      
+
       case 'PT':
         if (numbers.length <= 3) return numbers;
         if (numbers.length <= 6) return `${numbers.slice(0, 3)} ${numbers.slice(3)}`;
         return `${numbers.slice(0, 3)} ${numbers.slice(3, 6)} ${numbers.slice(6, 9)}`;
-      
+
       default:
         return numbers;
     }
@@ -125,15 +126,15 @@ export function Login({ onNavigate }: LoginProps) {
   const handleContinueClick = async () => {
     if (phoneNumber && isPhoneValid) {
       // Salvar telefone com código do país
-      const fullPhone = `${selectedCountry.code}${phoneNumber.replace(/\\D/g, '')}`;
+      const fullPhone = `${selectedCountry.code}${phoneNumber.replace(/\D/g, '')}`;
       setLoginPhone(fullPhone);
       setIsValidating(true);
       setErrorMessage(''); // Limpar erros anteriores
-      
+
       try {
         const exists = await checkPhoneExists(fullPhone);
         setIsValidating(false);
-        
+
         if (exists) {
           onNavigate('passwordEntry');
         } else {
@@ -141,7 +142,7 @@ export function Login({ onNavigate }: LoginProps) {
         }
       } catch (error: any) {
         setIsValidating(false);
-        
+
         // Mostrar mensagem de erro
         setErrorMessage(t.email || 'Telefone não encontrado');
       }
@@ -152,8 +153,8 @@ export function Login({ onNavigate }: LoginProps) {
     <div className="bg-black text-white p-4 pb-20">
       {/* Overlay para fechar dropdowns ao clicar fora */}
       {(showCountryDropdown || showLanguageDropdown) && (
-        <div 
-          className="fixed inset-0 z-10" 
+        <div
+          className="fixed inset-0 z-10"
           onClick={() => {
             setShowCountryDropdown(false);
             setShowLanguageDropdown(false);
@@ -251,11 +252,10 @@ export function Login({ onNavigate }: LoginProps) {
 
         {/* Continue Button */}
         <button
-          className={`w-full py-3.5 rounded-full mb-5 transition-all duration-300 ${
-            phoneNumber && isPhoneValid
+          className={`w-full py-3.5 rounded-full mb-5 transition-all duration-300 ${phoneNumber && isPhoneValid
               ? 'bg-white text-black hover:opacity-90 active:scale-[0.98]'
               : 'bg-zinc-800 text-gray-500 cursor-not-allowed'
-          }`}
+            }`}
           disabled={!phoneNumber || !isPhoneValid}
           onClick={handleContinueClick}
         >
@@ -271,7 +271,7 @@ export function Login({ onNavigate }: LoginProps) {
 
         {/* Sign Up */}
         <div className="text-center mb-5">
-          <button 
+          <button
             onClick={() => onNavigate('signup')}
             className="w-full bg-zinc-900 text-white py-3.5 rounded-full transition-colors hover:bg-zinc-800 active:scale-[0.98]"
           >
@@ -281,7 +281,7 @@ export function Login({ onNavigate }: LoginProps) {
 
         {/* Language Selector */}
         <div className="flex justify-center items-center mb-4 relative">
-          <button 
+          <button
             className="flex items-center gap-2 text-slate-300 text-sm px-3 py-2 rounded-lg transition-colors active:bg-zinc-800"
             onClick={() => setShowLanguageDropdown(!showLanguageDropdown)}
           >

@@ -7,6 +7,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { collection, query, where, getDocs, addDoc, deleteDoc, doc, getDoc } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { generateBankAccountByCountry, getAvailableCountries, type BankAccount } from '../lib/bankAccountGenerator';
+export type { BankAccount };
 import { toast } from 'sonner';
 
 interface AccountDataProps {

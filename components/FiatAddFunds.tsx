@@ -135,8 +135,8 @@ export function FiatAddFunds({ account, onClose }: FiatAddFundsProps) {
     // Formato simplificado do payload PIX usando dados reais do Firestore
     const payload = {
       pixKey: selectedPixKey.keyValue, // ✅ Usando keyValue do Firestore
-      description: 'Depósito NexCoin',
-      merchantName: 'NexCoin',
+      description: 'Depósito Ethertron',
+      merchantName: 'Ethertron',
       merchantCity: 'SAO PAULO',
       txid: Math.random().toString(36).substring(2, 15).toUpperCase(),
       amount: pixAmount.toFixed(2),
@@ -194,8 +194,8 @@ export function FiatAddFunds({ account, onClose }: FiatAddFundsProps) {
               <button
                 onClick={() => setSelectedMethod('transfer')}
                 className={`flex-1 py-3 px-4 rounded-xl text-sm font-medium transition-all ${selectedMethod === 'transfer'
-                    ? 'bg-white text-black'
-                    : 'bg-[#0A0A0A] text-gray-400 border border-[#1A1A1A]'
+                  ? 'bg-white text-black'
+                  : 'bg-[#0A0A0A] text-gray-400 border border-[#1A1A1A]'
                   }`}
               >
                 Transferência
@@ -203,8 +203,8 @@ export function FiatAddFunds({ account, onClose }: FiatAddFundsProps) {
               <button
                 onClick={() => setSelectedMethod('pix')}
                 className={`flex-1 py-3 px-4 rounded-xl text-sm font-medium transition-all ${selectedMethod === 'pix'
-                    ? 'bg-white text-black'
-                    : 'bg-[#0A0A0A] text-gray-400 border border-[#1A1A1A]'
+                  ? 'bg-white text-black'
+                  : 'bg-[#0A0A0A] text-gray-400 border border-[#1A1A1A]'
                   }`}
               >
                 PIX
@@ -259,7 +259,7 @@ export function FiatAddFunds({ account, onClose }: FiatAddFundsProps) {
                 <div className="flex items-center justify-between">
                   <p className="text-sm text-white font-mono">{account.branchCode}</p>
                   <button
-                    onClick={() => handleCopy(account.branchCode, 'branch')}
+                    onClick={() => handleCopy(account.branchCode || '', 'branch')}
                     className="p-2 hover:bg-white/10 rounded-lg transition-colors"
                   >
                     {copiedField === 'branch' ? (
@@ -408,7 +408,7 @@ export function FiatAddFunds({ account, onClose }: FiatAddFundsProps) {
                       </div>
                       <div className="flex justify-between items-center">
                         <span className="text-xs text-gray-400">Destinatário</span>
-                        <span className="text-sm text-white">NexCoin</span>
+                        <span className="text-sm text-white">Ethertron</span>
                       </div>
                     </div>
 

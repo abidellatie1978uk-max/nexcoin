@@ -107,7 +107,7 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
                     const txId = change.doc.id;
 
                     // Recuperar lista de notificações já exibidas do localStorage
-                    const notifiedKey = `nexcoin_notified_txs_${userData.uid}`;
+                    const notifiedKey = `nEthertron_notified_txs_${userData.uid}`;
                     const notifiedTxs = JSON.parse(localStorage.getItem(notifiedKey) || '[]');
 
                     // Se já foi notificado, ignora
