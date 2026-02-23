@@ -285,6 +285,25 @@ export const translations = {
             seconds: 'segundos',
             clickToDelete: 'Clique 2x para excluir',
         },
+        fiatAccounts: {
+            accountData: 'Dados da Conta',
+            bank: 'Banco',
+            accountNumber: 'Número da Conta',
+            bankCode: 'Código do Banco',
+            iban: 'IBAN',
+            swiftBic: 'SWIFT/BIC',
+            accountSettings: 'Configurações da Conta',
+            removeAccount: 'Remover Conta',
+            pixKeys: 'Chaves PIX',
+            addButton: 'Adicionar',
+            depositButton: 'Depositar',
+        },
+        pix: {
+            manage: 'Gerenciar',
+            registerKey: 'Cadastrar Chave',
+            keyCopied: 'Copiado!',
+            randomKey: 'Chave Aleatória',
+        },
     },
 
     en: {
@@ -571,6 +590,25 @@ export const translations = {
             seconds: 'seconds',
             clickToDelete: 'Double-click to delete',
         },
+        fiatAccounts: {
+            accountData: 'Account Data',
+            bank: 'Bank',
+            accountNumber: 'Account Number',
+            bankCode: 'Bank Code',
+            iban: 'IBAN',
+            swiftBic: 'SWIFT/BIC',
+            accountSettings: 'Account Settings',
+            removeAccount: 'Remove Account',
+            pixKeys: 'PIX Keys',
+            addButton: 'Add',
+            depositButton: 'Deposit',
+        },
+        pix: {
+            manage: 'Manage',
+            registerKey: 'Register Key',
+            keyCopied: 'Copied!',
+            randomKey: 'Random Key',
+        },
     },
 
     es: {
@@ -856,6 +894,25 @@ export const translations = {
             needBankAccount: 'Necesitas abrir una cuenta bancaria para convertir cripto en moneda fiat.',
             seconds: 'segundos',
             clickToDelete: 'Haz doble clic para eliminar',
+        },
+        fiatAccounts: {
+            accountData: 'Datos de la Cuenta',
+            bank: 'Banco',
+            accountNumber: 'Número de Cuenta',
+            bankCode: 'Código del Banco',
+            iban: 'IBAN',
+            swiftBic: 'SWIFT/BIC',
+            accountSettings: 'Configuración de la Cuenta',
+            removeAccount: 'Eliminar Cuenta',
+            pixKeys: 'Claves PIX',
+            addButton: 'Agregar',
+            depositButton: 'Depositar',
+        },
+        pix: {
+            manage: 'Gestionar',
+            registerKey: 'Registrar Clave',
+            keyCopied: '¡Copiado!',
+            randomKey: 'Clave Aleatoria',
         },
     }
 };

@@ -1,10 +1,14 @@
-import { X, ArrowUpRight, ArrowDownLeft, ArrowLeftRight, ChevronRight, Plus } from 'lucide-react';
+import { X, ArrowUpRight, ArrowDownLeft, ArrowLeftRight, ChevronRight, Plus, Copy, Check, Share2, Key } from 'lucide-react';
 import { useState, useMemo } from 'react';
 import type { BankAccount } from '../lib/bankAccountGenerator';
 import { PixKeys } from './PixKeys';
 import { useFiatBalances } from '../hooks/useFiatBalances';
 import { FiatAddFunds } from './FiatAddFunds';
 import { useTransactions } from '../hooks/useTransactions';
+import { usePixKeys } from '../hooks/usePixKeys';
+import { toast } from 'sonner';
+import { copyToClipboard } from '../utils/clipboard';
+import { useLanguage } from '../contexts/LanguageContext';
 
 interface FiatAccountDetailsProps {
   account: BankAccount;
@@ -17,87 +21,82 @@ export function FiatAccountDetails({ account, onClose, onNavigateToConvert, onNa
   const [activeTab, setActiveTab] = useState<'transactions' | 'options'>('transactions');
   const [showPixKeys, setShowPixKeys] = useState(false);
   const [showAddFunds, setShowAddFunds] = useState(false);
+  const [copiedKey, setCopiedKey] = useState<string | null>(null);
   const { getBalance } = useFiatBalances();
+  const { pixKeys, isLoading: isLoadingPixKeys } = usePixKeys();
   const { transactions, isLoading, formatTransactionDescription, getTransactionIconType } = useTransactions();
+  const { t, language } = useLanguage();
 
-  // Filtrar transações da moeda atual
   const accountTransactions = useMemo(() => {
     return transactions.filter(tx => {
-      // Mostrar transações que envolvem esta moeda
       if (tx.currency === account.currency) return true;
       if (tx.fromCurrency === account.currency) return true;
       if (tx.toCurrency === account.currency) return true;
       return false;
-    }).slice(0, 10); // Mostrar apenas as 10 mais recentes
+    }).slice(0, 10);
   }, [transactions, account.currency]);
 
   const formatBalance = (currency: string) => {
     const balance = getBalance(currency);
-    
-    if (currency === 'BRL') {
-      return `${balance.toLocaleString('pt-BR', {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2
-      })} ${currency}`;
+    const locale = language === 'pt' ? 'pt-BR' : language === 'es' ? 'es-ES' : 'en-US';
+    return `${balance.toLocaleString(locale, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${currency}`;
+  };
+
+  const handleCopyPixKey = (value: string, keyId: string) => {
+    copyToClipboard(value);
+    setCopiedKey(keyId);
+    toast.success(t.pix?.keyCopied || 'Copiado!', { duration: 2000 });
+    setTimeout(() => setCopiedKey(null), 2000);
+  };
+
+  const handleSharePixKey = async (value: string, keyType: string) => {
+    const text = `Chave PIX (${keyType}): ${value}`;
+    if (navigator.share) {
+      try { await navigator.share({ title: 'Chave PIX', text }); } catch { }
+    } else {
+      copyToClipboard(text);
+      toast.success(t.pix?.keyCopied || 'Copiado!', { duration: 2000 });
     }
-    
-    return `${balance.toFixed(2).replace('.', ',')} ${currency}`;
+  };
+
+  const pixKeyTypeLabel = (type: string): string => {
+    const labels: Record<string, string> = {
+      email: 'E-mail', phone: t.profile?.phone || 'Telefone', cpf: 'CPF',
+      cnpj: 'CNPJ', random: t.pix?.randomKey || 'Chave Aleatória',
+    };
+    return labels[type] || type;
   };
 
   const formatAmount = (tx: any) => {
     let amount = 0;
     let currency = account.currency;
-    
-    // Determinar o valor e a moeda corretos para exibir
     if (tx.type === 'convert') {
-      // Para conversões, mostrar o valor na moeda da conta
-      if (tx.fromCurrency === account.currency) {
-        amount = -tx.fromAmount;
-        currency = tx.fromCurrency;
-      } else if (tx.toCurrency === account.currency) {
-        amount = tx.toAmount;
-        currency = tx.toCurrency;
-      }
+      if (tx.fromCurrency === account.currency) { amount = -tx.fromAmount; currency = tx.fromCurrency; }
+      else if (tx.toCurrency === account.currency) { amount = tx.toAmount; currency = tx.toCurrency; }
     } else if (tx.type === 'withdraw_fiat' || tx.type === 'send_crypto' || tx.type === 'crypto_send' || tx.type === 'pix_send') {
-      // ✅ Adicionar novos tipos de envio (saída)
-      amount = -Math.abs(tx.amount); // Garantir que seja negativo
+      amount = -Math.abs(tx.amount);
       currency = tx.currency;
     } else {
-      // ✅ Tipos de recebimento (entrada): receive_crypto, crypto_receive, pix_receive, deposit_fiat
-      amount = Math.abs(tx.amount); // Garantir que seja positivo
+      amount = Math.abs(tx.amount);
       currency = tx.currency;
     }
-
     const sign = amount >= 0 ? '+' : '-';
     const absAmount = Math.abs(amount);
-    
-    let value: string;
-    if (currency === 'BRL') {
-      value = absAmount.toLocaleString('pt-BR', {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2
-      });
-    } else {
-      value = absAmount.toFixed(2).replace('.', ',');
-    }
-    
+    const locale = language === 'pt' ? 'pt-BR' : language === 'es' ? 'es-ES' : 'en-US';
+    const value = absAmount.toLocaleString(locale, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     return { formatted: `${sign} ${value} ${currency}`, amount };
   };
 
   const formatDate = (date: Date) => {
-    const day = date.getDate();
-    const month = date.toLocaleDateString('pt-BR', { month: 'short' });
-    return `${day} de ${month.charAt(0).toUpperCase() + month.slice(1)}`;
+    const locale = language === 'pt' ? 'pt-BR' : language === 'es' ? 'es-ES' : 'en-US';
+    return date.toLocaleDateString(locale, { day: 'numeric', month: 'short' });
   };
 
   const getTransactionIcon = (iconType: 'entrada' | 'saida' | 'conversao') => {
     switch (iconType) {
-      case 'saida':
-        return <ArrowUpRight className="w-5 h-5 text-white" />;
-      case 'entrada':
-        return <ArrowDownLeft className="w-5 h-5 text-white" />;
-      case 'conversao':
-        return <ArrowLeftRight className="w-5 h-5 text-white" />;
+      case 'saida': return <ArrowUpRight className="w-5 h-5 text-white" />;
+      case 'entrada': return <ArrowDownLeft className="w-5 h-5 text-white" />;
+      case 'conversao': return <ArrowLeftRight className="w-5 h-5 text-white" />;
     }
   };
 
@@ -106,12 +105,7 @@ export function FiatAccountDetails({ account, onClose, onNavigateToConvert, onNa
       {showAddFunds ? (
         <FiatAddFunds account={account} onClose={() => setShowAddFunds(false)} />
       ) : showPixKeys ? (
-        <PixKeys onNavigate={(screen) => {
-          if (screen === 'home') {
-            setShowPixKeys(false);
-            onClose();
-          }
-        }} />
+        <PixKeys onNavigate={(screen) => { if (screen === 'home') { setShowPixKeys(false); onClose(); } }} />
       ) : (
         <div className="fixed inset-0 bg-gradient-to-b from-[#1a2942] via-black to-black z-50 overflow-y-auto">
           {/* Header */}
@@ -126,67 +120,28 @@ export function FiatAccountDetails({ account, onClose, onNavigateToConvert, onNa
 
           {/* Account Info */}
           <div className="flex flex-col items-center mt-8 px-4 relative z-10">
-            {/* Currency Code */}
-            <div className="text-white/60 text-sm font-semibold mb-2 tracking-widest uppercase">
-              {account.currency}
-            </div>
-
-            {/* Balance */}
-            <div className="text-xl font-light text-white mb-8 tabular-nums">
-              {formatBalance(account.currency)}
-            </div>
-
-            {/* PIX Keys Button (only for BRL) */}
-            {account.currency === 'BRL' && (
-              <button 
-                onClick={() => setShowPixKeys(true)}
-                className="mb-8 px-6 py-2.5 rounded-full bg-white/10 hover:bg-white/15 backdrop-blur-md border border-white/20 transition-all flex items-center gap-2 text-white font-semibold text-sm shadow-[0_0_20px_rgba(255,255,255,0.05)]"
-              >
-                Chaves Pix
-              </button>
-            )}
+            <div className="text-white/60 text-sm font-semibold mb-2 tracking-widest uppercase">{account.currency}</div>
+            <div className="text-xl font-light text-white mb-8 tabular-nums">{formatBalance(account.currency)}</div>
 
             {/* Action Buttons */}
             <div className="flex items-center gap-8 mb-10">
-              {/* Adicionar */}
-              <button 
-                onClick={() => setShowAddFunds(true)}
-                className="flex flex-col items-center gap-2 group"
-              >
-                <div className="w-14 h-14 rounded-full bg-white/5 backdrop-blur-md border-2 border-white/20 transition-all flex items-center justify-center shadow-[inset_0_1px_0_0_rgba(255,255,255,0.1),0_4px_12px_rgba(0,0,0,0.3)] hover:bg-white/10 active:scale-95">
+              <button onClick={() => setShowAddFunds(true)} className="flex flex-col items-center gap-2 group">
+                <div className="w-14 h-14 rounded-full bg-white/5 backdrop-blur-md border-2 border-white/20 flex items-center justify-center shadow-lg hover:bg-white/10 active:scale-95">
                   <Plus className="w-6 h-6 text-white" />
                 </div>
-                <span className="text-xs text-white/70 font-light">Adicionar</span>
+                <span className="text-xs text-white/70 font-light">{t.fiatAccounts.addButton}</span>
               </button>
-
-              {/* Converter */}
-              <button 
-                onClick={() => {
-                  if (onNavigateToConvert) {
-                    onNavigateToConvert();
-                  }
-                }}
-                className="flex flex-col items-center gap-2 group"
-              >
-                <div className="w-14 h-14 rounded-full bg-white/5 backdrop-blur-md border-2 border-white/20 transition-all flex items-center justify-center shadow-[inset_0_1px_0_0_rgba(255,255,255,0.1),0_4px_12px_rgba(0,0,0,0.3)] hover:bg-white/10 active:scale-95">
+              <button onClick={() => onNavigateToConvert?.()} className="flex flex-col items-center gap-2 group">
+                <div className="w-14 h-14 rounded-full bg-white/5 backdrop-blur-md border-2 border-white/20 flex items-center justify-center shadow-lg hover:bg-white/10 active:scale-95">
                   <ArrowLeftRight className="w-6 h-6 text-white" />
                 </div>
-                <span className="text-xs text-white/70 font-light">Converter</span>
+                <span className="text-xs text-white/70 font-light">{t.bottomNav.convert}</span>
               </button>
-
-              {/* Enviar */}
-              <button 
-                onClick={() => {
-                  if (onNavigateToWithdraw) {
-                    onNavigateToWithdraw();
-                  }
-                }}
-                className="flex flex-col items-center gap-2 group"
-              >
-                <div className="w-14 h-14 rounded-full bg-white/5 backdrop-blur-md border-2 border-white/20 transition-all flex items-center justify-center shadow-[inset_0_1px_0_0_rgba(255,255,255,0.1),0_4px_12px_rgba(0,0,0,0.3)] hover:bg-white/10 active:scale-95">
+              <button onClick={() => onNavigateToWithdraw?.()} className="flex flex-col items-center gap-2 group">
+                <div className="w-14 h-14 rounded-full bg-white/5 backdrop-blur-md border-2 border-white/20 flex items-center justify-center shadow-lg hover:bg-white/10 active:scale-95">
                   <ArrowUpRight className="w-6 h-6 text-white" />
                 </div>
-                <span className="text-xs text-white/70 font-light">Enviar</span>
+                <span className="text-xs text-white/70 font-light">{t.withdrawTransfer.sendMoney}</span>
               </button>
             </div>
           </div>
@@ -196,23 +151,15 @@ export function FiatAccountDetails({ account, onClose, onNavigateToConvert, onNa
             <div className="bg-white/5 backdrop-blur-md rounded-full p-1 flex border border-white/10">
               <button
                 onClick={() => setActiveTab('transactions')}
-                className={`flex-1 py-2 rounded-full text-sm font-semibold transition-all ${
-                  activeTab === 'transactions'
-                    ? 'bg-white/20 backdrop-blur-md text-white shadow-[0_0_20px_rgba(255,255,255,0.05)]'
-                    : 'text-white/50 hover:text-white/70'
-                }`}
+                className={`flex-1 py-2 rounded-full text-sm font-semibold transition-all ${activeTab === 'transactions' ? 'bg-white/20 text-white' : 'text-white/50'}`}
               >
-                Transações
+                {t.transactions}
               </button>
               <button
                 onClick={() => setActiveTab('options')}
-                className={`flex-1 py-2 rounded-full text-sm font-semibold transition-all ${
-                  activeTab === 'options'
-                    ? 'bg-white/20 backdrop-blur-md text-white shadow-[0_0_20px_rgba(255,255,255,0.05)]'
-                    : 'text-white/50 hover:text-white/70'
-                }`}
+                className={`flex-1 py-2 rounded-full text-sm font-semibold transition-all ${activeTab === 'options' ? 'bg-white/20 text-white' : 'text-white/50'}`}
               >
-                Opções
+                {t.options}
               </button>
             </div>
           </div>
@@ -224,107 +171,92 @@ export function FiatAccountDetails({ account, onClose, onNavigateToConvert, onNa
                 {isLoading ? (
                   <div className="text-center py-12">
                     <div className="inline-block w-8 h-8 border-4 border-white/20 border-t-white rounded-full animate-spin" />
-                    <p className="text-white/50 mt-4 text-sm">Carregando transações...</p>
                   </div>
                 ) : accountTransactions.length === 0 ? (
                   <div className="text-center py-12">
-                    <div className="w-16 h-16 rounded-full bg-white/5 mx-auto mb-4 flex items-center justify-center">
-                      <ArrowLeftRight className="w-8 h-8 text-white/30" />
-                    </div>
-                    <p className="text-white/50 text-sm">Nenhuma transação encontrada</p>
-                    <p className="text-white/30 text-xs mt-2">Suas transações aparecerão aqui</p>
+                    <ArrowLeftRight className="w-8 h-8 text-white/30 mx-auto mb-4" />
+                    <p className="text-white/50 text-sm">{t.transactionsPage.noTransactions}</p>
                   </div>
                 ) : (
-                  <>
-                    {accountTransactions.map((transaction) => {
-                      const { formatted, amount } = formatAmount(transaction);
-                      const iconType = getTransactionIconType(transaction);
-
-                      return (
-                        <div
-                          key={transaction.id}
-                          className="bg-white/5 backdrop-blur-md rounded-2xl p-4 border border-white/10 shadow-[0_0_20px_rgba(255,255,255,0.05)] hover:bg-white/10 transition-all"
-                        >
-                          <div className="flex items-center gap-4">
-                            {/* Icon */}
-                            <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center flex-shrink-0">
-                              {getTransactionIcon(iconType)}
-                            </div>
-
-                            {/* Info */}
-                            <div className="flex-1 min-w-0">
-                              <div className="text-white font-semibold text-sm truncate">
-                                {formatTransactionDescription(transaction)}
-                              </div>
-                              <div className="text-white/50 text-xs">
-                                {transaction.recipientInfo || transaction.description || 'Transação'} · {formatDate(transaction.createdAt)}
-                              </div>
-                            </div>
-
-                            {/* Amount */}
-                            <div className="flex flex-col items-end">
-                              <div className={`font-semibold text-sm tabular-nums ${
-                                amount >= 0 ? 'text-[#34c759]' : 'text-white'
-                              }`}>
-                                {formatted}
-                              </div>
-                            </div>
-                          </div>
+                  accountTransactions.map((transaction) => {
+                    const { formatted, amount } = formatAmount(transaction);
+                    const iconType = getTransactionIconType(transaction);
+                    return (
+                      <div key={transaction.id} className="bg-white/5 rounded-2xl p-4 border border-white/10 flex items-center gap-4">
+                        <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center flex-shrink-0">
+                          {getTransactionIcon(iconType)}
                         </div>
-                      );
-                    })}
-                  </>
+                        <div className="flex-1 min-w-0">
+                          <div className="text-white font-semibold text-sm truncate">{formatTransactionDescription(transaction)}</div>
+                          <div className="text-white/50 text-xs">{formatDate(transaction.createdAt)}</div>
+                        </div>
+                        <div className={`font-semibold text-sm tabular-nums ${amount >= 0 ? 'text-[#34c759]' : 'text-white'}`}>{formatted}</div>
+                      </div>
+                    );
+                  })
                 )}
               </div>
             ) : (
-              <div className="space-y-3">
+              <div className="space-y-4">
                 {/* Account Details */}
-                <div className="bg-white/5 backdrop-blur-md rounded-2xl p-4 border border-white/10 shadow-[0_0_20px_rgba(255,255,255,0.05)]">
-                  <h3 className="text-white font-bold text-sm mb-3">Dados da Conta</h3>
-                  
-                  <div className="space-y-3">
-                    <div>
-                      <div className="text-white/50 text-xs mb-1">Banco</div>
-                      <div className="text-white text-sm font-semibold">{account.bankName}</div>
-                    </div>
-
-                    <div>
-                      <div className="text-white/50 text-xs mb-1">Número da Conta</div>
-                      <div className="text-white text-sm font-semibold tabular-nums">{account.accountNumber}</div>
-                    </div>
-
-                    {account.routingNumber && (
-                      <div>
-                        <div className="text-white/50 text-xs mb-1">Código do Banco</div>
-                        <div className="text-white text-sm font-semibold tabular-nums">{account.routingNumber}</div>
-                      </div>
-                    )}
-
-                    {account.iban && (
-                      <div>
-                        <div className="text-white/50 text-xs mb-1">IBAN</div>
-                        <div className="text-white text-sm font-semibold tabular-nums">{account.iban}</div>
-                      </div>
-                    )}
-
-                    {account.swift && (
-                      <div>
-                        <div className="text-white/50 text-xs mb-1">SWIFT</div>
-                        <div className="text-white text-sm font-semibold tabular-nums">{account.swift}</div>
-                      </div>
-                    )}
+                <div className="bg-white/5 rounded-2xl p-4 border border-white/10">
+                  <h3 className="text-white font-bold text-sm mb-3">{t.fiatAccounts.accountData}</h3>
+                  <div className="space-y-3 text-sm">
+                    <div><div className="text-white/50 text-xs">{t.fiatAccounts.bank}</div><div className="text-white font-semibold">{account.bankName}</div></div>
+                    <div><div className="text-white/50 text-xs">{t.fiatAccounts.accountNumber}</div><div className="text-white font-semibold tabular-nums">{account.accountNumber}</div></div>
+                    {account.routingNumber && <div><div className="text-white/50 text-xs">{t.fiatAccounts.bankCode}</div><div className="text-white font-semibold tabular-nums">{account.routingNumber}</div></div>}
+                    {account.iban && <div><div className="text-white/50 text-xs">{t.fiatAccounts.iban}</div><div className="text-white font-semibold tabular-nums">{account.iban}</div></div>}
+                    {account.swift && <div><div className="text-white/50 text-xs">{t.fiatAccounts.swiftBic}</div><div className="text-white font-semibold tabular-nums">{account.swift}</div></div>}
                   </div>
                 </div>
 
+                {/* PIX Keys Section (BRL only) */}
+                {account.currency === 'BRL' && (
+                  <div className="bg-white/5 rounded-2xl p-4 border border-white/10">
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center gap-2">
+                        <Key className="w-4 h-4 text-cyan-400" />
+                        <h3 className="text-white font-bold text-sm">{t.fiatAccounts.pixKeys}</h3>
+                      </div>
+                      <button onClick={() => setShowPixKeys(true)} className="text-xs text-cyan-400 font-semibold">{t.pix.manage}</button>
+                    </div>
+
+                    {isLoadingPixKeys ? (
+                      <div className="flex justify-center py-4"><div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin" /></div>
+                    ) : pixKeys.length === 0 ? (
+                      <div className="text-center py-4">
+                        <button onClick={() => setShowPixKeys(true)} className="px-4 py-2 rounded-xl bg-cyan-500/20 text-cyan-400 text-sm font-semibold border border-cyan-500/30">+ {t.pix.registerKey}</button>
+                      </div>
+                    ) : (
+                      <div className="space-y-2">
+                        {pixKeys.map((key) => (
+                          <div key={key.id} className="flex items-center gap-3 bg-black/30 rounded-xl p-3 border border-white/5">
+                            <div className="w-8 h-8 rounded-full bg-cyan-500/15 flex items-center justify-center flex-shrink-0"><Key className="w-4 h-4 text-cyan-400" /></div>
+                            <div className="flex-1 min-w-0">
+                              <div className="text-white/50 text-xs mb-0.5">{pixKeyTypeLabel(key.keyType)}</div>
+                              <div className="text-white text-sm font-mono truncate">{key.keyValue}</div>
+                            </div>
+                            <div className="flex items-center gap-1">
+                              <button onClick={() => handleSharePixKey(key.keyValue, pixKeyTypeLabel(key.keyType))} className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center hover:bg-white/10"><Share2 className="w-3.5 h-3.5 text-white/60" /></button>
+                              <button onClick={() => handleCopyPixKey(key.keyValue, key.id)} className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center hover:bg-white/10">
+                                {copiedKey === key.id ? <Check className="w-3.5 h-3.5 text-green-400" /> : <Copy className="w-3.5 h-3.5 text-cyan-400" />}
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
+
                 {/* Account Actions */}
-                <div className="bg-white/5 backdrop-blur-md rounded-2xl overflow-hidden border border-white/10 shadow-[0_0_20px_rgba(255,255,255,0.05)]">
-                  <button className="w-full p-4 flex items-center justify-between hover:bg-white/10 transition-all border-b border-white/5">
-                    <span className="text-white text-sm font-semibold">Configurações da Conta</span>
+                <div className="bg-white/5 rounded-2xl overflow-hidden border border-white/10">
+                  <button className="w-full p-4 flex items-center justify-between hover:bg-white/10 border-b border-white/5">
+                    <span className="text-white text-sm font-semibold">{t.fiatAccounts.accountSettings}</span>
                     <ChevronRight className="w-4 h-4 text-white/50" />
                   </button>
-                  
-                  <button className="w-full p-4 flex items-center justify-between hover:bg-white/10 transition-all">
-                    <span className="text-[#ff3b30] text-sm font-semibold">Remover Conta</span>
+                  <button className="w-full p-4 flex items-center justify-between hover:bg-white/10">
+                    <span className="text-[#ff3b30] text-sm font-semibold">{t.fiatAccounts.removeAccount}</span>
                     <ChevronRight className="w-4 h-4 text-[#ff3b30]/50" />
                   </button>
                 </div>
