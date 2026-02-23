@@ -61,7 +61,7 @@ export function FiatAccountDetails({ account, onClose, onNavigateToConvert, onNa
 
   const pixKeyTypeLabel = (type: string): string => {
     const labels: Record<string, string> = {
-      email: 'E-mail', phone: t.profile?.phone || 'Telefone', cpf: 'CPF',
+      email: 'E-mail', phone: t.phone || 'Telefone', cpf: 'CPF',
       cnpj: 'CNPJ', random: t.pix?.randomKey || 'Chave Aleatória',
     };
     return labels[type] || type;

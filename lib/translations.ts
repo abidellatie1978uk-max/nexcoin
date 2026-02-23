@@ -199,6 +199,13 @@ export const translations = {
         goodMorning: 'Bom dia',
         goodAfternoon: 'Boa tarde',
         goodEvening: 'Boa noite',
+        options: 'Opções',
+        withdrawTransfer: {
+            sendMoney: 'Enviar',
+        },
+        transactionsPage: {
+            noTransactions: 'Nenhuma transação encontrada',
+        },
 
         // Deposit/Withdraw
         depositFunds: 'Depositar fundos',
@@ -504,6 +511,13 @@ export const translations = {
         goodMorning: 'Good morning',
         goodAfternoon: 'Good afternoon',
         goodEvening: 'Good evening',
+        options: 'Options',
+        withdrawTransfer: {
+            sendMoney: 'Send',
+        },
+        transactionsPage: {
+            noTransactions: 'No transactions found',
+        },
 
         // Deposit/Withdraw
         depositFunds: 'Deposit Funds',
@@ -809,6 +823,13 @@ export const translations = {
         goodMorning: 'Buenos días',
         goodAfternoon: 'Buenas tardes',
         goodEvening: 'Buenas noches',
+        options: 'Opciones',
+        withdrawTransfer: {
+            sendMoney: 'Enviar',
+        },
+        transactionsPage: {
+            noTransactions: 'No se encontraron transacciones',
+        },
 
         // Deposit/Withdraw
         depositFunds: 'Depositar Fondos',
