@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { Eye, EyeOff, ArrowLeft, ChevronDown } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useSignUpFlow } from '../contexts/SignUpFlowContext';
-import { useAuth } from '../contexts/AuthContext';
 import { FlagIcon } from './FlagIcon';
 import { Screen } from '../App';
 import { capitalizeText } from '../lib/textUtils';
@@ -12,7 +11,6 @@ interface SignUpProps {
 }
 
 export function SignUp({ onNavigate }: SignUpProps) {
-  const { signUp } = useAuth();
   const { setSignUpData } = useSignUpFlow();
   const { t } = useLanguage();
   const [formData, setFormData] = useState({
@@ -185,54 +183,6 @@ export function SignUp({ onNavigate }: SignUpProps) {
     onNavigate('countrySelection');
   };
 
-  const handleTestSignUp = async () => {
-    // Dados de teste automáticos
-    const testData = {
-      name: 'Usuário Teste',
-      email: `teste${Date.now()}@ethertron.com`,
-      phone: '+5511999999999',
-      password: 'Teste123!',
-      country: 'BR',
-    };
-
-    try {
-      // Criar conta diretamente no Firebase
-      await signUp(
-        testData.email,
-        testData.password,
-        testData.name,
-        testData.phone,
-        testData.country,
-        '123456' // PIN de teste
-      );
-
-      console.log('✅ Conta de teste criada com sucesso!')
-      console.log('📧 Email:', testData.email);
-      console.log('🔑 Senha:', testData.password);
-      console.log('📱 PIN:', '123456');
-
-      alert(`✅ Conta criada com sucesso!\n\nEmail: ${testData.email}\nSenha: ${testData.password}\nPIN: 123456`);
-
-      // Navegar para Home
-      onNavigate('home');
-    } catch (error: any) {
-      console.error('❌ Erro ao criar conta de teste:', error);
-
-      // Verificar se é erro de permissão do Firestore (várias formas possíveis)
-      const errorMessage = error.message || error.toString();
-      const isPermissionError =
-        errorMessage.includes('permission') ||
-        errorMessage.includes('Permission') ||
-        errorMessage.includes('PERMISSION_DENIED') ||
-        error.code === 'permission-denied';
-
-      if (isPermissionError) {
-        alert(`❌ Erro: ${errorMessage}\n\nVocê precisa configurar o Firebase corretamente para criar contas de teste.`);
-      } else {
-        alert(`❌ Erro: ${errorMessage}`);
-      }
-    }
-  };
 
   return (
     <div className="min-h-screen bg-black text-white p-4 flex flex-col justify-center items-center relative">
@@ -265,6 +215,7 @@ export function SignUp({ onNavigate }: SignUpProps) {
           <p className="text-slate-400 text-sm mb-5">
             {t.dontHaveAccount}
           </p>
+
 
           <form className="space-y-3 mb-5">
             {/* Name Input */}

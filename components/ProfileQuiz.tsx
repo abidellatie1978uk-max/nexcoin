@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight, AlertCircle } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
-import { doc, updateDoc, collection, addDoc, query, where, getDocs } from 'firebase/firestore';
+import { doc, updateDoc, collection, addDoc, query, where, getDocs, getDoc, setDoc } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import type { Screen } from '../App';
 import { generateBankAccountByCountry } from '../lib/bankAccountGenerator';
@@ -25,7 +25,7 @@ interface Question {
 
 export function ProfileQuiz({ onNavigate }: ProfileQuizProps) {
   const { userData, user, reloadUserData } = useAuth();
-  
+
   // Mapear documentos por país
   const getDocumentsByCountry = (countryCode: string) => {
     const documentMap: Record<string, { value: string; label: string; format: string }[]> = {
@@ -100,7 +100,7 @@ export function ProfileQuiz({ onNavigate }: ProfileQuizProps) {
   // Pegar documentos do país do usuário
   const userCountry = userData?.country || 'BR';
   const availableDocuments = getDocumentsByCountry(userCountry);
-  
+
   // Definir campos de endereço por país
   const getAddressFieldsByCountry = (countryCode: string) => {
     const addressFields: Record<string, Question[]> = {
@@ -357,7 +357,7 @@ export function ProfileQuiz({ onNavigate }: ProfileQuizProps) {
   };
 
   const addressFields = getAddressFieldsByCountry(userCountry);
-  
+
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [answers, setAnswers] = useState<Record<string, string>>({
     birthDate: '',
@@ -380,39 +380,39 @@ export function ProfileQuiz({ onNavigate }: ProfileQuizProps) {
   const questions: Question[] = [
     {
       id: 'birthDate',
-      question: userCountry === 'BR' ? 'Qual é a sua data de nascimento?' : 
-                userCountry === 'US' ? 'What is your birth date?' :
-                userCountry === 'ES' ? '¿Cuál es tu fecha de nascimento?' :
-                'Qual é a sua data de nascimento?',
+      question: userCountry === 'BR' ? 'Qual é a sua data de nascimento?' :
+        userCountry === 'US' ? 'What is your birth date?' :
+          userCountry === 'ES' ? '¿Cuál es tu fecha de nascimento?' :
+            'Qual é a sua data de nascimento?',
       subtitle: userCountry === 'BR' ? 'Você precisa ter pelo menos 18 anos' :
-                userCountry === 'US' ? 'You must be at least 18 years old' :
-                userCountry === 'ES' ? 'Debes tener al menos 18 años' :
-                'Você precisa ter pelo menos 18 anos',
+        userCountry === 'US' ? 'You must be at least 18 years old' :
+          userCountry === 'ES' ? 'Debes tener al menos 18 años' :
+            'Você precisa ter pelo menos 18 anos',
       type: 'date',
     },
     {
       id: 'documentType',
       question: userCountry === 'BR' ? 'Qual tipo de documento você possui?' :
-                userCountry === 'US' ? 'What type of document do you have?' :
-                userCountry === 'ES' ? '¿Qué tipo de documento tienes?' :
-                'Qual tipo de documento você possui?',
+        userCountry === 'US' ? 'What type of document do you have?' :
+          userCountry === 'ES' ? '¿Qué tipo de documento tienes?' :
+            'Qual tipo de documento você possui?',
       subtitle: userCountry === 'BR' ? 'Selecione o documento de identificação' :
-                userCountry === 'US' ? 'Select your identification document' :
-                userCountry === 'ES' ? 'Selecciona el documento de identificação' :
-                'Selecione o documento de identificação',
+        userCountry === 'US' ? 'Select your identification document' :
+          userCountry === 'ES' ? 'Selecciona el documento de identificação' :
+            'Selecione o documento de identificação',
       type: 'choice',
       options: availableDocuments.map(doc => ({ value: doc.value, label: doc.label })),
     },
     {
       id: 'document',
-      question: `${userCountry === 'BR' ? 'Digite o número do seu' : 
-                  userCountry === 'US' ? 'Enter your' :
-                  userCountry === 'ES' ? 'Ingresa tu número de' :
-                  'Digite o número do seu'} ${availableDocuments.find(d => d.value === answers.documentType)?.label || 'documento'}`,
-      subtitle: `${userCountry === 'BR' ? 'Formato:' : 
-                  userCountry === 'US' ? 'Format:' :
-                  userCountry === 'ES' ? 'Formato:' :
-                  'Formato:'} ${availableDocuments.find(d => d.value === answers.documentType)?.format || ''}`,
+      question: `${userCountry === 'BR' ? 'Digite o número do seu' :
+        userCountry === 'US' ? 'Enter your' :
+          userCountry === 'ES' ? 'Ingresa tu número de' :
+            'Digite o número do seu'} ${availableDocuments.find(d => d.value === answers.documentType)?.label || 'documento'}`,
+      subtitle: `${userCountry === 'BR' ? 'Formato:' :
+        userCountry === 'US' ? 'Format:' :
+          userCountry === 'ES' ? 'Formato:' :
+            'Formato:'} ${availableDocuments.find(d => d.value === answers.documentType)?.format || ''}`,
       type: 'document',
       placeholder: availableDocuments.find(d => d.value === answers.documentType)?.format || '',
     },
@@ -535,7 +535,7 @@ export function ProfileQuiz({ onNavigate }: ProfileQuizProps) {
       const today = new Date();
       const age = today.getFullYear() - birthDate.getFullYear();
       const monthDiff = today.getMonth() - birthDate.getMonth();
-      
+
       if (age < 18 || (age === 18 && monthDiff < 0)) {
         setError('Você precisa ter pelo menos 18 anos');
         return false;
@@ -620,29 +620,26 @@ export function ProfileQuiz({ onNavigate }: ProfileQuizProps) {
         profileCompletedAt: new Date(),
       });
 
-      // 2. Criar conta bancária automaticamente no país de origem (SE NÃO EXISTIR)
+      // 2. Criar conta bancária automaticamente no país de origem (IDEMPOTENTE)
       try {
-        const accountsRef = collection(db, 'bankAccounts');
-        
-        // 🔍 Verificar se já existe conta desse país
-        const existingAccountQuery = query(
-          accountsRef,
-          where('userId', '==', user.uid),
-          where('country', '==', userCountry)
-        );
-        const existingAccountSnapshot = await getDocs(existingAccountQuery);
-        
+        const accountId = `${user.uid}_${userCountry}`;
+        const accountDocRef = doc(db, 'bankAccounts', accountId);
+        const accountSnapshot = await getDoc(accountDocRef);
+
         // ✅ Só criar se NÃO existir
-        if (existingAccountSnapshot.empty) {
+        if (!accountSnapshot.exists()) {
+          console.log('💼 Criando conta bancária única para:', userCountry);
           const bankAccount = generateBankAccountByCountry(userCountry, user.uid);
-          await addDoc(accountsRef, {
+          await setDoc(accountDocRef, {
             ...bankAccount,
+            id: accountId, // ID determinístico
             userId: user.uid,
-            isPrimary: true, // Primeira conta é sempre a principal
+            isPrimary: true,
+            createdAt: new Date(),
           });
-          console.log('✅ Conta bancária criada para:', userCountry);
+          console.log('✅ Conta bancária criada:', accountId);
         } else {
-          console.log('ℹ️ Conta bancária já existe para:', userCountry);
+          console.log('ℹ️ Conta bancária já existe:', accountId);
         }
       } catch (bankError: any) {
         console.error('⚠️ Erro ao criar conta bancária:', bankError);
@@ -650,10 +647,10 @@ export function ProfileQuiz({ onNavigate }: ProfileQuizProps) {
 
       // 3. Atualizar userData localmente
       Object.assign(userData, answers);
-      
+
       // 4. Recarregar do Firebase para garantir sincronização
       await reloadUserData();
-      
+
       // 5. Redirecionar para home
       console.log('✅ Cadastro concluído! Redirecionando para home...');
       onNavigate('home');
@@ -668,7 +665,7 @@ export function ProfileQuiz({ onNavigate }: ProfileQuizProps) {
   // Atualizar resposta
   const handleAnswerChange = (value: string) => {
     const question = questions[currentQuestion];
-    
+
     if (question.type === 'document') {
       if (answers.documentType === 'cpf') {
         value = formatCPF(value);
@@ -678,15 +675,15 @@ export function ProfileQuiz({ onNavigate }: ProfileQuizProps) {
         value = value.toUpperCase();
       }
     }
-    
+
     if (question.type === 'zipcode') {
       value = formatZipCode(value);
     }
 
     // ✅ Capitalizar automaticamente campos de texto (nomes de ruas, cidades, complementos)
     if (question.type === 'text' && (
-      question.id === 'streetName' || 
-      question.id === 'city' || 
+      question.id === 'streetName' ||
+      question.id === 'city' ||
       question.id === 'state' ||
       question.id === 'complement'
     )) {
@@ -705,35 +702,35 @@ export function ProfileQuiz({ onNavigate }: ProfileQuizProps) {
       const today = new Date();
       const age = today.getFullYear() - birthDate.getFullYear();
       const monthDiff = today.getMonth() - birthDate.getMonth();
-      
+
       if (age < 18 || (age === 18 && monthDiff < 0)) return false;
       return true;
     }
 
     if (question.id === 'document') {
       if (!value) return false;
-      
+
       // Remover formatação para validar
       const cleanValue = value.replace(/\D/g, '');
-      
+
       // Validar CPF - precisa ter 11 dígitos
       if (currentAnswers.documentType === 'cpf') {
         if (cleanValue.length !== 11) return false;
         console.log('🔍 Validando CPF:', cleanValue, 'Resultado:', validateCPF(value));
         return validateCPF(value);
       }
-      
+
       // Validar CNPJ - precisa ter 14 dígitos
       if (currentAnswers.documentType === 'cnpj') {
         if (cleanValue.length !== 14) return false;
         return validateCNPJ(value);
       }
-      
+
       // Validar Passaporte
       if (currentAnswers.documentType === 'passport') {
         return validatePassport(value);
       }
-      
+
       // Outros documentos - mínimo 5 caracteres
       return cleanValue.length >= 5;
     }
@@ -749,13 +746,13 @@ export function ProfileQuiz({ onNavigate }: ProfileQuizProps) {
 
     return !!value;
   };
-  
+
   // Selecionar opção
   const handleOptionSelect = (value: string) => {
     const question = questions[currentQuestion];
     setAnswers({ ...answers, [question.id]: value });
     setError('');
-    
+
     // Auto-avançar após selecionar opção
     setTimeout(() => {
       handleNext();
@@ -771,18 +768,18 @@ export function ProfileQuiz({ onNavigate }: ProfileQuizProps) {
     const fetchCep = async () => {
       // Só buscar se for Brasil e o campo atual for zipCode
       if (userCountry !== 'BR' || currentQuestionData.id !== 'zipCode') return;
-      
+
       const cleanCep = answers.zipCode.replace(/\D/g, '');
-      
+
       // CEP brasileiro tem 8 dígitos
       if (cleanCep.length !== 8) return;
-      
+
       setIsLoadingCep(true);
       setError('');
-      
+
       try {
         const cepData = await searchCep(answers.zipCode);
-        
+
         if (cepData) {
           // ✅ Preencher automaticamente os dados do endereço
           setAnswers(prev => ({
@@ -791,7 +788,7 @@ export function ProfileQuiz({ onNavigate }: ProfileQuizProps) {
             city: cepData.localidade || '',
             state: cepData.uf || '',
           }));
-          
+
           console.log('✅ Endereço encontrado:', cepData);
         } else {
           setError('CEP não encontrado. Verifique e tente novamente.');
@@ -803,7 +800,7 @@ export function ProfileQuiz({ onNavigate }: ProfileQuizProps) {
         setIsLoadingCep(false);
       }
     };
-    
+
     fetchCep();
   }, [answers.zipCode, userCountry, currentQuestionData.id]);
 
@@ -842,9 +839,8 @@ export function ProfileQuiz({ onNavigate }: ProfileQuizProps) {
       {/* Question Content */}
       <div className="flex-1 px-6 pb-24 overflow-y-auto">
         <div
-          className={`transition-opacity duration-200 ${
-            isAnimating ? 'opacity-0' : 'opacity-100'
-          }`}
+          className={`transition-opacity duration-200 ${isAnimating ? 'opacity-0' : 'opacity-100'
+            }`}
         >
           {/* Question */}
           <div className="mb-6">
@@ -875,11 +871,10 @@ export function ProfileQuiz({ onNavigate }: ProfileQuizProps) {
                 <button
                   key={option.value}
                   onClick={() => handleOptionSelect(option.value)}
-                  className={`w-full p-4 rounded-xl text-left transition-all border ${
-                    currentValue === option.value
-                      ? 'bg-gradient-to-r from-orange-500 to-purple-500 border-transparent'
-                      : 'bg-white/5 backdrop-blur-md border-white/10 hover:bg-white/10 shadow-[0_0_20px_rgba(255,255,255,0.05)]'
-                  }`}
+                  className={`w-full p-4 rounded-xl text-left transition-all border ${currentValue === option.value
+                    ? 'bg-gradient-to-r from-orange-500 to-purple-500 border-transparent'
+                    : 'bg-white/5 backdrop-blur-md border-white/10 hover:bg-white/10 shadow-[0_0_20px_rgba(255,255,255,0.05)]'
+                    }`}
                 >
                   <span className="font-semibold">{option.label}</span>
                 </button>
@@ -887,26 +882,26 @@ export function ProfileQuiz({ onNavigate }: ProfileQuizProps) {
             </div>
           )}
 
-          {(currentQuestionData.type === 'text' || 
-            currentQuestionData.type === 'document' || 
+          {(currentQuestionData.type === 'text' ||
+            currentQuestionData.type === 'document' ||
             currentQuestionData.type === 'zipcode') && (
-            <div className="relative">
-              <input
-                type="text"
-                value={currentValue}
-                onChange={(e) => handleAnswerChange(e.target.value)}
-                placeholder={currentQuestionData.placeholder}
-                className="w-full bg-zinc-900 rounded-xl px-4 py-3.5 border border-white/10 focus:border-orange-500 outline-none"
-                autoFocus
-              />
-              {/* Loading CEP indicator */}
-              {isLoadingCep && currentQuestionData.id === 'zipCode' && (
-                <div className="absolute right-4 top-1/2 -translate-y-1/2">
-                  <div className="w-5 h-5 border-2 border-orange-500 border-t-transparent rounded-full animate-spin"></div>
-                </div>
-              )}
-            </div>
-          )}
+              <div className="relative">
+                <input
+                  type="text"
+                  value={currentValue}
+                  onChange={(e) => handleAnswerChange(e.target.value)}
+                  placeholder={currentQuestionData.placeholder}
+                  className="w-full bg-zinc-900 rounded-xl px-4 py-3.5 border border-white/10 focus:border-orange-500 outline-none"
+                  autoFocus
+                />
+                {/* Loading CEP indicator */}
+                {isLoadingCep && currentQuestionData.id === 'zipCode' && (
+                  <div className="absolute right-4 top-1/2 -translate-y-1/2">
+                    <div className="w-5 h-5 border-2 border-orange-500 border-t-transparent rounded-full animate-spin"></div>
+                  </div>
+                )}
+              </div>
+            )}
 
           {/* Error Message */}
           {error && (
@@ -915,7 +910,7 @@ export function ProfileQuiz({ onNavigate }: ProfileQuizProps) {
               <p className="text-sm text-red-400">{error}</p>
             </div>
           )}
-          
+
           {/* Loading indicator quando estiver processando */}
           {isSaving && (
             <div className="mt-6 text-center">

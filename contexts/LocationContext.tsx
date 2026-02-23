@@ -1,6 +1,9 @@
 import React, { createContext, useContext, useState, useCallback } from 'react';
 import { auth, db } from '../lib/firebase';
 import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
+import { Geolocation } from '@capacitor/geolocation';
+import { Camera } from '@capacitor/camera';
+import { Capacitor } from '@capacitor/core';
 
 export interface LocationCoordinates {
   latitude: number;
@@ -55,22 +58,25 @@ export function LocationProvider({ children }: { children: React.ReactNode }) {
 
   const checkCameraPermission = useCallback(async () => {
     try {
-      console.log('📷 [Camera] Verificando permissão de câmera...');
-      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-      console.log('✅ [Camera] Permissão concedida');
-      setHasCameraPermission(true);
+      console.log('📷 [Camera] Verificando permissão nativa...');
+      const perm = await Camera.checkPermissions();
 
-      // Stop tracks to release camera
-      stream.getTracks().forEach(track => track.stop());
+      if (perm.camera === 'granted') {
+        setHasCameraPermission(true);
+      } else {
+        setHasCameraPermission(false);
+      }
     } catch (err) {
-      console.error('❌ [Camera] Permissão negada:', err);
+      console.error('❌ [Camera] Erro ao verificar permissão:', err);
       setHasCameraPermission(false);
     }
   }, []);
 
-  // Check camera permission on mount
+  // Check camera permission on mount WITHOUT triggering a prompt
   React.useEffect(() => {
-    checkCameraPermission();
+    if (Capacitor.isNativePlatform()) {
+      checkCameraPermission();
+    }
   }, [checkCameraPermission]);
 
   const handleSuccess = useCallback((position: GeolocationPosition) => {
@@ -186,7 +192,7 @@ export function LocationProvider({ children }: { children: React.ReactNode }) {
         `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`,
         {
           headers: {
-            'User-Agent': 'Ethertron/1.0'
+            'User-Agent': 'NexCoin/1.0'
           }
         }
       );
@@ -296,7 +302,7 @@ export function LocationProvider({ children }: { children: React.ReactNode }) {
         setFirestoreError('Firestore permission-denied - Regras precisam ser publicadas');
         console.error('🚨 [Firestore] ERRO DE PERMISSÃO - As regras do Firestore não foram publicadas!');
         console.error('🚨 [Firestore] Execute: bash deploy-firestore-rules.sh');
-        console.error('🚨 [Firestore] Ou publique manualmente em: https://console.firebase.google.com/project/ethertron-app/firestore/rules');
+        console.error('🚨 [Firestore] Ou publique manualmente em: https://console.firebase.google.com/project/NexCoin-app/firestore/rules');
       } else {
         setFirestoreError('Erro ao salvar localização no Firestore');
       }
@@ -319,39 +325,67 @@ export function LocationProvider({ children }: { children: React.ReactNode }) {
     });
   }, [handleSuccess, handleError]);
 
-  const watchLocation = useCallback(() => {
-    if (!navigator.geolocation) {
-      setError('Geolocalização não é suportada pelo seu navegador');
-      return;
+  const watchLocation = useCallback(async () => {
+    const isNative = Capacitor.isNativePlatform();
+
+    try {
+      if (isNative) {
+        const perm = await Geolocation.checkPermissions();
+        if (perm.location !== 'granted') {
+          console.log('📍 [Location] Permissão não concedida, solicitando...');
+          // Somente solicita se o usuário explicitamente pediu ou em fluxos específicos
+          // Por enquanto, apenas retornamos para evitar o loop
+          setIsLoading(false);
+          return;
+        }
+      }
+
+      if (isWatching) return;
+
+      console.log('🔄 [Location] Iniciando monitoramento de localização...');
+      setIsLoading(true);
+      setError(null);
+      setIsWatching(true);
+
+      if (isNative) {
+        const id = await Geolocation.watchPosition({
+          enableHighAccuracy: true,
+          timeout: 10000,
+        }, (position, err) => {
+          if (err) {
+            handleError(err as any);
+            return;
+          }
+          if (position) handleSuccess(position as any);
+        });
+        setWatchId(id as any);
+      } else {
+        const id = navigator.geolocation.watchPosition(handleSuccess, handleError, {
+          enableHighAccuracy: true,
+          timeout: 10000,
+          maximumAge: 0
+        });
+        setWatchId(id as any);
+      }
+
+      console.log('✅ [Location] Monitoramento iniciado');
+    } catch (err) {
+      console.error('❌ [Location] Erro ao iniciar monitoramento:', err);
+      setIsWatching(false);
+      setIsLoading(false);
     }
-
-    if (isWatching) {
-      console.log('⚠️ [Location] Já está monitorando localização');
-      return;
-    }
-
-    console.log('🔄 [Location] Iniciando monitoramento de localização...');
-    setIsLoading(true);
-    setError(null);
-    setIsWatching(true);
-
-    const id = navigator.geolocation.watchPosition(handleSuccess, handleError, {
-      enableHighAccuracy: true,
-      timeout: 10000,
-      maximumAge: 0
-    });
-
-    setWatchId(id);
-    console.log('✅ [Location] Monitoramento iniciado com ID:', id);
   }, [handleSuccess, handleError, isWatching]);
 
-  const stopWatching = useCallback(() => {
+  const stopWatching = useCallback(async () => {
     if (watchId !== null) {
-      console.log('🛑 [Location] Parando monitoramento de localização...');
-      navigator.geolocation.clearWatch(watchId);
+      console.log('🛑 [Location] Parando monitoramento...');
+      if (Capacitor.isNativePlatform()) {
+        await Geolocation.clearWatch({ id: watchId as any });
+      } else {
+        navigator.geolocation.clearWatch(watchId as any);
+      }
       setWatchId(null);
       setIsWatching(false);
-      console.log('✅ [Location] Monitoramento parado');
     }
   }, [watchId]);
 
@@ -372,23 +406,29 @@ export function LocationProvider({ children }: { children: React.ReactNode }) {
     firestoreError
   };
 
-  // ✅ Iniciar rastreamento AUTOMATICAMENTE quando o app abrir
+  // ✅ Iniciar rastreamento AUTOMATICAMENTE quando o app abrir, mas APENAS se já tiver permissão
   React.useEffect(() => {
-    console.log('🚀 [Location] Iniciando rastreamento automático ao abrir o app...');
+    const initTracking = async () => {
+      // Pequeno delay para evitar sobrecarga no boot
+      await new Promise(resolve => setTimeout(resolve, 2000));
 
-    // Pequeno delay para garantir que o Firebase Auth está pronto
-    const timer = setTimeout(() => {
-      if (!isWatching) {
-        console.log('📍 [Location] Ativando GPS automaticamente...');
-        watchLocation();
+      if (Capacitor.isNativePlatform()) {
+        const perm = await Geolocation.checkPermissions();
+        if (perm.location === 'granted') {
+          console.log('📍 [Location] Permissão já concedida, ativando GPS...');
+          watchLocation();
+        } else {
+          console.log('📍 [Location] Sem permissão prévia, não incomodando o usuário agora.');
+        }
+      } else {
+        // No web, verificamos se a permissão já foi dada anteriormente via localStorage experimental ou apenas tentamos
+        // Para evitar o pop-up chato, melhor não tentar automaticamente no Web se o usuário já disse que é chato
+        console.log('📍 [Web] Localização automática desativada para evitar pop-ups');
       }
-    }, 1000);
-
-    return () => {
-      clearTimeout(timer);
-      // NÃO parar o rastreamento quando desmontar, apenas limpar o timer
     };
-  }, []); // Executar apenas uma vez quando o componente montar
+
+    initTracking();
+  }, []);
 
   return (
     <LocationContext.Provider value={value}>

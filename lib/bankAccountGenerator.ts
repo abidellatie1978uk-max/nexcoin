@@ -45,7 +45,7 @@ interface BankData {
   swift?: string;
 }
 
-// Dados fixos da Ethertron por país
+// Dados fixos da NexCoin por país
 const BANK_DATA: Record<string, BankData> = {
   BR: {
     bankCode: '336', // Código fixo da instituição
@@ -141,7 +141,7 @@ export const generateBankAccountByCountry = (countryCode: string, userId?: strin
       accountNumber: generateBrazilianAccount(),
       bankCode: bankData?.bankCode,
       branchCode: bankData?.branchCode,
-      bankName: 'Ethertron transactions',
+      bankName: 'NexCoin transactions',
       accountType: 'Conta Corrente',
       swift: bankData?.swift,
     },
@@ -152,7 +152,7 @@ export const generateBankAccountByCountry = (countryCode: string, userId?: strin
       currency: 'USD',
       accountNumber: randomNumber(12),
       routingNumber: bankData?.routingNumber,
-      bankName: 'Ethertron transactions',
+      bankName: 'NexCoin transactions',
       accountType: 'Checking Account',
       swift: bankData?.swift,
     },
@@ -164,7 +164,7 @@ export const generateBankAccountByCountry = (countryCode: string, userId?: strin
       accountNumber: randomNumber(11),
       iban: generateIBAN('PT', bankData?.bankCode || '0000', randomNumber(11)),
       swift: bankData?.swift,
-      bankName: 'Ethertron transactions',
+      bankName: 'NexCoin transactions',
       accountType: 'Conta à Ordem',
       bankCode: bankData?.bankCode,
     },
@@ -176,7 +176,7 @@ export const generateBankAccountByCountry = (countryCode: string, userId?: strin
       accountNumber: randomNumber(10),
       iban: generateIBAN('ES', bankData?.bankCode || '0000', randomNumber(10)),
       swift: bankData?.swift,
-      bankName: 'Ethertron transactions',
+      bankName: 'NexCoin transactions',
       accountType: 'Cuenta Corriente',
       bankCode: bankData?.bankCode,
     },
@@ -188,7 +188,7 @@ export const generateBankAccountByCountry = (countryCode: string, userId?: strin
       accountNumber: randomNumber(11),
       iban: generateIBAN('FR', bankData?.bankCode || '00000', randomNumber(11)),
       swift: bankData?.swift,
-      bankName: 'Ethertron transactions',
+      bankName: 'NexCoin transactions',
       accountType: 'Compte Courant',
       bankCode: bankData?.bankCode,
       branchCode: bankData?.branchCode,
@@ -201,7 +201,7 @@ export const generateBankAccountByCountry = (countryCode: string, userId?: strin
       accountNumber: randomNumber(10),
       iban: generateIBAN('DE', bankData?.bankCode || '00000000', randomNumber(10)),
       swift: bankData?.swift,
-      bankName: 'Ethertron transactions',
+      bankName: 'NexCoin transactions',
       accountType: 'Girokonto',
       bankCode: bankData?.bankCode,
     },
@@ -213,7 +213,7 @@ export const generateBankAccountByCountry = (countryCode: string, userId?: strin
       accountNumber: randomNumber(12),
       iban: generateIBAN('IT', (bankData?.bankCode || '00000') + (bankData?.branchCode || '00000'), randomNumber(12)),
       swift: bankData?.swift,
-      bankName: 'Ethertron transactions',
+      bankName: 'NexCoin transactions',
       accountType: 'Conto Corrente',
       bankCode: bankData?.bankCode,
       branchCode: bankData?.branchCode,
@@ -226,7 +226,7 @@ export const generateBankAccountByCountry = (countryCode: string, userId?: strin
       accountNumber: randomNumber(8),
       iban: generateIBAN('GB', bankData?.sortCode?.replace(/-/g, '') || '000000', randomNumber(8)),
       swift: bankData?.swift,
-      bankName: 'Ethertron transactions',
+      bankName: 'NexCoin transactions',
       accountType: 'Current Account',
       sortCode: bankData?.sortCode,
     },
@@ -238,7 +238,7 @@ export const generateBankAccountByCountry = (countryCode: string, userId?: strin
       accountNumber: randomNumber(10),
       iban: generateIBAN('NL', bankData?.bankCode || 'ETRC', randomNumber(10)),
       swift: bankData?.swift,
-      bankName: 'Ethertron transactions',
+      bankName: 'NexCoin transactions',
       accountType: 'Betaalrekening',
       bankCode: bankData?.bankCode,
     },
@@ -250,7 +250,7 @@ export const generateBankAccountByCountry = (countryCode: string, userId?: strin
       accountNumber: randomNumber(12),
       iban: generateIBAN('BE', bankData?.bankCode || '000', randomNumber(12)),
       swift: bankData?.swift,
-      bankName: 'Ethertron transactions',
+      bankName: 'NexCoin transactions',
       accountType: 'Compte à Vue',
       bankCode: bankData?.bankCode,
     },
@@ -262,7 +262,7 @@ export const generateBankAccountByCountry = (countryCode: string, userId?: strin
       accountNumber: randomNumber(9),
       iban: generateIBAN('CH', bankData?.bankCode || '00000', randomNumber(9)),
       swift: bankData?.swift,
-      bankName: 'Ethertron transactions',
+      bankName: 'NexCoin transactions',
       accountType: 'Privatkonto',
       bankCode: bankData?.bankCode,
     },
@@ -274,7 +274,7 @@ export const generateBankAccountByCountry = (countryCode: string, userId?: strin
       accountNumber: randomNumber(11),
       iban: generateIBAN('AT', bankData?.bankCode || '00000', randomNumber(11)),
       swift: bankData?.swift,
-      bankName: 'Ethertron transactions',
+      bankName: 'NexCoin transactions',
       accountType: 'Girokonto',
       bankCode: bankData?.bankCode,
     },
@@ -286,7 +286,7 @@ export const generateBankAccountByCountry = (countryCode: string, userId?: strin
       accountNumber: randomNumber(12),
       routingNumber: bankData?.routingNumber,
       swift: bankData?.swift,
-      bankName: 'Ethertron transactions',
+      bankName: 'NexCoin transactions',
       accountType: 'Chequing Account',
     },
     AU: {
@@ -297,7 +297,7 @@ export const generateBankAccountByCountry = (countryCode: string, userId?: strin
       accountNumber: randomNumber(9),
       routingNumber: bankData?.routingNumber, // BSB
       swift: bankData?.swift,
-      bankName: 'Ethertron transactions',
+      bankName: 'NexCoin transactions',
       accountType: 'Transaction Account',
     },
     MX: {
@@ -308,7 +308,7 @@ export const generateBankAccountByCountry = (countryCode: string, userId?: strin
       accountNumber: randomNumber(18),
       bankCode: bankData?.bankCode,
       swift: bankData?.swift,
-      bankName: 'Ethertron transactions',
+      bankName: 'NexCoin transactions',
       accountType: 'Cuenta de Cheques',
     },
     AR: {
@@ -320,7 +320,7 @@ export const generateBankAccountByCountry = (countryCode: string, userId?: strin
       bankCode: bankData?.bankCode,
       branchCode: bankData?.branchCode,
       swift: bankData?.swift,
-      bankName: 'Ethertron transactions',
+      bankName: 'NexCoin transactions',
       accountType: 'Cuenta Corriente',
     },
     CL: {
@@ -331,7 +331,7 @@ export const generateBankAccountByCountry = (countryCode: string, userId?: strin
       accountNumber: randomNumber(12),
       bankCode: bankData?.bankCode,
       swift: bankData?.swift,
-      bankName: 'Ethertron transactions',
+      bankName: 'NexCoin transactions',
       accountType: 'Cuenta Corriente',
     },
     CO: {
@@ -342,7 +342,7 @@ export const generateBankAccountByCountry = (countryCode: string, userId?: strin
       accountNumber: randomNumber(11),
       bankCode: bankData?.bankCode,
       swift: bankData?.swift,
-      bankName: 'Ethertron transactions',
+      bankName: 'NexCoin transactions',
       accountType: 'Cuenta de Ahorros',
     },
   };
@@ -355,7 +355,7 @@ export const generateBankAccountByCountry = (countryCode: string, userId?: strin
     accountNumber: randomNumber(10),
     iban: generateIBAN(countryCode, '0000', randomNumber(10)),
     swift: `ETR${countryCode}XX`,
-    bankName: 'Ethertron transactions',
+    bankName: 'NexCoin transactions',
     accountType: 'Account',
   };
 

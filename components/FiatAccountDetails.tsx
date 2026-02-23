@@ -1,9 +1,13 @@
-import { X, ArrowUpRight, ArrowDownLeft, ArrowLeftRight, ChevronRight, Plus } from 'lucide-react';
+import { X, ArrowUpRight, ArrowDownLeft, ArrowLeftRight, ChevronRight, Plus, Copy, Check, Share2, KeyRound } from 'lucide-react';
 import { useState, useMemo } from 'react';
 import type { BankAccount } from '../lib/bankAccountGenerator';
 import { PixKeys } from './PixKeys';
-import { useFiatBalances } from '../hooks/useFiatBalances';
 import { FiatAddFunds } from './FiatAddFunds';
+import { useFiatBalances } from '../hooks/useFiatBalances';
+import { usePixKeys } from '../hooks/usePixKeys';
+import { toast } from 'sonner';
+import { copyToClipboard } from '../utils/clipboard';
+
 import { useTransactions } from '../hooks/useTransactions';
 
 interface FiatAccountDetailsProps {
@@ -17,7 +21,9 @@ export function FiatAccountDetails({ account, onClose, onNavigateToConvert, onNa
   const [activeTab, setActiveTab] = useState<'transactions' | 'options'>('transactions');
   const [showPixKeys, setShowPixKeys] = useState(false);
   const [showAddFunds, setShowAddFunds] = useState(false);
+  const [copiedKey, setCopiedKey] = useState<string | null>(null);
   const { getBalance } = useFiatBalances();
+  const { pixKeys, isLoading: isLoadingPixKeys } = usePixKeys();
   const { transactions, isLoading, formatTransactionDescription, getTransactionIconType } = useTransactions();
 
   // Filtrar transações da moeda atual
@@ -33,21 +39,46 @@ export function FiatAccountDetails({ account, onClose, onNavigateToConvert, onNa
 
   const formatBalance = (currency: string) => {
     const balance = getBalance(currency);
-    
+
     if (currency === 'BRL') {
       return `${balance.toLocaleString('pt-BR', {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2
       })} ${currency}`;
     }
-    
+
     return `${balance.toFixed(2).replace('.', ',')} ${currency}`;
+  };
+
+  const handleCopyPixKey = (value: string, keyId: string) => {
+    copyToClipboard(value);
+    setCopiedKey(keyId);
+    toast.success('Chave PIX copiada!', { duration: 2000 });
+    setTimeout(() => setCopiedKey(null), 2000);
+  };
+
+  const handleSharePixKey = async (value: string, keyType: string) => {
+    const text = `Minha chave PIX (${keyType}): ${value}`;
+    if (navigator.share) {
+      try { await navigator.share({ title: 'Chave PIX', text }); } catch { }
+    } else {
+      copyToClipboard(text);
+      toast.success('Chave PIX copiada!', { duration: 2000 });
+    }
+  };
+
+  const pixKeyTypeLabel = (type: string): string => {
+    const labels: Record<string, string> = {
+      email: 'E-mail', phone: 'Telefone', cpf: 'CPF',
+      cnpj: 'CNPJ', random: 'Chave Aleatória',
+    };
+    return labels[type] || type;
   };
 
   const formatAmount = (tx: any) => {
     let amount = 0;
     let currency = account.currency;
-    
+
     // Determinar o valor e a moeda corretos para exibir
     if (tx.type === 'convert') {
       // Para conversões, mostrar o valor na moeda da conta
@@ -70,7 +101,7 @@ export function FiatAccountDetails({ account, onClose, onNavigateToConvert, onNa
 
     const sign = amount >= 0 ? '+' : '-';
     const absAmount = Math.abs(amount);
-    
+
     let value: string;
     if (currency === 'BRL') {
       value = absAmount.toLocaleString('pt-BR', {
@@ -80,7 +111,7 @@ export function FiatAccountDetails({ account, onClose, onNavigateToConvert, onNa
     } else {
       value = absAmount.toFixed(2).replace('.', ',');
     }
-    
+
     return { formatted: `${sign} ${value} ${currency}`, amount };
   };
 
@@ -138,7 +169,7 @@ export function FiatAccountDetails({ account, onClose, onNavigateToConvert, onNa
 
             {/* PIX Keys Button (only for BRL) */}
             {account.currency === 'BRL' && (
-              <button 
+              <button
                 onClick={() => setShowPixKeys(true)}
                 className="mb-8 px-6 py-2.5 rounded-full bg-white/10 hover:bg-white/15 backdrop-blur-md border border-white/20 transition-all flex items-center gap-2 text-white font-semibold text-sm shadow-[0_0_20px_rgba(255,255,255,0.05)]"
               >
@@ -149,18 +180,17 @@ export function FiatAccountDetails({ account, onClose, onNavigateToConvert, onNa
             {/* Action Buttons */}
             <div className="flex items-center gap-8 mb-10">
               {/* Adicionar */}
-              <button 
+              <button
                 onClick={() => setShowAddFunds(true)}
                 className="flex flex-col items-center gap-2 group"
               >
                 <div className="w-14 h-14 rounded-full bg-white/5 backdrop-blur-md border-2 border-white/20 transition-all flex items-center justify-center shadow-[inset_0_1px_0_0_rgba(255,255,255,0.1),0_4px_12px_rgba(0,0,0,0.3)] hover:bg-white/10 active:scale-95">
-                  <Plus className="w-6 h-6 text-white" />
+                  <ArrowDownLeft className="w-6 h-6 text-white" />
                 </div>
-                <span className="text-xs text-white/70 font-light">Adicionar</span>
+                <span className="text-xs text-white/70 font-light">Receber</span>
               </button>
 
-              {/* Converter */}
-              <button 
+              <button
                 onClick={() => {
                   if (onNavigateToConvert) {
                     onNavigateToConvert();
@@ -175,7 +205,7 @@ export function FiatAccountDetails({ account, onClose, onNavigateToConvert, onNa
               </button>
 
               {/* Enviar */}
-              <button 
+              <button
                 onClick={() => {
                   if (onNavigateToWithdraw) {
                     onNavigateToWithdraw();
@@ -196,21 +226,19 @@ export function FiatAccountDetails({ account, onClose, onNavigateToConvert, onNa
             <div className="bg-white/5 backdrop-blur-md rounded-full p-1 flex border border-white/10">
               <button
                 onClick={() => setActiveTab('transactions')}
-                className={`flex-1 py-2 rounded-full text-sm font-semibold transition-all ${
-                  activeTab === 'transactions'
-                    ? 'bg-white/20 backdrop-blur-md text-white shadow-[0_0_20px_rgba(255,255,255,0.05)]'
-                    : 'text-white/50 hover:text-white/70'
-                }`}
+                className={`flex-1 py-2 rounded-full text-sm font-semibold transition-all ${activeTab === 'transactions'
+                  ? 'bg-white/20 backdrop-blur-md text-white shadow-[0_0_20px_rgba(255,255,255,0.05)]'
+                  : 'text-white/50 hover:text-white/70'
+                  }`}
               >
                 Transações
               </button>
               <button
                 onClick={() => setActiveTab('options')}
-                className={`flex-1 py-2 rounded-full text-sm font-semibold transition-all ${
-                  activeTab === 'options'
-                    ? 'bg-white/20 backdrop-blur-md text-white shadow-[0_0_20px_rgba(255,255,255,0.05)]'
-                    : 'text-white/50 hover:text-white/70'
-                }`}
+                className={`flex-1 py-2 rounded-full text-sm font-semibold transition-all ${activeTab === 'options'
+                  ? 'bg-white/20 backdrop-blur-md text-white shadow-[0_0_20px_rgba(255,255,255,0.05)]'
+                  : 'text-white/50 hover:text-white/70'
+                  }`}
               >
                 Opções
               </button>
@@ -263,9 +291,8 @@ export function FiatAccountDetails({ account, onClose, onNavigateToConvert, onNa
 
                             {/* Amount */}
                             <div className="flex flex-col items-end">
-                              <div className={`font-semibold text-sm tabular-nums ${
-                                amount >= 0 ? 'text-[#34c759]' : 'text-white'
-                              }`}>
+                              <div className={`font-semibold text-sm tabular-nums ${amount >= 0 ? 'text-[#34c759]' : 'text-white'
+                                }`}>
                                 {formatted}
                               </div>
                             </div>
@@ -281,7 +308,7 @@ export function FiatAccountDetails({ account, onClose, onNavigateToConvert, onNa
                 {/* Account Details */}
                 <div className="bg-white/5 backdrop-blur-md rounded-2xl p-4 border border-white/10 shadow-[0_0_20px_rgba(255,255,255,0.05)]">
                   <h3 className="text-white font-bold text-sm mb-3">Dados da Conta</h3>
-                  
+
                   <div className="space-y-3">
                     <div>
                       <div className="text-white/50 text-xs mb-1">Banco</div>
@@ -316,13 +343,86 @@ export function FiatAccountDetails({ account, onClose, onNavigateToConvert, onNa
                   </div>
                 </div>
 
+                {/* ── PIX Keys Section (BRL only) ─────────────────────── */}
+                {account.currency === 'BRL' && (
+                  <div className="bg-white/5 backdrop-blur-md rounded-2xl p-4 border border-white/10 shadow-[0_0_20px_rgba(255,255,255,0.05)]">
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center gap-2">
+                        <KeyRound className="w-4 h-4 text-cyan-400" />
+                        <h3 className="text-white font-bold text-sm">Chaves PIX</h3>
+                      </div>
+                      <button
+                        onClick={() => setShowPixKeys(true)}
+                        className="text-xs text-cyan-400 hover:text-cyan-300 transition-colors font-semibold"
+                      >
+                        Gerenciar
+                      </button>
+                    </div>
+
+                    {isLoadingPixKeys ? (
+                      <div className="flex items-center justify-center py-4">
+                        <div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+                      </div>
+                    ) : pixKeys.length === 0 ? (
+                      <div className="text-center py-4">
+                        <p className="text-white/40 text-sm mb-3">Nenhuma chave PIX cadastrada</p>
+                        <button
+                          onClick={() => setShowPixKeys(true)}
+                          className="px-4 py-2 rounded-xl bg-cyan-500/20 border border-cyan-500/30 text-cyan-400 text-sm font-semibold hover:bg-cyan-500/30 transition-all"
+                        >
+                          + Cadastrar chave PIX
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="space-y-2">
+                        {pixKeys.map((key) => (
+                          <div
+                            key={key.id}
+                            className="flex items-center gap-3 bg-black/30 rounded-xl p-3 border border-white/5"
+                          >
+                            {/* Icon */}
+                            <div className="w-8 h-8 rounded-full bg-cyan-500/15 flex items-center justify-center flex-shrink-0">
+                              <KeyRound className="w-4 h-4 text-cyan-400" />
+                            </div>
+
+                            {/* Info */}
+                            <div className="flex-1 min-w-0">
+                              <div className="text-white/50 text-xs mb-0.5">{pixKeyTypeLabel(key.keyType)}</div>
+                              <div className="text-white text-sm font-mono truncate">{key.keyValue}</div>
+                            </div>
+
+                            {/* Actions */}
+                            <div className="flex items-center gap-1 flex-shrink-0">
+                              <button
+                                onClick={() => handleSharePixKey(key.keyValue, pixKeyTypeLabel(key.keyType))}
+                                className="w-8 h-8 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center transition-colors"
+                              >
+                                <Share2 className="w-3.5 h-3.5 text-white/60" />
+                              </button>
+                              <button
+                                onClick={() => handleCopyPixKey(key.keyValue, key.id)}
+                                className="w-8 h-8 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center transition-colors"
+                              >
+                                {copiedKey === key.id
+                                  ? <Check className="w-3.5 h-3.5 text-green-400" />
+                                  : <Copy className="w-3.5 h-3.5 text-cyan-400" />}
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
+                {/* ──────────────────────────────────────────────────────── */}
+
                 {/* Account Actions */}
                 <div className="bg-white/5 backdrop-blur-md rounded-2xl overflow-hidden border border-white/10 shadow-[0_0_20px_rgba(255,255,255,0.05)]">
                   <button className="w-full p-4 flex items-center justify-between hover:bg-white/10 transition-all border-b border-white/5">
                     <span className="text-white text-sm font-semibold">Configurações da Conta</span>
                     <ChevronRight className="w-4 h-4 text-white/50" />
                   </button>
-                  
+
                   <button className="w-full p-4 flex items-center justify-between hover:bg-white/10 transition-all">
                     <span className="text-[#ff3b30] text-sm font-semibold">Remover Conta</span>
                     <ChevronRight className="w-4 h-4 text-[#ff3b30]/50" />

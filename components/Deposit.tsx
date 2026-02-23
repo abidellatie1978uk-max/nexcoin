@@ -32,7 +32,7 @@ export function Deposit({ onNavigate }: DepositProps) {
     { symbol: 'USDT', name: 'Tether', id: 'tether' },
     { symbol: 'BTC', name: 'Bitcoin', id: 'bitcoin' },
     { symbol: 'ETH', name: 'Ethereum', id: 'ethereum' },
-    { symbol: 'BNB', name: 'BinancEthertron', id: 'binancecoin' },
+    { symbol: 'BNB', name: 'Binance', id: 'binancecoin' },
     { symbol: 'SOL', name: 'Solana', id: 'solana' },
     { symbol: 'ADA', name: 'Cardano', id: 'cardano' },
     { symbol: 'XRP', name: 'Ripple', id: 'ripple' },

@@ -1,6 +1,7 @@
 {
   "name": "ethertron-mobile",
   "version": "1.0.0",
+  "homepage": "https://abidellatie1978uk-max.github.io/nexcoin/",
   "type": "module",
   "private": true,
   "scripts": {
@@ -13,7 +14,9 @@
   },
   "dependencies": {
     "@capacitor/app": "^6.0.3",
+    "@capacitor/camera": "^6.1.3",
     "@capacitor/device": "^6.0.3",
+    "@capacitor/geolocation": "^6.1.1",
     "@capacitor/haptics": "^6.0.3",
     "@capacitor/keyboard": "^6.0.4",
     "@capacitor/local-notifications": "^6.1.3",

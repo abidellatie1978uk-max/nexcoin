@@ -1,4 +1,4 @@
-package com.ethertron.app;
+package com.nexcoin.app;
 
 import com.getcapacitor.BridgeActivity;
 

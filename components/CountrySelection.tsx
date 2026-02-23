@@ -91,7 +91,7 @@ export function CountrySelection({
       {/* Header */}
       <div className="w-full max-w-md mx-auto pt-4 pb-8">
         <h1 className="text-2xl font-bold tracking-tight text-center mb-2">
-          Ethertron
+          NexCoin
         </h1>
       </div>
 

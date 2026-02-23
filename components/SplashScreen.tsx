@@ -4,16 +4,11 @@ export function SplashScreen() {
     return (
         <div className="fixed inset-0 bg-black flex items-center justify-center z-50">
             <div className="flex flex-col items-center">
-                <div className="relative inline-block animate-pulse">
-                    <h1 className="text-4xl font-bold italic relative ethertron-logo-text">
-                        Ethertron
-                    </h1>
-                    <div
-                        className="h-[2px] w-full mx-auto mt-2 rounded-full"
-                        style={{
-                            background: 'linear-gradient(90deg, transparent, #00d4ff, #7b2ff7, transparent)',
-                            boxShadow: '0 0 10px rgba(0, 212, 255, 0.8)',
-                        }}
+                <div className="relative inline-block">
+                    <img
+                        src="/assets/logos/logo_white.png"
+                        alt="NexCoin Logo"
+                        className="w-32 h-32 object-contain animate-pulse"
                     />
                 </div>
                 <div className="mt-8">

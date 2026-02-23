@@ -16,10 +16,10 @@ export default {
   'welcome.termsText': 'Ao continuar, você concorda com nossos Termos de Serviço e Política de Privacidade.',
 
   // Login
-  'login.title': 'Ethertron',
+  'login.title': 'NexCoin',
   'login.subtitle': 'Entrar',
   'login.welcome': 'Bem-vindo de volta!',
-  'login.description': 'Digite o número de telefone associado à sua conta Ethertron.',
+  'login.description': 'Digite o número de telefone associado à sua conta NexCoin.',
   'login.phonePlaceholder': 'Número de telefone',
   'login.lostAccess': 'Perdi acesso ao meu telefone',
   'login.continue': 'Continuar',
@@ -199,7 +199,7 @@ export default {
   'profile.settings': 'Configurações',
   'profile.appPreferences': 'Preferências do app',
   'profile.logout': 'Sair',
-  'profile.version': 'Ethertron v1.0.0',
+  'profile.version': 'NexCoin v1.0.0',
 
   // Transactions
   'transactions.title': 'Transações',
@@ -221,4 +221,12 @@ export default {
   'language.portuguese': 'Português (Brasil)',
   'language.english': 'English (US)',
   'language.spanish': 'Español',
+
+  // Permissions Blocked
+  'permissions.locationTitle': 'Acesso à Localização Obrigatório',
+  'permissions.locationDesc': 'Para sua segurança e proteção contra fraudes, o NexCoin exige acesso à sua localização. Por favor, habilite o GPS nas configurações do seu dispositivo.',
+  'permissions.cameraTitle': 'Acesso à Câmera Obrigatório',
+  'permissions.cameraDesc': 'O NexCoin exige acesso à câmera para verificação de identidade (KYC) e segurança da sua conta. Por favor, habilite a permissão de câmera nas configurações.',
+  'permissions.retry': 'Tentar Novamente',
+  'permissions.securityNotice': 'Este requisito garante a integridade das suas transações e protege sua conta.',
 };

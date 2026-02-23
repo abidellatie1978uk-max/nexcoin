@@ -138,13 +138,13 @@ export function Login({ onNavigate }: LoginProps) {
         if (exists) {
           onNavigate('passwordEntry');
         } else {
-          setErrorMessage(t.email || 'Telefone não encontrado');
+          setErrorMessage(t.phoneNotFound || 'Telefone não encontrado');
         }
       } catch (error: any) {
         setIsValidating(false);
 
         // Mostrar mensagem de erro
-        setErrorMessage(t.email || 'Telefone não encontrado');
+        setErrorMessage(t.phoneNotFound || 'Telefone não encontrado');
       }
     }
   };
@@ -223,7 +223,7 @@ export function Login({ onNavigate }: LoginProps) {
             <input
               ref={phoneInputRef}
               className="w-full h-12 bg-zinc-900 border-none focus:ring-2 focus:ring-blue-500 text-white px-4 rounded-xl placeholder-slate-500 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.05)]"
-              placeholder={t.email}
+              placeholder={t.phone}
               type="tel"
               value={phoneNumber}
               onChange={handlePhoneChange}
@@ -233,7 +233,7 @@ export function Login({ onNavigate }: LoginProps) {
         </div>
         {touched && phoneNumber && !isPhoneValid && (
           <p className="text-red-500 text-xs -mt-2 mb-3">
-            {t.email}
+            {t.invalidPhone}
           </p>
         )}
         {errorMessage && (
@@ -253,8 +253,8 @@ export function Login({ onNavigate }: LoginProps) {
         {/* Continue Button */}
         <button
           className={`w-full py-3.5 rounded-full mb-5 transition-all duration-300 ${phoneNumber && isPhoneValid
-              ? 'bg-white text-black hover:opacity-90 active:scale-[0.98]'
-              : 'bg-zinc-800 text-gray-500 cursor-not-allowed'
+            ? 'bg-white text-black hover:opacity-90 active:scale-[0.98]'
+            : 'bg-zinc-800 text-gray-500 cursor-not-allowed'
             }`}
           disabled={!phoneNumber || !isPhoneValid}
           onClick={handleContinueClick}

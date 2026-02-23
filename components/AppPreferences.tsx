@@ -129,7 +129,7 @@ export function AppPreferences({ onNavigate }: AppPreferencesProps) {
           </div>
         </div>
         <p className="text-xs text-gray-400 mt-2 px-1">
-          O Ethertron usa tema escuro por padrão para melhor experiência visual
+          O NexCoin usa tema escuro por padrão para melhor experiência visual
         </p>
 
         {/* Info Section */}

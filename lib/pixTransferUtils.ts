@@ -144,7 +144,7 @@ export async function validatePixKey(
         userId: null,
         userName: null,
         pixKeyType: null,
-        error: 'Chave PIX não encontrada no sistema Ethertron',
+        error: 'Chave PIX não encontrada no sistema NexCoin',
       };
     }
 

@@ -5,7 +5,35 @@ interface WelcomeProps {
   onNavigate: (screen: Screen) => void;
 }
 
+// Detectar idioma do dispositivo e retornar textos traduzidos
+function getTexts() {
+  const lang = (navigator.language || navigator.languages?.[0] || 'en').toLowerCase();
+
+  if (lang.startsWith('pt')) {
+    return {
+      createAccount: 'Criar conta',
+      login: 'Entrar',
+      terms: 'Ao se cadastrar, você concorda com nossos Termos de Serviço e Política de Privacidade.',
+    };
+  }
+  if (lang.startsWith('es')) {
+    return {
+      createAccount: 'Crear cuenta',
+      login: 'Iniciar sesión',
+      terms: 'Al registrarte, aceptas nuestros Términos de Servicio y Política de Privacidad.',
+    };
+  }
+  // Default: English
+  return {
+    createAccount: 'Create Account',
+    login: 'Login',
+    terms: 'By signing up, you agree to our Terms of Service and Privacy Policy.',
+  };
+}
+
 export function Welcome({ onNavigate }: WelcomeProps) {
+  const texts = getTexts();
+
   const handleLoginClick = () => {
     console.log('👆 Botão de Login clicado no Welcome');
     onNavigate('login');
@@ -70,7 +98,7 @@ export function Welcome({ onNavigate }: WelcomeProps) {
 
       {/* Main Content */}
       <main className="relative z-20 h-screen flex flex-col justify-between px-6 pb-12 pt-20">
-        {/* Logo Section */}
+        {/* Logo / Brand Name Section */}
         <div className="flex flex-col items-center text-center pt-[env(safe-area-inset-top)] opacity-0 animate-scaleIn" style={{ animationDelay: '0.4s' }}>
           <div className="relative inline-block">
             {/* Glow effect background */}
@@ -81,21 +109,13 @@ export function Welcome({ onNavigate }: WelcomeProps) {
               }}
             />
 
-            {/* Main logo */}
+            {/* Brand Name Text */}
             <h1
-              className="text-3xl font-black relative ethertron-logo-text"
+              className="NexCoin-logo-text text-2xl font-normal tracking-widest uppercase"
+              style={{ fontFamily: "'Orbitron', sans-serif" }}
             >
               Ethertron
             </h1>
-
-            {/* Underline accent */}
-            <div
-              className="h-[2px] w-24 mx-auto mt-3 rounded-full"
-              style={{
-                background: 'linear-gradient(90deg, transparent, #00d4ff, #7b2ff7, transparent)',
-                boxShadow: '0 0 10px rgba(0, 212, 255, 0.8)',
-              }}
-            />
           </div>
 
           <p className="mt-4 text-white/70 font-medium tracking-wide uppercase text-[10px]">
@@ -113,7 +133,7 @@ export function Welcome({ onNavigate }: WelcomeProps) {
             className="w-full bg-white text-black font-bold py-3.5 px-6 rounded-full shadow-lg active:scale-[0.98] transition-all duration-200 text-base opacity-0 animate-slideUp"
             style={{ animationDelay: '0.6s' }}
           >
-            Create Account
+            {texts.createAccount}
           </button>
 
           <button
@@ -121,11 +141,11 @@ export function Welcome({ onNavigate }: WelcomeProps) {
             className="w-full py-3 text-white font-semibold active:opacity-60 transition-opacity duration-200 text-base bg-white/10 rounded-full opacity-0 animate-slideUp"
             style={{ animationDelay: '0.8s' }}
           >
-            Login
+            {texts.login}
           </button>
 
           <p className="text-[10px] text-white/40 text-center mt-1 px-8 opacity-0 animate-fadeIn" style={{ animationDelay: '1s' }}>
-            By signing up, you agree to our Terms of Service and Privacy Policy.
+            {texts.terms}
           </p>
         </div>
       </main>

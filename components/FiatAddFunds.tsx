@@ -5,8 +5,6 @@ import { usePixKeys } from '../hooks/usePixKeys';
 import { useAuth } from '../contexts/AuthContext';
 import { toast } from 'sonner';
 import { copyToClipboard } from '../utils/clipboard';
-import type { Screen } from '../App';
-import { updateFiatBalance } from '../lib/fiatBalanceUtils';
 import type { BankAccount } from '../lib/bankAccountGenerator';
 
 interface FiatAddFundsProps {
@@ -16,20 +14,11 @@ interface FiatAddFundsProps {
 
 export function FiatAddFunds({ account, onClose }: FiatAddFundsProps) {
   const { user } = useAuth();
-  const { pixKeys, isLoading: isLoadingPixKeys } = usePixKeys();
+  const { pixKeys } = usePixKeys();
   const [selectedMethod, setSelectedMethod] = useState<'transfer' | 'pix'>('transfer');
-  const [amount, setAmount] = useState('');
-  const [isProcessing, setIsProcessing] = useState(false);
   const [copiedField, setCopiedField] = useState<string | null>(null);
   const [selectedPixKeyId, setSelectedPixKeyId] = useState<string>('');
   const [showPixKeySelector, setShowPixKeySelector] = useState(false);
-
-  console.log('🟢 FiatAddFunds renderizado', {
-    account,
-    user: user?.uid,
-    pixKeysCount: pixKeys.length,
-    isLoadingPixKeys
-  });
 
   const isBrazil = account.country === 'BR';
   const currencySymbol = account.currency === 'BRL' ? 'R$' :
@@ -52,100 +41,14 @@ export function FiatAddFunds({ account, onClose }: FiatAddFundsProps) {
     setTimeout(() => setCopiedField(null), 2000);
   };
 
-  const formatAmount = (value: string) => {
-    // Remove tudo que não é número
-    const numbers = value.replace(/\D/g, '');
-
-    // Se não houver números, retorna vazio
-    if (!numbers) return '';
-
-    // Converte para número e divide por 100 (para casas decimais)
-    const amount = parseInt(numbers) / 100;
-
-    // Formata no padrão brasileiro: 1.000,00
-    return amount.toLocaleString('pt-BR', {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2
-    });
-  };
-
-  const handleAmountChange = (value: string) => {
-    const formatted = formatAmount(value);
-    setAmount(formatted);
-  };
-
-  const handleSimulateDeposit = async () => {
-    // Converte o valor formatado (1.000,00) para número (1000.00)
-    const numericValue = parseFloat(amount.replace(/\./g, '').replace(',', '.'));
-
-    if (!amount || numericValue <= 0) {
-      toast.error('Insira um valor válido');
-      return;
-    }
-
-    if (!user?.uid) {
-      toast.error('Usuário não autenticado');
-      return;
-    }
-
-    setIsProcessing(true);
-
-    try {
-      const depositAmount = numericValue;
-      const method = selectedMethod === 'pix' ? 'PIX' : 'Transferência Bancária';
-
-      const result = await updateFiatBalance(
-        user.uid,
-        account.currency,
-        depositAmount,
-        `Depósito via ${method}`
-      );
-
-      if (result.success) {
-        // ✅ Formatação correta para BRL na mensagem de sucesso
-        const formattedAmount = account.currency === 'BRL'
-          ? depositAmount.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-          : depositAmount.toFixed(2);
-
-        toast.success(`Depósito de ${currencySymbol}${formattedAmount} realizado com sucesso!`);
-        setAmount('');
-        // Aguarda 1 segundo para o usuário ver a mensagem de sucesso
-        setTimeout(() => {
-          onClose();
-        }, 1000);
-      } else {
-        toast.error(result.message || 'Erro ao processar depósito');
-      }
-    } catch (error) {
-      console.error('Erro ao simular depósito:', error);
-      toast.error('Erro ao processar depósito');
-    } finally {
-      setIsProcessing(false);
-    }
-  };
-
-  // Gerar payload PIX no formato EMV (Pix Copia e Cola)
   const generatePixPayload = () => {
-    if (!selectedPixKey || !amount) return '';
-
-    // Converte o valor formatado (1.000,00) para número (1000.00)
-    const pixAmount = parseFloat(amount.replace(/\./g, '').replace(',', '.'));
-    if (pixAmount <= 0) return '';
-
-    // Formato simplificado do payload PIX usando dados reais do Firestore
+    if (!selectedPixKey) return '';
     const payload = {
-      pixKey: selectedPixKey.keyValue, // ✅ Usando keyValue do Firestore
-      description: 'Depósito Ethertron',
-      merchantName: 'Ethertron',
+      pixKey: selectedPixKey.keyValue,
+      merchantName: 'NexCoin',
       merchantCity: 'SAO PAULO',
-      txid: Math.random().toString(36).substring(2, 15).toUpperCase(),
-      amount: pixAmount.toFixed(2),
     };
-
-    // Gerar string de payload (formato simplificado para QR Code)
-    // Em produção real, use o formato EMV completo
-    const pixString = JSON.stringify(payload);
-    return pixString;
+    return JSON.stringify(payload);
   };
 
   const pixPayload = generatePixPayload();
@@ -171,7 +74,7 @@ export function FiatAddFunds({ account, onClose }: FiatAddFundsProps) {
         >
           <ArrowLeft className="w-6 h-6" />
         </button>
-        <h1 className="flex-1 text-center font-semibold text-lg pr-10">Adicionar Fundos</h1>
+        <h1 className="flex-1 text-center font-semibold text-lg pr-10">Receber</h1>
       </div>
 
       {/* Content */}
@@ -189,7 +92,7 @@ export function FiatAddFunds({ account, onClose }: FiatAddFundsProps) {
         {/* Method Selector (Only for Brazil) */}
         {isBrazil && (
           <div className="mb-6">
-            <p className="text-sm text-gray-400 mb-3">Método de Depósito</p>
+            <p className="text-sm text-gray-400 mb-3">Método de Recebimento</p>
             <div className="flex gap-3">
               <button
                 onClick={() => setSelectedMethod('transfer')}
@@ -212,24 +115,6 @@ export function FiatAddFunds({ account, onClose }: FiatAddFundsProps) {
             </div>
           </div>
         )}
-
-        {/* Amount Input */}
-        <div className="mb-6">
-          <p className="text-sm text-gray-400 mb-3">Valor do Depósito</p>
-          <div className="relative">
-            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-2xl font-semibold text-white">
-              {currencySymbol}
-            </span>
-            <input
-              type="text"
-              inputMode="decimal"
-              value={amount}
-              onChange={(e) => handleAmountChange(e.target.value)}
-              placeholder="0,00"
-              className="w-full bg-[#0A0A0A] border border-[#1A1A1A] rounded-2xl py-4 pl-12 pr-4 text-2xl font-semibold text-white placeholder-gray-600 focus:outline-none focus:border-white/20"
-            />
-          </div>
-        </div>
 
         {/* Transfer Instructions */}
         {selectedMethod === 'transfer' && (
@@ -330,9 +215,8 @@ export function FiatAddFunds({ account, onClose }: FiatAddFundsProps) {
         )}
 
         {/* PIX Instructions */}
-        {selectedMethod === 'pix' && (
+        {isBrazil && selectedMethod === 'pix' && (
           <div className="space-y-4">
-            {/* Seletor de Chave PIX */}
             {pixKeys.length > 0 ? (
               <>
                 <div>
@@ -353,7 +237,6 @@ export function FiatAddFunds({ account, onClose }: FiatAddFundsProps) {
                       <ChevronDown className={`w-5 h-5 text-gray-400 transition-transform ${showPixKeySelector ? 'rotate-180' : ''}`} />
                     </button>
 
-                    {/* Dropdown de chaves */}
                     {showPixKeySelector && (
                       <div className="absolute top-full left-0 right-0 mt-2 bg-[#0A0A0A] border border-[#1A1A1A] rounded-xl overflow-hidden z-10 max-h-60 overflow-y-auto">
                         {pixKeys.map((key) => (
@@ -363,8 +246,7 @@ export function FiatAddFunds({ account, onClose }: FiatAddFundsProps) {
                               setSelectedPixKeyId(key.id);
                               setShowPixKeySelector(false);
                             }}
-                            className={`w-full p-4 text-left hover:bg-white/5 transition-colors border-b border-[#1A1A1A] last:border-b-0 ${selectedPixKeyId === key.id ? 'bg-white/5' : ''
-                              }`}
+                            className={`w-full p-4 text-left hover:bg-white/5 transition-colors border-b border-[#1A1A1A] last:border-b-0 ${selectedPixKeyId === key.id ? 'bg-white/5' : ''}`}
                           >
                             <p className="text-xs text-gray-400 mb-1">{getPixKeyTypeLabel(key.keyType)}</p>
                             <p className="text-sm text-white font-mono">{key.keyValue}</p>
@@ -375,12 +257,9 @@ export function FiatAddFunds({ account, onClose }: FiatAddFundsProps) {
                   </div>
                 </div>
 
-                {/* QR Code PIX */}
-                {selectedPixKey && amount && parseFloat(amount) > 0 && (
+                {selectedPixKey && (
                   <div className="bg-[#0A0A0A] border border-[#1A1A1A] rounded-2xl p-6">
-                    <h3 className="text-sm font-semibold text-white mb-4 text-center">QR Code PIX</h3>
-
-                    {/* QR Code Real */}
+                    <h3 className="text-sm font-semibold text-white mb-4 text-center">QR Code da Chave PIX</h3>
                     <div className="bg-white rounded-2xl p-6 mb-4 flex items-center justify-center">
                       <QRCodeSVG
                         value={pixPayload}
@@ -390,37 +269,24 @@ export function FiatAddFunds({ account, onClose }: FiatAddFundsProps) {
                         className="w-full h-auto"
                       />
                     </div>
-
-                    {/* Informações do PIX */}
-                    <div className="space-y-3 mb-4">
-                      <div className="flex justify-between items-center">
-                        <span className="text-xs text-gray-400">Valor</span>
-                        <span className="text-sm text-white font-semibold">
-                          {currencySymbol} {account.currency === 'BRL'
-                            ? parseFloat(amount).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-                            : parseFloat(amount).toFixed(2)
-                          }
-                        </span>
-                      </div>
+                    <div className="space-y-2">
                       <div className="flex justify-between items-center">
                         <span className="text-xs text-gray-400">Chave</span>
                         <span className="text-sm text-white font-mono truncate ml-4">{selectedPixKey.keyValue}</span>
                       </div>
                       <div className="flex justify-between items-center">
                         <span className="text-xs text-gray-400">Destinatário</span>
-                        <span className="text-sm text-white">Ethertron</span>
+                        <span className="text-sm text-white">NexCoin</span>
                       </div>
                     </div>
-
-                    {/* Botão Copiar Código PIX */}
                     <button
                       onClick={() => handleCopy(pixPayload, 'pixPayload')}
-                      className="w-full bg-white/10 hover:bg-white/15 border border-white/20 rounded-xl py-3 flex items-center justify-center gap-2 transition-colors"
+                      className="w-full mt-4 bg-white/10 hover:bg-white/15 border border-white/20 rounded-xl py-3 flex items-center justify-center gap-2 transition-colors"
                     >
                       {copiedField === 'pixPayload' ? (
                         <>
                           <Check className="w-4 h-4 text-green-500" />
-                          <span className="text-sm font-medium text-green-500">Código Copiado!</span>
+                          <span className="text-sm font-medium text-green-500">Copiado!</span>
                         </>
                       ) : (
                         <>
@@ -431,44 +297,23 @@ export function FiatAddFunds({ account, onClose }: FiatAddFundsProps) {
                     </button>
                   </div>
                 )}
-
-                {/* Instruções */}
-                {!amount || parseFloat(amount) <= 0 ? (
-                  <div className="bg-white/5 border border-white/10 rounded-xl p-4 backdrop-blur-sm">
-                    <p className="text-xs text-white/70">
-                      💡 <strong>Dica:</strong> Insira o valor do depósito acima para gerar o QR Code PIX.
-                    </p>
-                  </div>
-                ) : null}
               </>
             ) : (
               <div className="bg-white/5 border border-white/10 rounded-xl p-4 backdrop-blur-sm">
                 <p className="text-xs text-white/70">
-                  ⚠️ <strong>Nenhuma chave PIX cadastrada.</strong> Cadastre uma chave PIX para usar este método.
+                  ⚠️ <strong>Nenhuma chave PIX cadastrada.</strong> Cadastre uma chave PIX para receber por este método.
                 </p>
               </div>
             )}
           </div>
         )}
 
-        {/* Warning */}
+        {/* Note */}
         <div className="bg-white/5 border border-white/10 rounded-xl p-4 mt-6 backdrop-blur-sm">
           <p className="text-xs text-white/60">
-            ⚠️ <strong>Simulação:</strong> Em produção, o sistema aguardaria confirmação da transferência bancária.
-            Aqui, o saldo será adicionado instantaneamente ao clicar em "Confirmar Depósito".
+            Utilize os dados acima no seu banco habitual para realizar a transferência {isBrazil ? 'ou PIX' : ''}. O saldo será creditado automaticamente assim que a transferência for processada pela nossa rede.
           </p>
         </div>
-      </div>
-
-      {/* Bottom Button */}
-      <div className="p-6 flex-shrink-0 border-t border-[#1A1A1A]">
-        <button
-          onClick={handleSimulateDeposit}
-          disabled={!amount || isProcessing || (selectedMethod === 'pix' && !selectedPixKey)}
-          className="w-full bg-white text-black py-4 rounded-2xl font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-100 active:scale-[0.98]"
-        >
-          {isProcessing ? 'Processando...' : 'Confirmar Depósito'}
-        </button>
       </div>
     </div>
   );

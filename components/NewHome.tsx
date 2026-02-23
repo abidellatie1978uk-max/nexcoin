@@ -104,27 +104,26 @@ export function NewHome({ onNavigate, onNavigateWithAccount }: NewHomeProps) {
           return;
         }
 
-        // Mapear contas para moedas e remover duplicatas
-        const currenciesMap: { [key: string]: 'USD' | 'BRL' | 'GBP' | 'EUR' } = {
-          'USD': 'USD',
-          'BRL': 'BRL',
-          'GBP': 'GBP',
-          'EUR': 'EUR'
-        };
+        const rawAccounts = snapshot.docs.map(doc => ({
+          ...doc.data(),
+          id: doc.id
+        })) as BankAccount[];
 
-        const userCurrencies = snapshot.docs
-          .map(doc => {
-            const account = doc.data() as BankAccount;
-            return currenciesMap[account.currency];
-          })
-          .filter((curr): curr is 'USD' | 'BRL' | 'GBP' | 'EUR' => curr !== undefined);
+        // 🧹 DEDUP: Manter apenas uma conta por moeda
+        const dedupedMap = new Map<string, BankAccount>();
+        rawAccounts.forEach(acc => {
+          const existing = dedupedMap.get(acc.currency);
+          const isDeterministic = acc.id === `${user.uid}_${acc.currency}` || acc.id === `${user.uid}_BRL`;
+          if (!existing || isDeterministic) {
+            dedupedMap.set(acc.currency, acc);
+          }
+        });
 
-        // Remover duplicatas mantendo ordem
-        const uniqueCurrencies = Array.from(new Set(userCurrencies));
+        const uniqueAccounts = Array.from(dedupedMap.values());
+        const uniqueCurrencies = uniqueAccounts.map(acc => acc.currency as 'USD' | 'BRL' | 'GBP' | 'EUR');
 
         if (uniqueCurrencies.length > 0) {
           setAvailableCurrencies(uniqueCurrencies);
-          // Se a moeda atual não está disponível, mudar para a primeira disponível
           if (!uniqueCurrencies.includes(displayCurrency)) {
             setDisplayCurrency(uniqueCurrencies[0]);
           }
@@ -133,8 +132,7 @@ export function NewHome({ onNavigate, onNavigateWithAccount }: NewHomeProps) {
           setDisplayCurrency('USD');
         }
 
-        // Salvar contas do usuário
-        setUserAccounts(snapshot.docs.map(doc => doc.data() as BankAccount));
+        setUserAccounts(uniqueAccounts);
       } catch (error) {
         console.error('Erro ao carregar moedas disponíveis:', error);
         setAvailableCurrencies(['USD']);
@@ -422,7 +420,7 @@ export function NewHome({ onNavigate, onNavigateWithAccount }: NewHomeProps) {
         <header className="px-6 pt-12 pb-4 flex items-center justify-between gap-3 relative z-10">
           <label
             htmlFor="profile-photo-input"
-            className="w-10 h-10 rounded-full overflow-hidden border-2 border-white/10 cursor-pointer hover:border-white/30 transition-all active:scale-95 block bg-white/10"
+            className="w-10 h-10 rounded-full overflow-hidden border-2 border-white/10 cursor-pointer hover:border-white/30 transition-all active:scale-95 block flex-shrink-0"
           >
             {profilePhoto ? (
               <img
@@ -431,8 +429,14 @@ export function NewHome({ onNavigate, onNavigateWithAccount }: NewHomeProps) {
                 src={profilePhoto}
               />
             ) : (
-              <div className="w-full h-full flex items-center justify-center text-white/60 text-lg font-bold">
-                {userData?.displayName?.[0]?.toUpperCase() || 'U'}
+              <div className="w-full h-full flex items-center justify-center bg-black text-white text-xs font-medium select-none">
+                {(() => {
+                  const fullName = userData?.name || userData?.displayName || '';
+                  const parts = fullName.trim().split(/\s+/);
+                  const first = parts[0]?.[0]?.toUpperCase() || '';
+                  const last = parts.length > 1 ? parts[parts.length - 1][0]?.toUpperCase() : '';
+                  return first + last || 'U';
+                })()}
               </div>
             )}
           </label>
@@ -486,7 +490,7 @@ export function NewHome({ onNavigate, onNavigateWithAccount }: NewHomeProps) {
         </section>
 
         {/* Action Buttons */}
-        <section className="mt-1 px-6 grid grid-cols-2 gap-8 relative z-10">
+        <section className="mt-1 px-6 grid grid-cols-3 gap-2 relative z-10">
           <div className="flex flex-col items-center gap-2">
             <button
               onClick={() => {
@@ -499,12 +503,23 @@ export function NewHome({ onNavigate, onNavigateWithAccount }: NewHomeProps) {
                   onNavigate('selectFiatAccount');
                 }
               }}
-              className="w-14 h-14 rounded-full bg-white/5 backdrop-blur-md flex items-center justify-center transition-transform active:scale-95 border-2 border-white/20 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.1),0_4px_12px_rgba(0,0,0,0.3)]"
+              className="w-14 h-14 rounded-full bg-white/5 backdrop-blur-md flex items-center justify-center transition-transform active:scale-95 border-2 border-white/20 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.1),0_4px_12px_rgba(0,0,0,0.3)] hover:bg-white/10"
             >
               <ArrowDownLeft className="text-white w-6 h-6" />
             </button>
-            <span className="text-white text-sm font-light tracking-wide">{t.deposit}</span>
+            <span className="text-white text-[10px] font-light tracking-wide uppercase opacity-70">{t.deposit}</span>
           </div>
+
+          <div className="flex flex-col items-center gap-2">
+            <button
+              onClick={() => onNavigate('crypto')}
+              className="w-14 h-14 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center transition-transform active:scale-95 border-2 border-white/30 shadow-[0_0_20px_rgba(255,255,255,0.1),inset_0_1px_0_0_rgba(255,255,255,0.2),0_4px_12px_rgba(0,0,0,0.3)] hover:bg-white/20"
+            >
+              <TrendingUp className="text-cyan-400 w-6 h-6" />
+            </button>
+            <span className="text-white text-[10px] font-bold tracking-wide uppercase">Cripto</span>
+          </div>
+
           <div className="flex flex-col items-center gap-2">
             <button
               onClick={() => {
@@ -518,11 +533,11 @@ export function NewHome({ onNavigate, onNavigateWithAccount }: NewHomeProps) {
                   onNavigate('withdrawFiat');
                 }
               }}
-              className="w-14 h-14 rounded-full bg-white/5 backdrop-blur-md flex items-center justify-center transition-transform active:scale-95 border-2 border-white/20 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.1),0_4px_12px_rgba(0,0,0,0.3)]"
+              className="w-14 h-14 rounded-full bg-white/5 backdrop-blur-md flex items-center justify-center transition-transform active:scale-95 border-2 border-white/20 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.1),0_4px_12px_rgba(0,0,0,0.3)] hover:bg-white/10"
             >
               <ArrowUpRight className="text-white w-6 h-6" />
             </button>
-            <span className="text-white text-sm font-light tracking-wide">{t.transfer}</span>
+            <span className="text-white text-[10px] font-light tracking-wide uppercase opacity-70">{t.transfer}</span>
           </div>
         </section>
 

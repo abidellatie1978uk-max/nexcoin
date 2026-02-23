@@ -1,6 +1,6 @@
 {
-	"appId": "com.ethertron.app",
-	"appName": "Ethertron",
+	"appId": "com.nexcoin.app",
+	"appName": "NexCoin",
 	"webDir": "dist",
 	"server": {
 		"androidScheme": "https",
@@ -22,7 +22,9 @@
 	},
 	"packageClassList": [
 		"AppPlugin",
+		"CAPCameraPlugin",
 		"DevicePlugin",
+		"GeolocationPlugin",
 		"HapticsPlugin",
 		"KeyboardPlugin",
 		"LocalNotificationsPlugin",

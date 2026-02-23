@@ -34,7 +34,7 @@ export function PendingApproval() {
 
           {/* Descrição */}
           <p className="text-gray-400 mb-8 leading-relaxed">
-            Olá {userData?.name?.split(' ')[0] || 'usuário'}! Sua solicitação de acesso ao <span className="text-white font-semibold">Ethertron</span> está sendo analisada pela nossa equipe de segurança.
+            Olá {userData?.name?.split(' ')[0] || 'usuário'}! Sua solicitação de acesso ao <span className="text-white font-semibold">NexCoin</span> está sendo analisada pela nossa equipe de segurança.
           </p>
 
           {/* Timeline de Processo */}
@@ -113,7 +113,7 @@ export function PendingApproval() {
         <div className="mt-6 text-center">
           <p className="text-sm text-gray-400">
             Precisa de ajuda?{' '}
-            <a href="mailto:suporte@ethertron.com" className="text-white hover:underline">
+            <a href="mailto:Suporte.NexCoin@gmail.com" className="text-white hover:underline">
               Entre em contato
             </a>
           </p>

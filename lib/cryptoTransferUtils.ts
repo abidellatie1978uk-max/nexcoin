@@ -38,7 +38,7 @@ export async function validateWalletAddress(
         isValid: false,
         userId: null,
         userName: null,
-        error: 'Endereço não encontrado. Certifique-se de que o destinatário possui uma conta Ethertron.',
+        error: 'Endereço não encontrado. Certifique-se de que o destinatário possui uma conta NexCoin.',
       };
     }
 
@@ -230,7 +230,7 @@ export async function processCryptoTransfer(
       feeCurrency: coinSymbol, // ✅ Adicionar campo feeCurrency
       network,
       fromUserId,
-      fromAddress: transferData.fromAddress || 'Ethertron User',
+      fromAddress: transferData.fromAddress || 'NexCoin User',
       status: 'completed',
       transactionHash: transferData.transactionHash,
       transactionId,

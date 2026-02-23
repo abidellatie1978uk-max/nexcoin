@@ -220,7 +220,7 @@ export async function notifyAppUpdate(userId: string): Promise<void> {
     userId,
     'info',
     'Atualização disponível',
-    'Nova versão do Ethertron disponível',
+    'Nova versão do NexCoin disponível',
     { type: 'app_update' }
   );
 }

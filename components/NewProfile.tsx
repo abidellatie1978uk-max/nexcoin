@@ -142,7 +142,7 @@ export function NewProfile({ onNavigate }: NewProfileProps) {
 
         {/* Version */}
         <div className="text-center mt-6 text-sm text-gray-500">
-          Ethertron v1.0.0
+          NexCoin v1.0.0
         </div>
       </div>
     </div>

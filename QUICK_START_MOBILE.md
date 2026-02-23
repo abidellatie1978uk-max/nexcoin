@@ -2,7 +2,7 @@
 
 ## ⚠️ Importante
 
-Este guia é para compilar o aplicativo Ethertron para **dispositivos móveis Android e iOS**. 
+Este guia é para compilar o aplicativo NexCoin para **dispositivos móveis Android e iOS**. 
 O desenvolvimento atual roda no **navegador web** e não requer o Capacitor.
 
 **Quando usar este guia:**
@@ -109,12 +109,12 @@ npm run build && npx cap sync
 
 **Android:**
 ```bash
-adb logcat | grep -i ethertron
+adb logcat | grep -i NexCoin
 ```
 
 **iOS:**
 ```bash
-xcrun simctl spawn booted log stream --predicate 'process == "Ethertron"'
+xcrun simctl spawn booted log stream --predicate 'process == "NexCoin"'
 ```
 
 ---
@@ -135,8 +135,8 @@ APK estará em: `android/app/build/outputs/apk/debug/app-debug.apk`
 ### 1. Criar Keystore (primeira vez):
 
 ```bash
-keytool -genkey -v -keystore ethertron-release.keystore \
-  -alias ethertron -keyalg RSA -keysize 2048 -validity 10000
+keytool -genkey -v -keystore NexCoin-release.keystore \
+  -alias NexCoin -keyalg RSA -keysize 2048 -validity 10000
 ```
 
 ### 2. Configurar Signing (editar android/app/build.gradle):
@@ -145,9 +145,9 @@ keytool -genkey -v -keystore ethertron-release.keystore \
 android {
     signingConfigs {
         release {
-            storeFile file("../../ethertron-release.keystore")
+            storeFile file("../../NexCoin-release.keystore")
             storePassword "SUA_SENHA"
-            keyAlias "ethertron"
+            keyAlias "NexCoin"
             keyPassword "SUA_SENHA"
         }
     }
@@ -242,7 +242,7 @@ npx cap sync
 ## Estrutura de Arquivos
 
 ```
-ethertron/
+NexCoin/
 ├── android/              # Projeto Android nativo
 ├── ios/                  # Projeto iOS nativo
 ├── src/                  # Código React

@@ -2,7 +2,7 @@
 
 /**
  * Script para remover TODAS as classes font-bold, font-semibold e font-medium
- * de TODOS os arquivos .tsx do projeto Ethertron, sem exceção.
+ * de TODOS os arquivos .tsx do projeto NexCoin, sem exceção.
  */
 
 const fs = require('fs');
@@ -61,7 +61,7 @@ function findTsxFiles(dir) {
 
 function main() {
   console.log('='.repeat(80));
-  console.log('🔍 REMOVENDO TODAS AS CLASSES BOLD DO ETHERTRON');
+  console.log('🔍 REMOVENDO TODAS AS CLASSES BOLD DO NexCoin');
   console.log('='.repeat(80));
   console.log();
 

@@ -58,7 +58,7 @@ export function WithdrawAddress({ crypto, network, onBack }: WithdrawAddressProp
       setRecipientInfo(null);
 
       try {
-        // ✅ Passar o userId atual para validar auto-transferência
+        // ? Passar o userId atual para validar auto-transferência
         const validation = await validateWalletAddress(walletAddress, network.id, user?.uid);
         setRecipientInfo(validation);
       } catch (error) {
@@ -75,7 +75,7 @@ export function WithdrawAddress({ crypto, network, onBack }: WithdrawAddressProp
 
     const timeoutId = setTimeout(validateAddress, 800);
     return () => clearTimeout(timeoutId);
-  }, [walletAddress, network.id, user?.uid]); // ✅ Adicionar user?.uid como dependência
+  }, [walletAddress, network.id, user?.uid]); // ? Adicionar user?.uid como dependência
 
   // Formata o saldo
   const formatBalance = (amount: number): string => {
@@ -96,7 +96,7 @@ export function WithdrawAddress({ crypto, network, onBack }: WithdrawAddressProp
     amount &&
     parseFloat(amount) > 0 &&
     parseFloat(amount) <= crypto.balance &&
-    recipientInfo?.isValid === true; // ⚠️ Validação crítica!
+    recipientInfo?.isValid === true; // ?? Validação crítica!
 
   // Processar envio
   const handleSend = async () => {
@@ -285,7 +285,7 @@ export function WithdrawAddress({ crypto, network, onBack }: WithdrawAddressProp
             </div>
             {amount && (
               <div className="mt-2 text-sm text-gray-400">
-                ≈ ${(parseFloat(amount) * (prices[crypto.id]?.usd || 0)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                ˜ ${(parseFloat(amount) * (prices[crypto.id]?.usd || 0)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </div>
             )}
           </div>
@@ -315,7 +315,7 @@ export function WithdrawAddress({ crypto, network, onBack }: WithdrawAddressProp
                   {crypto.symbol === 'USDT' ? formatCurrency(totalAmount) : formatCrypto(totalAmount)} {crypto.symbol}
                 </div>
                 <div className="text-xs text-gray-400">
-                  ≈ {formatCurrency(totalAmount * (prices[crypto.id]?.usd || 0))} USDT
+                  ˜ {formatCurrency(totalAmount * (prices[crypto.id]?.usd || 0))} USDT
                 </div>
               </div>
             </div>
@@ -328,7 +328,7 @@ export function WithdrawAddress({ crypto, network, onBack }: WithdrawAddressProp
           <div className="text-sm text-yellow-200/90">
             <p className="font-semibold mb-1">Atenção</p>
             <p className="text-xs text-yellow-200/70">
-              Verifique cuidadosamente o endereço e a rede antes de enviar. Apenas endereços cadastrados na Ethertron são aceitos.
+              Verifique cuidadosamente o endereço e a rede antes de enviar. Apenas endereços cadastrados na NexCoin são aceitos.
             </p>
           </div>
         </div>
@@ -355,7 +355,7 @@ export function WithdrawAddress({ crypto, network, onBack }: WithdrawAddressProp
         </button>
         {!recipientInfo?.isValid && walletAddress && !isValidating && (
           <p className="text-center text-xs text-gray-400 mt-2">
-            O endereço precisa estar cadastrado na Ethertron
+            O endereço precisa estar cadastrado na NexCoin
           </p>
         )}
       </div>

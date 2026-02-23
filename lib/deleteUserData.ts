@@ -13,15 +13,14 @@ export async function deleteUserAccount(userId: string): Promise<{ success: bool
 
     // 1️⃣ Deletar SUBCOLEÇÕES do usuário
     console.log('🗑️ [1/6] Deletando subcoleções do usuário...');
-    
+
     const subcollections = [
       'portfolio', // ✅ Ativos e posições do usuário
       'assets', // Depreciado, mantido para compatibilidade
-      'transactions', 
+      'transactions',
       'conversions',
       'fiatBalances',
       'fiatTransactions',
-      'pixKeys', // Chaves PIX na subcoleção do usuário
       'wallets', // Depreciado, mantido para compatibilidade
       'walletAddresses',
       'receiveAddresses',
@@ -33,9 +32,9 @@ export async function deleteUserAccount(userId: string): Promise<{ success: bool
       try {
         const subcollectionRef = collection(db, 'users', userId, subcollectionName);
         const snapshot = await getDocs(subcollectionRef);
-        
+
         console.log(`🗑️   Deletando ${snapshot.size} documentos de ${subcollectionName}...`);
-        
+
         if (snapshot.size > 0) {
           // Deletar em lotes (batch)
           const batches: any[] = [];
@@ -91,9 +90,9 @@ export async function deleteUserAccount(userId: string): Promise<{ success: bool
       const bankAccountsRef = collection(db, 'bankAccounts');
       const bankAccountsQuery = query(bankAccountsRef, where('userId', '==', userId));
       const bankAccountsSnapshot = await getDocs(bankAccountsQuery);
-      
+
       console.log(`🗑️   Deletando ${bankAccountsSnapshot.size} contas bancárias...`);
-      
+
       if (bankAccountsSnapshot.size > 0) {
         const bankBatch = writeBatch(db);
         bankAccountsSnapshot.docs.forEach((docSnapshot) => {
@@ -114,9 +113,9 @@ export async function deleteUserAccount(userId: string): Promise<{ success: bool
       const pixKeysRef = collection(db, 'pixKeys');
       const pixKeysQuery = query(pixKeysRef, where('userId', '==', userId));
       const pixKeysSnapshot = await getDocs(pixKeysQuery);
-      
+
       console.log(`🗑️   Deletando ${pixKeysSnapshot.size} chaves PIX...`);
-      
+
       if (pixKeysSnapshot.size > 0) {
         const pixBatch = writeBatch(db);
         pixKeysSnapshot.docs.forEach((docSnapshot) => {
@@ -137,16 +136,16 @@ export async function deleteUserAccount(userId: string): Promise<{ success: bool
       const walletAddressIndexRef = collection(db, 'walletAddressIndex');
       const walletAddressIndexQuery = query(walletAddressIndexRef, where('userId', '==', userId));
       const walletAddressIndexSnapshot = await getDocs(walletAddressIndexQuery);
-      
+
       if (walletAddressIndexSnapshot.size > 0) {
         console.log(`🗑️   Deletando ${walletAddressIndexSnapshot.size} endereços do índice...`);
-        
+
         const walletAddressBatch = writeBatch(db);
         walletAddressIndexSnapshot.docs.forEach((docSnapshot) => {
           walletAddressBatch.delete(docSnapshot.ref);
         });
         await walletAddressBatch.commit();
-        
+
         console.log(`✅   ${walletAddressIndexSnapshot.size} endereços deletados do índice`);
       } else {
         console.log('✅   Nenhum endereço no índice encontrado');
@@ -157,7 +156,7 @@ export async function deleteUserAccount(userId: string): Promise<{ success: bool
 
     // 6️⃣ Deletar USUÁRIO do Firebase Auth
     console.log('🗑️ [6/6] Deletando usuário do Firebase Auth...');
-    
+
     if (!auth.currentUser) {
       throw new Error('Usuário não está autenticado');
     }
@@ -169,7 +168,7 @@ export async function deleteUserAccount(userId: string): Promise<{ success: bool
 
     // Deletar usuário do Auth
     await deleteUser(auth.currentUser);
-    
+
     console.log('✅   Usuário deletado do Firebase Auth');
     console.log('🗑️ ============ CONTA EXCLUÍDA COM SUCESSO ============');
 
@@ -185,7 +184,7 @@ export async function deleteUserAccount(userId: string): Promise<{ success: bool
 
     // Mensagens de erro mais amigáveis
     let errorMessage = 'Erro ao excluir conta. Tente novamente.';
-    
+
     if (error.code === 'auth/requires-recent-login') {
       errorMessage = 'Por segurança, faça login novamente antes de excluir sua conta.';
     } else if (error.code === 'permission-denied') {
@@ -270,8 +269,8 @@ export async function countUserData(userId: string): Promise<{
       // Silencioso - permissão negada ou não existe
     }
 
-    counts.total = counts.assets + counts.transactions + counts.conversions + 
-                   counts.fiatBalances + counts.bankAccounts + counts.pixKeys;
+    counts.total = counts.assets + counts.transactions + counts.conversions +
+      counts.fiatBalances + counts.bankAccounts + counts.pixKeys;
 
     console.log('📊 Contagem de dados do usuário:', counts);
     return counts;

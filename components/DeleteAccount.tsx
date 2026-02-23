@@ -363,7 +363,7 @@ export function DeleteAccount({ onNavigate }: DeleteAccountProps) {
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-red-500 mt-0.5">•</span>
-                  <span>Sua conta Ethertron será <strong>encerrada definitivamente</strong></span>
+                  <span>Sua conta NexCoin será <strong>encerrada definitivamente</strong></span>
                 </li>
               </ul>
             </div>
@@ -494,7 +494,7 @@ export function DeleteAccount({ onNavigate }: DeleteAccountProps) {
             {/* Última confirmação */}
             <div className="bg-red-500/10 border border-red-500/30 rounded-2xl p-6 mb-6">
               <p className="text-sm text-red-200/90 text-center">
-                <strong>Última confirmação:</strong> Ao clicar em "Excluir Minha Conta", todos os seus dados serão <strong>permanentemente removidos</strong> do Ethertron.
+                <strong>Última confirmação:</strong> Ao clicar em "Excluir Minha Conta", todos os seus dados serão <strong>permanentemente removidos</strong> do NexCoin.
               </p>
             </div>
 

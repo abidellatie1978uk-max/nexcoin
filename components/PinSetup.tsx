@@ -17,7 +17,7 @@ export function PinSetup({ onNavigate }: PinSetupProps) {
   const [error, setError] = useState('');
   const [shake, setShake] = useState(false);
   const [loading, setLoading] = useState(false);
-  
+
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
   useEffect(() => {
@@ -57,7 +57,7 @@ export function PinSetup({ onNavigate }: PinSetupProps) {
     // Verificar PIN quando completar todos os dígitos
     if (currentPin.every(digit => digit !== '')) {
       const fullPin = currentPin.join('');
-      
+
       if (step === 'create') {
         // Avançar para confirmação
         setTimeout(() => {
@@ -106,7 +106,7 @@ export function PinSetup({ onNavigate }: PinSetupProps) {
     if (e.key === 'Backspace') {
       e.preventDefault();
       const currentPin = isConfirm ? [...confirmPin] : [...pin];
-      
+
       if (currentPin[index] === '') {
         // Se vazio, voltar para anterior
         if (index > 0) {
@@ -244,12 +244,20 @@ export function PinSetup({ onNavigate }: PinSetupProps) {
 
         {/* Helper Text */}
         <p className="text-xs text-gray-500 text-center max-w-xs">
-          {step === 'verify' 
+          {step === 'verify'
             ? 'Use seu PIN de 6 dígitos para acessar sua conta'
             : 'Escolha um PIN fácil de lembrar, mas difícil de adivinhar'
           }
         </p>
       </div>
+
+      {/* Loading Overlay */}
+      {loading && (
+        <div className="absolute inset-0 bg-black/60 backdrop-blur-sm z-50 flex flex-col items-center justify-center">
+          <div className="w-12 h-12 border-4 border-white border-t-transparent rounded-full animate-spin mb-4"></div>
+          <p className="text-white font-medium animate-pulse">Criando sua conta...</p>
+        </div>
+      )}
 
       {/* Footer */}
       {step === 'verify' && (

@@ -30,8 +30,8 @@ const detectBrowserLanguage = (): Language => {
 const defaultLanguage = detectBrowserLanguage();
 const defaultValue: LanguageContextType = {
   language: defaultLanguage,
-  setLanguage: async () => {},
-  t: translations[defaultLanguage]
+  setLanguage: async () => { },
+  t: translations[defaultLanguage] as any
 };
 
 const LanguageContext = createContext<LanguageContextType>(defaultValue);
@@ -70,14 +70,14 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
             }
             setLanguageState(detectBrowserLanguage());
           });
-          
+
           return () => unsubscribeDoc();
         } else {
           // Usuário não autenticado - usar idioma do navegador
           setLanguageState(detectBrowserLanguage());
         }
       });
-      
+
       return () => unsubscribeAuth();
     } catch (error) {
       console.error('Erro ao configurar listener de autenticação:', error);
@@ -94,7 +94,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
       }
 
       setLanguageState(lang);
-      
+
       // Salvar no Firestore se usuário estiver autenticado
       const user = auth.currentUser;
       if (user) {
@@ -115,7 +115,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   const value: LanguageContextType = {
     language,
     setLanguage,
-    t: translations[language] || translations.pt // Fallback para português se idioma inválido
+    t: (translations[language] || translations.pt) as any
   };
 
   return (

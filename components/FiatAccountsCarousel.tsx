@@ -42,9 +42,9 @@ export function FiatAccountsCarousel({ onAccountClick, onAddAccountClick }: Fiat
         console.log('⚠️ Configuração de listener já em andamento, ignorando...');
         return;
       }
-      
+
       isSettingUp = true;
-      
+
       // Limpar listener anterior se existir
       if (unsubscribe) {
         console.log('🔌 Limpando listener anterior antes de criar novo...');
@@ -54,21 +54,32 @@ export function FiatAccountsCarousel({ onAccountClick, onAddAccountClick }: Fiat
 
       const accountsRef = collection(db, 'bankAccounts');
       const q = query(accountsRef, where('userId', '==', user.uid));
-      
+
       unsubscribe = onSnapshot(
         q,
         (snapshot) => {
           console.log('📡 Contas bancárias recebidas:', snapshot.size);
           retryCount = 0; // Reset retry count on success
           isSettingUp = false;
-          
-          const accountsData = snapshot.docs.map(doc => ({
+
+          const rawAccounts = snapshot.docs.map(doc => ({
             ...doc.data(),
             id: doc.id,
             createdAt: doc.data().createdAt?.toDate() || new Date(),
           })) as BankAccount[];
 
-          console.log('💳 Total de contas carregadas:', accountsData.length);
+          // 🧹 DEDUP: Manter apenas uma conta por moeda
+          const dedupedMap = new Map<string, BankAccount>();
+          rawAccounts.forEach(acc => {
+            const existing = dedupedMap.get(acc.currency);
+            const isDeterministic = acc.id === `${user.uid}_${acc.currency}` || acc.id === `${user.uid}_BRL`;
+            if (!existing || isDeterministic) {
+              dedupedMap.set(acc.currency, acc);
+            }
+          });
+          const accountsData = Array.from(dedupedMap.values());
+
+          console.log('💳 Total de contas (deduplicadas):', accountsData.length);
           console.log('🌍 Países das contas:', accountsData.map(acc => `${acc.country} (${acc.currency})`).join(', '));
 
           setAccounts(accountsData);
@@ -78,7 +89,7 @@ export function FiatAccountsCarousel({ onAccountClick, onAddAccountClick }: Fiat
         (error) => {
           console.error('❌ Erro no listener de contas bancárias:', error);
           isSettingUp = false;
-          
+
           if (error.code === 'permission-denied') {
             console.log('⚠️ Erro de permissão, tentando getDocs...');
             loadAccountsWithGetDocs();
@@ -115,7 +126,7 @@ export function FiatAccountsCarousel({ onAccountClick, onAddAccountClick }: Fiat
       const accountsRef = collection(db, 'bankAccounts');
       const q = query(accountsRef, where('userId', '==', user.uid));
       const snapshot = await getDocs(q);
-      
+
       const accountsData = snapshot.docs.map(doc => ({
         ...doc.data(),
         id: doc.id,
@@ -209,7 +220,7 @@ export function FiatAccountsCarousel({ onAccountClick, onAddAccountClick }: Fiat
         <Slider {...settings}>
           {accounts.map((account) => {
             const badge = getPaymentBadge(account);
-            
+
             return (
               <div key={account.id} className="px-3">
                 <button
@@ -218,19 +229,19 @@ export function FiatAccountsCarousel({ onAccountClick, onAddAccountClick }: Fiat
                 >
                   {/* Efeito de brilho glassmorphism */}
                   <div className="absolute inset-0 bg-gradient-to-br from-white/[0.05] via-transparent to-transparent pointer-events-none"></div>
-                  
+
                   {/* Header com bandeira e moeda */}
                   <div className="flex items-center justify-between mb-10 relative z-10">
                     <div className="flex items-center gap-3">
                       {/* Bandeira */}
                       <div className="w-10 h-10 rounded-full overflow-hidden flex items-center justify-center bg-zinc-800 border border-zinc-700">
-                        <img 
+                        <img
                           src={`https://flagcdn.com/w80/${account.country.toLowerCase()}.png`}
                           alt={account.currency}
                           className="w-full h-full object-cover"
                         />
                       </div>
-                      
+
                       {/* Código da moeda */}
                       <div className="text-xl font-semibold text-white">
                         {account.currency}
@@ -261,9 +272,9 @@ export function FiatAccountsCarousel({ onAccountClick, onAddAccountClick }: Fiat
 
                   {/* Saldo */}
                   <div className="relative z-10 tabular-nums text-white">
-                    <FormattedAmount 
-                      value={getBalance(account.currency)} 
-                      symbol={currencySymbols[account.currency]} 
+                    <FormattedAmount
+                      value={getBalance(account.currency)}
+                      symbol={currencySymbols[account.currency]}
                       className="text-2xl font-light"
                     />
                   </div>
@@ -271,7 +282,7 @@ export function FiatAccountsCarousel({ onAccountClick, onAddAccountClick }: Fiat
               </div>
             );
           })}
-          
+
           {/* Card de Nova Conta */}
           <div className="px-3">
             <div
@@ -285,7 +296,7 @@ export function FiatAccountsCarousel({ onAccountClick, onAddAccountClick }: Fiat
                 </div>
                 <span className="text-white/70 font-semibold">Nova Conta</span>
               </div>
-              
+
               {/* Texto centralizado */}
               <div className="flex-1 flex items-center justify-center relative z-10">
                 <p className="text-white/50 text-sm text-center">Adicione uma conta<br />de outro país</p>

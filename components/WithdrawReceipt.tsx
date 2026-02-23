@@ -45,7 +45,7 @@ export function WithdrawReceipt({ onNavigate, transactionData }: WithdrawReceipt
 
   const handleShare = async () => {
     // Texto formatado do comprovante
-    const shareText = `🎯 Comprovante de Transferência Ethertron
+    const shareText = `🎯 Comprovante de Transferência NexCoin
 
 💰 Valor: ${transactionData.symbol} ${transactionData.amount}
 💳 Moeda: ${transactionData.currency}
@@ -59,7 +59,7 @@ export function WithdrawReceipt({ onNavigate, transactionData }: WithdrawReceipt
 ⏱️ Processamento: ${transactionData.processingTime}
 📅 Data: ${transactionData.date}
 
-✨ Ethertron - Seu banco digital de criptomoedas`;
+✨ NexCoin - Seu banco digital de criptomoedas`;
 
     setShareStatus('sharing');
 
@@ -104,7 +104,7 @@ export function WithdrawReceipt({ onNavigate, transactionData }: WithdrawReceipt
         navigator.canShare({ text: shareText })) {
         try {
           await navigator.share({
-            title: '🎯 Comprovante de Transferência - Ethertron',
+            title: '🎯 Comprovante de Transferência - NexCoin',
             text: shareText,
           });
 

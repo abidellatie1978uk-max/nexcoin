@@ -7,7 +7,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useFiatBalances } from '../hooks/useFiatBalances';
 import { useTransactions } from '../hooks/useTransactions';
 import { updateFiatBalance } from '../lib/fiatBalanceUtils';
-import { validatePixKey as validatePixKeyEthertron, processPixTransfer, generatePixTransactionId } from '../lib/pixTransferUtils'; // ✅ Importar funções de transferência entre usuários
+import { validatePixKey as validatePixKeyNexCoin, processPixTransfer, generatePixTransactionId } from '../lib/pixTransferUtils'; // ✅ Importar funções de transferência entre usuários
 import { collection, query, where, getDocs, onSnapshot } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import type { BankAccount } from '../lib/bankAccountGenerator';
@@ -300,7 +300,7 @@ export function WithdrawFiat({ onNavigate }: WithdrawFiatProps) {
   };
 
   const handleAmountChange = (value: string) => {
-    // Remove tudo exceto números
+    // Remove tudo exceto números (o usuário digita centavos, nós formatamos)
     const cleaned = value.replace(/\D/g, '');
 
     if (cleaned === '') {
@@ -308,11 +308,16 @@ export function WithdrawFiat({ onNavigate }: WithdrawFiatProps) {
       return;
     }
 
-    // Converte para número (centavos)
-    const numberValue = parseInt(cleaned, 10);
+    // Remove zeros à esquerda
+    const digits = cleaned.replace(/^0+/, '') || '0';
 
-    // Divide por 100 para obter o valor em reais
-    let realValue = numberValue / 100;
+    // Pega os últimos 2 dígitos como centavos, o restante como reais
+    let reaisStr = digits.length > 2 ? digits.slice(0, -2) : '0';
+    let centavosStr = digits.length >= 2 ? digits.slice(-2) : digits.padStart(2, '0');
+
+    const reais = parseInt(reaisStr, 10);
+    const centavos = parseInt(centavosStr, 10);
+    let realValue = reais + centavos / 100;
 
     // Obter saldo disponível da moeda atual
     const availableFiatBalance = getBalance(currentCountry.currency);
@@ -320,14 +325,17 @@ export function WithdrawFiat({ onNavigate }: WithdrawFiatProps) {
     // Limitar ao saldo disponível
     if (realValue > availableFiatBalance) {
       realValue = availableFiatBalance;
+      // Recalcular dígitos a partir do saldo máximo
+      const limitedCents = Math.floor(realValue * 100);
+      const lReais = Math.floor(limitedCents / 100);
+      const lCents = limitedCents % 100;
+      const formatted = lReais.toLocaleString('pt-BR') + ',' + String(lCents).padStart(2, '0');
+      setAmount(formatted);
+      return;
     }
 
-    // Formata no padrão brasileiro
-    const formatted = realValue.toLocaleString('pt-BR', {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    });
-
+    // Formata no padrão brasileiro (ex: 7.000,00)
+    const formatted = reais.toLocaleString('pt-BR') + ',' + centavosStr.padStart(2, '0');
     setAmount(formatted);
   };
 
@@ -477,16 +485,16 @@ export function WithdrawFiat({ onNavigate }: WithdrawFiatProps) {
     setIsProcessing(true);
 
     try {
-      // ✅ TRATAMENTO ESPECIAL PARA PIX - Verificar se é transferência entre usuários Ethertron
+      // ✅ TRATAMENTO ESPECIAL PARA PIX - Verificar se é transferência entre usuários NexCoin
       if (selectedCountry === 'BR' && selectedMethod === 'pix') {
-        console.log('🔍 Verificando se chave PIX pertence a um usuário Ethertron...');
+        console.log('🔍 Verificando se chave PIX pertence a um usuário NexCoin...');
 
-        // Validar chave PIX no sistema Ethertron
-        const pixValidation = await validatePixKeyEthertron(pixKey, user.uid);
+        // Validar chave PIX no sistema NexCoin
+        const pixValidation = await validatePixKeyNexCoin(pixKey, user.uid);
 
         if (pixValidation.isValid && pixValidation.userId) {
           // ✅ Chave PIX encontrada! Fazer transferência entre usuários
-          console.log('✅ Chave PIX encontrada no sistema Ethertron');
+          console.log('✅ Chave PIX encontrada no sistema NexCoin');
           console.log(`📤 Remetente: ${user.uid}`);
           console.log(`📥 Destinatário: ${pixValidation.userId} (${pixValidation.userName})`);
 
@@ -518,15 +526,15 @@ export function WithdrawFiat({ onNavigate }: WithdrawFiatProps) {
           setShowSuccess(true);
           return; // ✅ Sair da função aqui para não executar o fluxo antigo
         } else {
-          // ⚠️ Chave PIX não encontrada no sistema Ethertron
-          console.warn('⚠️ Chave PIX não encontrada no sistema Ethertron');
-          toast.error(pixValidation.error || 'Chave PIX não encontrada no sistema Ethertron. Apenas transferências entre usuários Ethertron são suportadas no momento.');
+          // ⚠️ Chave PIX não encontrada no sistema NexCoin
+          console.warn('⚠️ Chave PIX não encontrada no sistema NexCoin');
+          toast.error(pixValidation.error || 'Chave PIX não encontrada no sistema NexCoin. Apenas transferências entre usuários NexCoin são suportadas no momento.');
           setIsProcessing(false);
           return;
         }
       }
 
-      // ⚠️ FLUXO ANTIGO (para outros métodos que não são PIX entre usuários Ethertron)
+      // ⚠️ FLUXO ANTIGO (para outros métodos que não são PIX entre usuários NexCoin)
       // 1. Preparar descrição baseada no método
       let transactionDescription = '';
       if (selectedCountry === 'BR' && selectedMethod === 'pix') {
@@ -639,8 +647,8 @@ export function WithdrawFiat({ onNavigate }: WithdrawFiatProps) {
                 <span className="text-xl font-light text-white">{currentCountry.symbol}</span>
                 <input
                   type="text"
-                  inputMode="decimal"
-                  placeholder="0.00"
+                  inputMode="numeric"
+                  placeholder="0,00"
                   value={amount}
                   onChange={(e) => handleAmountChange(e.target.value)}
                   className="flex-1 bg-transparent text-xl font-light text-white outline-none placeholder-gray-600"
@@ -728,7 +736,7 @@ export function WithdrawFiat({ onNavigate }: WithdrawFiatProps) {
               <label className="block text-xs text-gray-400 mb-2 font-semibold">Valor</label>
               <div className="flex items-center gap-2">
                 <span className="text-2xl font-bold text-white">{currentCountry.symbol}</span>
-                <input type="text" inputMode="decimal" placeholder="0.00" value={amount} onChange={(e) => handleAmountChange(e.target.value)} className="flex-1 bg-transparent text-2xl font-bold text-white outline-none placeholder-gray-600" />
+                <input type="text" inputMode="numeric" placeholder="0,00" value={amount} onChange={(e) => handleAmountChange(e.target.value)} className="flex-1 bg-transparent text-2xl font-bold text-white outline-none placeholder-gray-600" />
               </div>
             </div>
 
@@ -786,7 +794,7 @@ export function WithdrawFiat({ onNavigate }: WithdrawFiatProps) {
               <label className="block text-xs text-gray-400 mb-2 font-semibold">Amount</label>
               <div className="flex items-center gap-2">
                 <span className="text-2xl font-bold text-white">{currentCountry.symbol}</span>
-                <input type="text" inputMode="decimal" placeholder="0.00" value={amount} onChange={(e) => handleAmountChange(e.target.value)} className="flex-1 bg-transparent text-2xl font-bold text-white outline-none placeholder-gray-600" />
+                <input type="text" inputMode="numeric" placeholder="0,00" value={amount} onChange={(e) => handleAmountChange(e.target.value)} className="flex-1 bg-transparent text-2xl font-bold text-white outline-none placeholder-gray-600" />
               </div>
             </div>
 
@@ -847,7 +855,7 @@ export function WithdrawFiat({ onNavigate }: WithdrawFiatProps) {
               <label className="block text-xs text-gray-400 mb-2 font-semibold">Amount</label>
               <div className="flex items-center gap-2">
                 <span className="text-2xl font-bold text-white">{currentCountry.symbol}</span>
-                <input type="text" inputMode="decimal" placeholder="0.00" value={amount} onChange={(e) => handleAmountChange(e.target.value)} className="flex-1 bg-transparent text-2xl font-bold text-white outline-none placeholder-gray-600" />
+                <input type="text" inputMode="numeric" placeholder="0,00" value={amount} onChange={(e) => handleAmountChange(e.target.value)} className="flex-1 bg-transparent text-2xl font-bold text-white outline-none placeholder-gray-600" />
               </div>
             </div>
 
@@ -904,7 +912,7 @@ export function WithdrawFiat({ onNavigate }: WithdrawFiatProps) {
               <label className="block text-xs text-gray-400 mb-2 font-semibold">Amount</label>
               <div className="flex items-center gap-2">
                 <span className="text-2xl font-bold text-white">{currentCountry.symbol}</span>
-                <input type="text" inputMode="decimal" placeholder="0.00" value={amount} onChange={(e) => handleAmountChange(e.target.value)} className="flex-1 bg-transparent text-2xl font-bold text-white outline-none placeholder-gray-600" />
+                <input type="text" inputMode="numeric" placeholder="0,00" value={amount} onChange={(e) => handleAmountChange(e.target.value)} className="flex-1 bg-transparent text-2xl font-bold text-white outline-none placeholder-gray-600" />
               </div>
             </div>
 

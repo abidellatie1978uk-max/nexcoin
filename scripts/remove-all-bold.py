@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Script para remover TODAS as classes font-bold, font-semibold e font-medium
-de TODOS os arquivos .tsx do projeto Ethertron, sem exceção.
+de TODOS os arquivos .tsx do projeto NexCoin, sem exceção.
 """
 
 import os
@@ -75,7 +75,7 @@ def main():
     root_dir = Path(__file__).parent.parent
     
     print("=" * 80)
-    print("🔍 REMOVENDO TODAS AS CLASSES BOLD DO ETHERTRON")
+    print("🔍 REMOVENDO TODAS AS CLASSES BOLD DO NexCoin")
     print("=" * 80)
     print()
     

@@ -1,0 +1,448 @@
+rules_version = '2'; 
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // ========================================
+    // FUNÇÕES AUXILIARES
+    // ========================================
+    
+    // Verifica se o usuário está autenticado
+    function isAuthenticated() {
+      return request.auth != null;
+    }    
+    
+    // Verifica se o usuário é o dono do documento
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    // 🆕 Verifica se o usuário é administrador
+    function isAdmin() {
+      return isAuthenticated() && 
+             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true;
+    }
+    
+    // ========================================
+    // COLEÇÃO USERS
+    // ========================================
+    
+    // Regra para a coleção de usuários
+    match /users/{userId} {
+      // 🔓 ATUALIZADO: Permitir leitura limitada para validações (ex: buscar nome do destinatário)
+      // Isso é necessário para mostrar o nome do destinatário nas transferências
+      allow read: if isAuthenticated();
+      
+      // Permitir criação de novo usuário quando autenticado
+      allow create: if isAuthenticated() && request.auth.uid == userId;
+      
+      // ✅ ATUALIZADO: Permitir atualização do próprio documento OU se for administrador
+      allow update: if isOwner(userId) || isAdmin();
+      
+      // 🗑️ ATUALIZADO: Permitir deleção do próprio documento (exclusão de conta) OU se for administrador
+      allow delete: if isOwner(userId) || isAdmin();
+      
+      // ========================================
+      // SUBCOLEÇÃO: PORTFOLIO
+      // ========================================
+      // ✅ ATUALIZADO: Permitir créditos de outros usuários para transferências
+      match /portfolio/{portfolioDoc} {
+        // Leitura: permitir para TODOS os usuários autenticados
+        // Isso é necessário para verificar saldos antes de creditar em transferências
+        allow read: if isAuthenticated();
+        
+        // Criação: permitir quando:
+        // 1. É o próprio usuário OU
+        // 2. É outro usuário criando uma posição (para transferências)
+        allow create: if isOwner(userId) || isAuthenticated();
+        
+        // Atualização: permitir quando:
+        // 1. É o próprio usuário OU
+        // 2. É outro usuário CREDITANDO (aumentando o saldo)
+        allow update: if isOwner(userId) || 
+                         (isAuthenticated() && 
+                          request.resource.data.amount > resource.data.amount);
+        
+        // Deleção: permitir apenas para o próprio usuário (para limpeza de documentos inválidos)
+        allow delete: if isOwner(userId);
+      }
+      
+      // ========================================
+      // SUBCOLEÇÃO: WALLETS (depreciado, mantido para compatibilidade)
+      // ========================================
+      match /wallets/{walletId} {
+        allow read, write: if isOwner(userId);
+      }
+      
+      // ========================================
+      // SUBCOLEÇÃO: WALLET ADDRESSES
+      // ========================================
+      // 🔓 NOVO: Endereços de carteira para recebimento de criptos
+      match /walletAddresses/{network} {
+        // 🔓 IMPORTANTE: Permitir leitura para TODOS os usuários autenticados
+        // Isso é necessário para validar o destinatário nas transferências
+        allow read: if isAuthenticated();
+        
+        // Escrita: apenas o próprio usuário pode criar/atualizar seus endereços
+        allow write: if isOwner(userId);
+      }
+      
+      // ========================================
+      // SUBCOLEÇÃO: RECEIVE ADDRESSES (depreciado, mantido para compatibilidade)
+      // ========================================
+      match /receiveAddresses/{addressId} {
+        allow read: if isAuthenticated(); // Permitir leitura para validações
+        allow write: if isOwner(userId);
+      }
+      
+      // ========================================
+      // SUBCOLEÇÃO: CONVERSIONS
+      // ========================================
+      match /conversions/{conversionId} {
+        allow read, write, delete: if isOwner(userId);
+      }
+      
+      // ========================================
+      // SUBCOLEÇÃO: FIAT BALANCES
+      // ========================================
+      // ✅ ATUALIZADO: Permitir créditos de outros usuários para transferências PIX
+      match /fiatBalances/{currency} {
+        // Leitura: permitir para TODOS os usuários autenticados
+        // Isso é necessário para verificar saldos antes de creditar em transferências PIX
+        allow read: if isAuthenticated();
+        
+        // Criação: permitir quando:
+        // 1. É o próprio usuário OU
+        // 2. É outro usuário criando um saldo (para transferências)
+        allow create: if isOwner(userId) || isAuthenticated();
+        
+        // Atualização: permitir quando:
+        // 1. É o próprio usuário OU
+        // 2. É outro usuário CREDITANDO (aumentando o saldo)
+        // ✅ IMPORTANTE: Verificar campo 'balance' (não 'amount')
+        allow update: if isOwner(userId) || 
+                         (isAuthenticated() && 
+                          request.resource.data.balance > resource.data.balance);
+        
+        // 🗑️ ATUALIZADO: Permitir deleção pelo próprio usuário (exclusão de conta)
+        allow delete: if isOwner(userId);
+      }
+      
+      // ========================================
+      // SUBCOLEÇÃO: FIAT TRANSACTIONS
+      // ========================================
+      match /fiatTransactions/{transactionId} {
+        // Leitura: apenas o próprio usuário
+        allow read: if isOwner(userId);
+        
+        // Criação: permitir do próprio usuário
+        allow create: if isOwner(userId);
+        
+        // 🗑️ ATUALIZADO: Permitir deleção pelo próprio usuário (exclusão de conta)
+        // Transações normalmente são imutáveis, mas permitir deleção para exclusão de conta
+        allow update: if false;
+        allow delete: if isOwner(userId);
+      }
+      
+      // ========================================
+      // SUBCOLEÇÃO: TRANSACTIONS
+      // ========================================
+      // ✅ ATUALIZADO: Permitir criação de transações de recebimento por terceiros
+      match /transactions/{transactionId} {
+        // Leitura: apenas o próprio usuário
+        allow read: if isOwner(userId);
+        
+        // Criação: permitir quando:
+        // 1. É o próprio usuário OU
+        // 2. É outro usuário criando transação de RECEBIMENTO com valor positivo
+        allow create: if isOwner(userId) || 
+                         (isAuthenticated() && 
+                          request.resource.data.type in ['crypto_receive', 'pix_receive', 'transfer_receive'] &&
+                          request.resource.data.amount > 0);
+        
+        // 🗑️ ATUALIZADO: Permitir deleção pelo próprio usuário (exclusão de conta)
+        // Transações normalmente são imutáveis, mas permitir deleção para exclusão de conta
+        allow update: if false;
+        allow delete: if isOwner(userId);
+      }
+      
+      // ========================================
+      // SUBCOLEÇÃO: AUDIT LOGS
+      // ========================================
+      match /auditLogs/{logId} {
+        allow read: if isOwner(userId);
+        allow create: if isOwner(userId);
+        allow update, delete: if false; // Logs são imutáveis
+      }
+      
+      // ========================================
+      // SUBCOLEÇÃO: PREFERENCES
+      // ========================================
+      match /preferences/{preferenceId} {
+        allow read, write: if isOwner(userId);
+      }
+    }
+    
+    // ========================================
+    // PERMITIR BUSCA POR TELEFONE (LOGIN)
+    // ========================================
+    // ⚠️ IMPORTANTE: Permitir busca por telefone para login
+    // Esta regra permite queries limitadas na coleção users
+    match /users/{document=**} {
+      // Permitir leitura (list) com limite de até 10 resultados
+      // Necessário para login por telefone + PIN
+      allow list: if request.query.limit <= 10;
+    }
+    
+    // ========================================
+    // COLEÇÃO: WALLET ADDRESS INDEX
+    // ========================================
+    // 🆕 NOVO: Índice global para busca rápida de endereços de carteira
+    // Estrutura: {addressId} -> { userId, network, address, createdAt }
+    match /walletAddressIndex/{addressId} {
+      // 🔓 IMPORTANTE: Permitir leitura para TODOS os usuários autenticados
+      // Isso é necessário para buscar rapidamente o destinatário nas transferências
+      // sem precisar fazer queries pesadas em subcoleções
+      allow read: if isAuthenticated();
+      
+      // Escrita: permitir quando:
+      // 1. É o próprio usuário criando/atualizando seu endereço
+      // 2. O userId no documento corresponde ao usuário autenticado
+      allow create: if isAuthenticated() && 
+                       request.resource.data.userId == request.auth.uid;
+      
+      // Atualização: apenas o próprio usuário pode atualizar seus endereços
+      // E garantir que o userId não pode ser alterado
+      allow update: if isAuthenticated() && 
+                       resource.data.userId == request.auth.uid &&
+                       request.resource.data.userId == request.auth.uid;
+      
+      // Deleção: apenas o próprio usuário pode deletar seus endereços
+      allow delete: if isAuthenticated() && 
+                       resource.data.userId == request.auth.uid;
+    }
+    
+    // Permitir queries/listagem no índice de endereços (necessário para buscar por address)
+    match /walletAddressIndex/{document=**} {
+      allow list: if isAuthenticated() && 
+                     request.query.limit <= 100;
+    }
+    
+    // ========================================
+    // COLEÇÃO: BANK ACCOUNTS
+    // ========================================
+    // 🏦 Contas bancárias do usuário (BRL, USD, EUR, etc)
+    match /bankAccounts/{accountId} {
+      // Leitura: apenas o próprio usuário
+      allow read: if isAuthenticated() && 
+                     resource.data.userId == request.auth.uid;
+      
+      // Criação: apenas o próprio usuário
+      allow create: if isAuthenticated() && 
+                       request.resource.data.userId == request.auth.uid;
+      
+      // Atualização: apenas o próprio usuário
+      // E garantir que o userId não pode ser alterado
+      allow update: if isAuthenticated() && 
+                       resource.data.userId == request.auth.uid &&
+                       request.resource.data.userId == request.auth.uid;
+      
+      // Deleção: apenas o próprio usuário (exclusão de conta)
+      allow delete: if isAuthenticated() && 
+                       resource.data.userId == request.auth.uid;
+    }
+    
+    // Permitir queries/listagem de contas bancárias do usuário
+    match /bankAccounts/{document=**} {
+      allow list: if isAuthenticated() && 
+                     request.query.limit <= 50;
+    }
+    
+    // ========================================
+    // COLEÇÃO: PIX KEYS
+    // ========================================
+    // 🔓 ATUALIZADO: Permitir leitura de chaves PIX para transferências
+    match /pixKeys/{keyId} {
+      // 🔓 IMPORTANTE: Permitir leitura para TODOS os usuários autenticados
+      // Isso é necessário para buscar o destinatário nas transferências PIX
+      allow read: if isAuthenticated();
+      
+      // Permitir criação de nova chave PIX vinculada ao usuário autenticado
+      allow create: if isAuthenticated() && 
+                       request.resource.data.userId == request.auth.uid;
+      
+      // Permitir atualização apenas das próprias chaves PIX
+      // E garantir que o userId não pode ser alterado
+      allow update: if isAuthenticated() && 
+                       request.resource.data.userId == request.auth.uid &&
+                       request.resource.data.userId == request.auth.uid;
+      
+      // Permitir deleção apenas das próprias chaves PIX
+      allow delete: if isAuthenticated() && 
+                       request.resource.data.userId == request.auth.uid;
+    }
+    
+    // Permitir queries/listagem de chaves PIX (necessário para buscar por chave)
+    match /pixKeys/{document=**} {
+      allow list: if isAuthenticated() && 
+                     request.query.limit <= 100;
+    }
+    
+    // ========================================
+    // COLEÇÃO: BIOMETRIC CREDENTIALS
+    // ========================================
+    // 🔐 Credenciais biométricas dos usuários
+    // Estrutura: {userId} -> { credentialId, publicKey, counter, createdAt, lastUsed, deviceInfo }
+    match /biometricCredentials/{userId} {
+      // Leitura: apenas o próprio usuário pode ler suas credenciais
+      allow read: if isAuthenticated() && request.auth.uid == userId;
+      
+      // Criação: apenas o próprio usuário pode criar suas credenciais
+      allow create: if isAuthenticated() && request.auth.uid == userId;
+      
+      // Atualização: apenas o próprio usuário pode atualizar suas credenciais
+      allow update: if isAuthenticated() && request.auth.uid == userId;
+      
+      // Deleção: apenas o próprio usuário pode deletar suas credenciais
+      allow delete: if isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    // ========================================
+    // COLEÇÃO: NOTIFICATIONS
+    // ========================================
+    // 🔔 Notificações do usuário
+    // Estrutura: { userId, type, title, message, timestamp, read, metadata }
+    match /notifications/{notificationId} {
+      // Leitura: apenas o próprio usuário pode ler suas notificações
+      allow read: if isAuthenticated() && 
+                     resource.data.userId == request.auth.uid;
+      
+      // Criação: apenas o próprio usuário pode criar suas notificações
+      allow create: if isAuthenticated() && 
+                       request.resource.data.userId == request.auth.uid;
+      
+      // Atualização: apenas o próprio usuário pode atualizar suas notificações
+      // (por exemplo, marcar como lida)
+      allow update: if isAuthenticated() && 
+                       resource.data.userId == request.auth.uid &&
+                       request.resource.data.userId == request.auth.uid;
+      
+      // Deleção: apenas o próprio usuário pode deletar suas notificações
+      allow delete: if isAuthenticated() && 
+                       resource.data.userId == request.auth.uid;
+    }
+    
+    // Permitir queries/listagem de notificações do usuário
+    match /notifications/{document=**} {
+      allow list: if isAuthenticated() && 
+                     request.query.limit <= 500;
+    }
+    
+    // ========================================
+    // COLEÇÃO: CARDS
+    // ========================================
+    // 💳 Cartões físicos e virtuais dos usuários
+    match /cards/{cardId} {
+      // Leitura: apenas o próprio usuário
+      allow read: if isAuthenticated() && 
+                     resource.data.userId == request.auth.uid;
+      
+      // Criação: apenas o próprio usuário
+      allow create: if isAuthenticated() && 
+                       request.resource.data.userId == request.auth.uid;
+      
+      // Atualização: apenas o próprio usuário
+      allow update: if isAuthenticated() && 
+                       resource.data.userId == request.auth.uid;
+      
+      // Deleção: apenas o próprio usuário
+      allow delete: if isAuthenticated() && 
+                       resource.data.userId == request.auth.uid;
+    }
+    
+    // Permitir queries/listagem de cartões do usuário
+    match /cards/{document=**} {
+      allow list: if isAuthenticated() && 
+                     request.query.limit <= 50;
+    }
+
+    // ========================================
+    // COLEÇÃO: TRANSACTIONS GLOBAL (depreciado)
+    // ========================================
+    // NOTA: Esta coleção é para transações que NÃO são específicas de um usuário
+    // Para transações de cripto de um usuário, use users/{userId}/transactions
+    match /transactions/{transactionId} {
+      // Permitir leitura apenas das próprias transações
+      allow read: if isAuthenticated() && 
+                     resource.data.userId == request.auth.uid;
+      
+      // Permitir criação de nova transação vinculada ao usuário autenticado
+      allow create: if isAuthenticated() && 
+                       request.resource.data.userId == request.auth.uid;
+      
+      // 🗑️ ATUALIZADO: Permitir deleção pelo próprio usuário (exclusão de conta)
+      // Transações normalmente são imutáveis, mas permitir deleção para exclusão de conta
+      allow update: if false;
+      allow delete: if isAuthenticated() && 
+                       resource.data.userId == request.auth.uid;
+    }
+    
+    // Permitir queries/listagem de transações do usuário
+    match /transactions/{document=**} {
+      allow list: if isAuthenticated() && 
+                     request.query.limit <= 500;
+    }
+    
+    // ========================================
+    // COLEÇÃO: CONVERSIONS GLOBAL
+    // ========================================
+    match /conversions/{conversionId} {
+      // Permitir leitura apenas das próprias conversões
+      allow read: if isAuthenticated() && 
+                     resource.data.userId == request.auth.uid;
+      
+      // Permitir criação de nova conversão vinculada ao usuário autenticado
+      allow create: if isAuthenticated() && 
+                       request.resource.data.userId == request.auth.uid;
+      
+      // 🗑️ ATUALIZADO: Permitir deleção pelo próprio usuário (exclusão de conta)
+      // Conversões normalmente são imutáveis, mas permitir deleção para exclusão de conta
+      allow update: if false;
+      allow delete: if isAuthenticated() && 
+                       resource.data.userId == request.auth.uid;
+    }
+    
+    // Permitir queries/listagem de conversões do usuário
+    match /conversions/{document=**} {
+      allow list: if isAuthenticated() && 
+                     request.query.limit <= 500;
+    }
+    
+    // ========================================
+    // COLEÇÃO: USER LOCATIONS
+    // ========================================
+    // 📍 Localizações GPS dos usuários em tempo real
+    // Estrutura: {userId} -> { userId, userEmail, coordinates: { latitude, longitude }, city, state, country, address, timestamp, updatedAt }
+    match /userLocations/{userId} {
+      // Leitura: apenas o próprio usuário pode ler sua localização
+      allow read: if isAuthenticated() && request.auth.uid == userId;
+      
+      // Criação: apenas o próprio usuário pode criar sua localização
+      allow create: if isAuthenticated() && request.auth.uid == userId;
+      
+      // Atualização: apenas o próprio usuário pode atualizar sua localização
+      allow update: if isAuthenticated() && request.auth.uid == userId;
+      
+      // Deleção: apenas o próprio usuário pode deletar sua localização
+      allow delete: if isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    // ========================================
+    // REGRA PADRÃO: NEGAR TUDO
+    // ========================================
+    // Regra padrão: negar tudo que não foi especificado
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

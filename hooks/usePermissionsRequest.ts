@@ -2,6 +2,9 @@ import { useEffect, useRef } from 'react';
 import { doc, updateDoc } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { useAuth } from '../contexts/AuthContext';
+import { Geolocation } from '@capacitor/geolocation';
+import { Camera } from '@capacitor/camera';
+import { Capacitor } from '@capacitor/core';
 
 /**
  * Detecta se está rodando no iOS/Safari
@@ -13,152 +16,143 @@ function isIOSSafari() {
   return isIOS || isSafari;
 }
 
+// Chaves para o LocalStorage
+const PERMISSIONS_REQUESTED_KEY = 'NexCoin_permissions_requested';
+
 /**
  * Hook que solicita permissões de localização e câmera usando notificações NATIVAS do sistema
  * Executa apenas UMA VEZ após primeiro login
  */
 export function usePermissionsRequest() {
   const { isAuthenticated, isPinVerified, userData } = useAuth();
-  const hasRequestedRef = useRef(false);
+  const hasRequestedInSessionRef = useRef(false);
 
   useEffect(() => {
-    const iOS = isIOSSafari();
-    console.log('🔍 usePermissionsRequest - Estado atual:', {
-      isAuthenticated,
-      isPinVerified,
-      hasUserData: !!userData,
-      uid: userData?.uid,
-      permissionsRequested: userData?.permissionsRequested,
-      hasRequestedRef: hasRequestedRef.current,
-      isIOSSafari: iOS
-    });
-
-    // Validações
-    if (!isAuthenticated) {
-      console.log('⏸️ Não autenticado, aguardando...');
+    // 1. Verificações de estado básico
+    if (!isAuthenticated || !isPinVerified || !userData) {
       return;
     }
 
-    if (!isPinVerified) {
-      console.log('⏸️ PIN não verificado, aguardando...');
+    // 2. Verificar se já solicitou nesta sessão (Ref)
+    if (hasRequestedInSessionRef.current) {
+      console.log('⏸️ usePermissionsRequest: Já solicitado nesta sessão (Ref)');
       return;
     }
 
-    if (!userData) {
-      console.log('⏸️ Sem userData, aguardando...');
+    // 3. Verificar se já solicitou neste dispositivo (LocalStorage)
+    const storedRequested = localStorage.getItem(`${PERMISSIONS_REQUESTED_KEY}_${userData.uid}`);
+    if (storedRequested === 'true') {
+      console.log('⏸️ usePermissionsRequest: Já solicitado neste dispositivo (LocalStorage)');
+      hasRequestedInSessionRef.current = true;
       return;
     }
 
-    if (hasRequestedRef.current) {
-      console.log('⏸️ Já solicitou nesta sessão');
-      return;
-    }
-
+    // 4. Verificar se já solicitou globalmente (Firestore)
     if (userData.permissionsRequested) {
-      console.log('⏸️ Já solicitou anteriormente (Firestore)');
+      console.log('⏸️ usePermissionsRequest: Já solicitado anteriormente (Firestore)');
+      // Sincronizar cache local se o Firestore diz que foi solicitado mas o local não
+      localStorage.setItem(`${PERMISSIONS_REQUESTED_KEY}_${userData.uid}`, 'true');
+      hasRequestedInSessionRef.current = true;
       return;
     }
 
-    console.log('🚀 TODAS VALIDAÇÕES PASSARAM! Iniciando solicitação de permissões em 1 segundo...');
-    hasRequestedRef.current = true;
+    console.log('🚀 usePermissionsRequest: Iniciando solicitação de permissões em 2 segundos...');
+    hasRequestedInSessionRef.current = true;
 
-    // Aguardar 1 segundo para dar tempo do usuário entrar no app
+    // Aguardar um pouco para não assustar o usuário assim que o app abrir
     const timer = setTimeout(() => {
-      console.log('⏰ Timer disparado! Executando requestPermissions()');
       requestPermissions();
-    }, 1000);
+    }, 2000);
 
     return () => clearTimeout(timer);
 
     async function requestPermissions() {
-      console.log('🔐 === INICIANDO SOLICITAÇÃO DE PERMISSÕES ===');
+      console.log('🔐 === INICIANDO SOLICITAÇÃO DE PERMISSÕES NATIVAS ===');
+      const isNative = Capacitor.isNativePlatform();
+      const userId = userData?.uid;
 
       const results = {
         location: 'not_requested',
         camera: 'not_requested'
       };
 
+      // Marcar como solicitado no localStorage IMEDIATAMENTE antes de começar
+      // Isso evita que, se o usuário fechar o app durante o prompt, peça de novo no próximo boot
+      if (userId) {
+        localStorage.setItem(`${PERMISSIONS_REQUESTED_KEY}_${userId}`, 'true');
+      }
+
       try {
-        // 1️⃣ SOLICITAR LOCALIZAÇÃO (pop-up nativo do navegador)
-        console.log('📍 Solicitando permissão de LOCALIZAÇÃO (nativo)');
+        // 1️⃣ LOCALIZAÇÃO
         try {
-          await new Promise<void>((resolve, reject) => {
-            navigator.geolocation.getCurrentPosition(
-              (position) => {
-                console.log('✅ Localização concedida:', position.coords);
-                results.location = 'granted';
-                resolve();
-              },
-              (error) => {
-                console.log('❌ Localização negada ou bloqueada:', error.message);
-                if (error.code === 1) {
-                  results.location = 'denied'; // User denied
-                } else if (error.code === 2) {
-                  results.location = 'unavailable'; // Position unavailable
-                } else {
-                  results.location = 'timeout'; // Timeout
-                }
-                resolve(); // Continuar mesmo se negar
-              },
-              {
-                enableHighAccuracy: true,
-                timeout: 10000,
-                maximumAge: 0
-              }
-            );
-          });
-        } catch (error) {
-          console.error('Erro ao solicitar localização:', error);
+          if (isNative) {
+            const locStatus = await Geolocation.checkPermissions();
+            if (locStatus.location !== 'granted') {
+              console.log('📍 Solicitando permissão de LOCALIZAÇÃO (Plugin)');
+              const reqLoc = await Geolocation.requestPermissions();
+              results.location = reqLoc.location;
+            } else {
+              results.location = 'granted';
+            }
+          } else {
+            // Web fallback
+            await new Promise<void>((resolve) => {
+              navigator.geolocation.getCurrentPosition(
+                () => { results.location = 'granted'; resolve(); },
+                () => { results.location = 'denied'; resolve(); },
+                { timeout: 5000 }
+              );
+            });
+          }
+        } catch (err) {
+          console.error('❌ Erro ao solicitar localização:', err);
           results.location = 'error';
         }
 
-        // Aguardar 1s entre solicitações
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        // Aguardar brevemente entre os prompts
+        await new Promise(resolve => setTimeout(resolve, 800));
 
-        // 2️⃣ SOLICITAR CÂMERA (pop-up nativo do navegador)
-        console.log('📷 Solicitando permissão de CÂMERA (nativo)');
+        // 2️⃣ CÂMERA
         try {
-          const stream = await navigator.mediaDevices.getUserMedia({
-            video: { facingMode: 'user' }, // Priorizar câmera frontal
-            audio: false
-          });
-
-          console.log('✅ Câmera concedida');
-          results.camera = 'granted';
-
-          // Fechar stream imediatamente
-          stream.getTracks().forEach(track => track.stop());
-        } catch (error: any) {
-          console.log('⚠️ Câmera não permitida:', error.name);
-          if (error.name === 'NotAllowedError') {
-            results.camera = 'denied'; // User denied or browser blocked
-          } else if (error.name === 'NotFoundError') {
-            results.camera = 'not_found'; // No camera device
-          } else if (error.name === 'NotReadableError') {
-            results.camera = 'in_use'; // Camera in use
-          } else if (error.name === 'NotSupportedError') {
-            results.camera = 'not_supported'; // HTTPS required
+          if (isNative) {
+            const camStatus = await Camera.checkPermissions();
+            if (camStatus.camera !== 'granted') {
+              console.log('📷 Solicitando permissão de CÂMERA (Plugin)');
+              const reqCam = await Camera.requestPermissions();
+              results.camera = reqCam.camera;
+            } else {
+              results.camera = 'granted';
+            }
           } else {
-            results.camera = 'error';
+            // Web fallback
+            try {
+              const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+              stream.getTracks().forEach(t => t.stop());
+              results.camera = 'granted';
+            } catch {
+              results.camera = 'denied';
+            }
           }
-          // NÃO propagar o erro - apenas logar
+        } catch (err) {
+          console.error('❌ Erro ao solicitar câmera:', err);
+          results.camera = 'error';
         }
 
         // 3️⃣ SALVAR RESULTADOS NO FIRESTORE
-        console.log('💾 Salvando permissões:', results);
+        console.log('💾 Salvando estado de solicitação no Firestore:', results);
 
-        if (userData?.uid) {
+        if (userId) {
           try {
-            const userRef = doc(db, 'users', userData.uid);
+            const userRef = doc(db, 'users', userId);
             await updateDoc(userRef, {
               permissionsRequested: true,
               locationPermission: results.location,
               cameraPermission: results.camera,
               permissionsRequestedAt: new Date().toISOString()
             });
-            console.log('✅ Permissões salvas no Firestore');
+            console.log('✅ Estado salvo no Firestore');
           } catch (error) {
-            console.error('❌ Erro ao salvar permissões:', error);
+            console.error('❌ Erro ao salvar estado no Firestore:', error);
           }
         }
 

@@ -31,9 +31,9 @@ import { BottomNav } from './components/BottomNav';
 import { PasswordEntry } from './components/PasswordEntry';
 import { ManageHoldings } from './components/ManageHoldings';
 import { SelectFiatAccount } from './components/SelectFiatAccount';
-import { WalletsMigrationAlert } from './components/WalletsMigrationAlert';
 import { WalletValueSync } from './components/WalletValueSync';
 import { FiatAccountDetails } from './components/FiatAccountDetails';
+import { Cards } from './components/Cards';
 import { PendingApproval } from './components/PendingApproval';
 import { DeleteAccount } from './components/DeleteAccount';
 import { LanguageSettings } from './components/LanguageSettings';
@@ -56,7 +56,7 @@ import { usePermissionsRequest } from './hooks/usePermissionsRequest';
 
 import { DownloadApp } from './components/DownloadApp';
 
-export type Screen = 'welcome' | 'login' | 'signup' | 'pinSetup' | 'pinVerify' | 'country' | 'countrySelection' | 'completeProfile' | 'home' | 'wallet' | 'convert' | 'crypto' | 'profile' | 'personalInfo' | 'accountData' | 'security' | 'changePassword' | 'notifications' | 'pushSettings' | 'helpCenter' | 'termsAndConditions' | 'privacyPolicy' | 'termsMenu' | 'deposit' | 'withdraw' | 'withdrawFiat' | 'receive' | 'transactions' | 'passwordEntry' | 'manageHoldings' | 'fiatAccountDetails' | 'selectFiatAccount' | 'deleteAccount' | 'languageSettings' | 'downloadApp';
+export type Screen = 'welcome' | 'login' | 'signup' | 'pinSetup' | 'pinVerify' | 'country' | 'countrySelection' | 'completeProfile' | 'home' | 'wallet' | 'convert' | 'crypto' | 'profile' | 'personalInfo' | 'accountData' | 'security' | 'changePassword' | 'notifications' | 'pushSettings' | 'helpCenter' | 'termsAndConditions' | 'privacyPolicy' | 'termsMenu' | 'deposit' | 'withdraw' | 'withdrawFiat' | 'receive' | 'transactions' | 'passwordEntry' | 'manageHoldings' | 'fiatAccountDetails' | 'selectFiatAccount' | 'deleteAccount' | 'languageSettings' | 'downloadApp' | 'cards';
 
 type TransitionType = 'slide' | 'fade' | 'scale' | 'slideup';
 
@@ -138,7 +138,8 @@ function AppContent() {
         return;
       }
 
-      if (['welcome', 'login', 'signup', 'pinVerify'].includes(currentScreen)) {
+      // ✅ Se estiver autenticado e com PIN verificado, ir para Home (se estiver em telas de auth)
+      if (['welcome', 'login', 'signup', 'pinSetup', 'pinVerify'].includes(currentScreen)) {
         console.log('✅ Redirecionando para home');
         setCurrentScreen('home');
       }
@@ -183,6 +184,7 @@ function AppContent() {
       selectFiatAccount: 'slideup',
       deleteAccount: 'slideup',
       languageSettings: 'slideup',
+      cards: 'slideup',
       downloadApp: 'fade'
     };
     return transitions[screen] || 'slide';
@@ -206,7 +208,7 @@ function AppContent() {
       setCurrentScreen(targetScreen);
       setTransitionType(getTransitionType(targetScreen));
       setIsTransitioning(false);
-    }, 700);
+    }, 300);
   };
 
   const handleNavigateWithAccount = (screen: Screen, account: BankAccount) => {
@@ -290,6 +292,8 @@ function AppContent() {
         return <DeleteAccount onNavigate={handleNavigate} />;
       case 'languageSettings':
         return <LanguageSettings onNavigate={handleNavigate} />;
+      case 'cards':
+        return <Cards onNavigate={handleNavigate} />;
       case 'downloadApp':
         return <DownloadApp />;
       default:
@@ -356,14 +360,14 @@ function AppContent() {
               </div>
 
               {/* Show BottomNav only on main app screens */}
-              {['home', 'wallet', 'convert', 'crypto', 'profile'].includes(currentScreen) && (
+              {['home', 'wallet', 'convert', 'crypto', 'cards', 'profile'].includes(currentScreen) && (
                 <BottomNav onNavigate={handleNavigate} currentScreen={currentScreen} />
               )}
             </>
           )}
 
           {/* Alerta de migração para nova estrutura de wallets */}
-          {isAuthenticated && <WalletsMigrationAlert />}
+
 
           {/* Sincronização automática de valores das wallets */}
           <WalletValueSync />

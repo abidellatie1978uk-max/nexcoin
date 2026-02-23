@@ -1,15 +1,15 @@
 ﻿{
   "project_info": {
     "project_number": "575773698878",
-    "project_id": "ethertron-app",
-    "storage_bucket": "ethertron-app.firebasestorage.app"
+    "project_id": "nexcoin-1f42f",
+    "storage_bucket": "nexcoin-1f42f.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
         "mobilesdk_app_id": "1:575773698878:android:6dbd03b95c2dde779f1a6f",
         "android_client_info": {
-          "package_name": "com.ethertron.app"
+          "package_name": "com.nexcoin.app"
         }
       },
       "oauth_client": [
