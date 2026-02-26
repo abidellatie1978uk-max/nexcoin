@@ -8,6 +8,7 @@ import { usePortfolio } from '../contexts/PortfolioContext';
 import { useFiatRates } from '../contexts/FiatRatesContext';
 import { useLocation } from '../contexts/LocationContext'; // ✅ Adicionar contexto de localização + erro do Firestore
 import { useLanguage } from '../contexts/LanguageContext'; // ✅ Adicionar contexto de idioma
+import { AVAILABLE_CRYPTOS } from '../config/constants';
 import { compressImageToBase64 } from '../lib/imageCompress';
 import { toast } from 'sonner';
 import { CryptoIcon } from './CryptoIcon';
@@ -161,69 +162,7 @@ export function NewHome({ onNavigate, onNavigateWithAccount }: NewHomeProps) {
   };
 
   // Lista expandida de criptomoedas disponíveis (incluindo as mais populares)
-  const availableCryptos = [
-    { symbol: 'BTC', name: 'Bitcoin', coinId: 'bitcoin' },
-    { symbol: 'ETH', name: 'Ethereum', coinId: 'ethereum' },
-    { symbol: 'SOL', name: 'Solana', coinId: 'solana' },
-    { symbol: 'BNB', name: 'BNB', coinId: 'binancecoin' },
-    { symbol: 'XRP', name: 'Ripple', coinId: 'ripple' },
-    { symbol: 'ADA', name: 'Cardano', coinId: 'cardano' },
-    { symbol: 'AVAX', name: 'Avalanche', coinId: 'avalanche-2' },
-    { symbol: 'DOGE', name: 'Dogecoin', coinId: 'dogecoin' },
-    { symbol: 'DOT', name: 'Polkadot', coinId: 'polkadot' },
-    { symbol: 'MATIC', name: 'Polygon', coinId: 'matic-network' },
-    { symbol: 'LINK', name: 'Chainlink', coinId: 'chainlink' },
-    { symbol: 'UNI', name: 'Uniswap', coinId: 'uniswap' },
-    { symbol: 'LTC', name: 'Litecoin', coinId: 'litecoin' },
-    { symbol: 'ATOM', name: 'Cosmos', coinId: 'cosmos' },
-    { symbol: 'XLM', name: 'Stellar', coinId: 'stellar' },
-    { symbol: 'TRX', name: 'Tron', coinId: 'tron' },
-    { symbol: 'SHIB', name: 'Shiba Inu', coinId: 'shiba-inu' },
-    { symbol: 'WBTC', name: 'Wrapped Bitcoin', coinId: 'wrapped-bitcoin' },
-    { symbol: 'DAI', name: 'Dai', coinId: 'dai' },
-    { symbol: 'LEO', name: 'UNUS SED LEO', coinId: 'leo-token' },
-    { symbol: 'USDC', name: 'USD Coin', coinId: 'usd-coin' },
-    { symbol: 'TON', name: 'Toncoin', coinId: 'the-open-network' },
-    { symbol: 'ETC', name: 'Ethereum Classic', coinId: 'ethereum-classic' },
-    { symbol: 'BCH', name: 'Bitcoin Cash', coinId: 'bitcoin-cash' },
-    { symbol: 'APT', name: 'Aptos', coinId: 'aptos' },
-    { symbol: 'ARB', name: 'Arbitrum', coinId: 'arbitrum' },
-    { symbol: 'OP', name: 'Optimism', coinId: 'optimism' },
-    { symbol: 'ICP', name: 'Internet Computer', coinId: 'internet-computer' },
-    { symbol: 'FIL', name: 'Filecoin', coinId: 'filecoin' },
-    { symbol: 'NEAR', name: 'NEAR Protocol', coinId: 'near' },
-    { symbol: 'VET', name: 'VeChain', coinId: 'vechain' },
-    { symbol: 'ALGO', name: 'Algorand', coinId: 'algorand' },
-    { symbol: 'INJ', name: 'Injective', coinId: 'injective-protocol' },
-    { symbol: 'AAVE', name: 'Aave', coinId: 'aave' },
-    { symbol: 'MKR', name: 'Maker', coinId: 'maker' },
-    { symbol: 'GRT', name: 'The Graph', coinId: 'the-graph' },
-    { symbol: 'IMX', name: 'Immutable X', coinId: 'immutable-x' },
-    { symbol: 'STX', name: 'Stacks', coinId: 'blockstack' },
-    { symbol: 'HBAR', name: 'Hedera', coinId: 'hedera-hashgraph' },
-    { symbol: 'FTM', name: 'Fantom', coinId: 'fantom' },
-    { symbol: 'SAND', name: 'The Sandbox', coinId: 'the-sandbox' },
-    { symbol: 'MANA', name: 'Decentraland', coinId: 'decentraland' },
-    { symbol: 'AXS', name: 'Axie Infinity', coinId: 'axie-infinity' },
-    { symbol: 'XTZ', name: 'Tezos', coinId: 'tezos' },
-    { symbol: 'THETA', name: 'Theta Network', coinId: 'theta-token' },
-    { symbol: 'EOS', name: 'EOS', coinId: 'eos' },
-    { symbol: 'XMR', name: 'Monero', coinId: 'monero' },
-    { symbol: 'FLOW', name: 'Flow', coinId: 'flow' },
-    { symbol: 'CHZ', name: 'Chiliz', coinId: 'chiliz' },
-    { symbol: 'ZEC', name: 'Zcash', coinId: 'zcash' },
-    { symbol: 'RUNE', name: 'THORChain', coinId: 'thorchain' },
-    { symbol: 'KLAY', name: 'Klaytn', coinId: 'klay-token' },
-    { symbol: 'DASH', name: 'Dash', coinId: 'dash' },
-    { symbol: 'NEO', name: 'Neo', coinId: 'neo' },
-    { symbol: 'IOTA', name: 'IOTA', coinId: 'iota' },
-    { symbol: 'QNT', name: 'Quant', coinId: 'quant-network' },
-    { symbol: 'EGLD', name: 'MultiversX', coinId: 'elrond-erd-2' },
-    { symbol: 'PEPE', name: 'Pepe', coinId: 'pepe' },
-    { symbol: 'FET', name: 'Fetch.ai', coinId: 'fetch-ai' },
-    { symbol: 'SUI', name: 'Sui', coinId: 'sui' },
-    { symbol: 'SEI', name: 'Sei', coinId: 'sei-network' },
-  ];
+  const availableCryptos = AVAILABLE_CRYPTOS;
 
   // Estado para controlar a moeda exibida no saldo
   const [displayCurrency, setDisplayCurrency] = useState<'USD' | 'BRL' | 'GBP' | 'EUR'>('USD');
@@ -571,7 +510,7 @@ export function NewHome({ onNavigate, onNavigateWithAccount }: NewHomeProps) {
               {portfolio.holdings
                 .filter(holding => holding.amount > 0)
                 .map((holding, index, array) => {
-                  const crypto = availableCryptos.find(c => c.symbol === holding.symbol);
+                  const crypto = AVAILABLE_CRYPTOS.find(c => c.symbol === holding.symbol);
                   const coinId = crypto?.coinId || holding.coinId || holding.symbol.toLowerCase();
                   const price = prices[coinId]?.usd || 0;
                   const change = prices[coinId]?.usd_24h_change || 0;
@@ -628,7 +567,7 @@ export function NewHome({ onNavigate, onNavigateWithAccount }: NewHomeProps) {
 
           {/* Cards Dinamicamente Renderizados */}
           <div className="grid grid-cols-2 gap-4">
-            {availableCryptos
+            {AVAILABLE_CRYPTOS
               .filter(crypto => visibleCards.includes(crypto.symbol))
               .map((crypto) => {
                 const price = prices[crypto.coinId]?.usd || 0;

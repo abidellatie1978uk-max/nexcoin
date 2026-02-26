@@ -3,16 +3,7 @@ import { initializeApp, getApps } from "firebase/app";
 import { getAuth, browserLocalPersistence, setPersistence } from "firebase/auth";
 import { getFirestore, initializeFirestore, persistentLocalCache, persistentMultipleTabManager, CACHE_SIZE_UNLIMITED } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
-
-// Your web app's Firebase configuration
-const firebaseConfig = {
-  apiKey: "AIzaSyBv8ljlrTY9LsoPUZPQpw1YaX2W6D5_O54",
-  authDomain: "nexcoin-1f42f.firebaseapp.com",
-  projectId: "nexcoin-1f42f",
-  storageBucket: "nexcoin-1f42f.firebasestorage.app",
-  messagingSenderId: "575773698878",
-  appId: "1:575773698878:web:29261adabbe23c039f1a6f"
-};
+import { firebaseConfig } from "../config/firebase";
 
 // Initialize Firebase (evita reinicialização)
 const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];

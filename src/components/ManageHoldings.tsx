@@ -1,5 +1,6 @@
 import { ArrowLeft, Plus, Trash2, Edit2, Save, X } from 'lucide-react';
 import { useState, useEffect } from 'react';
+import { AVAILABLE_CRYPTOS } from '../config/constants';
 import type { Screen } from '../App';
 import { usePortfolio } from '../contexts/PortfolioContext';
 import { useCryptoPrices } from '../contexts/CryptoPriceContext';
@@ -27,23 +28,7 @@ export function ManageHoldings({ onNavigate }: ManageHoldingsProps) {
   const [addAmount, setAddAmount] = useState('');
 
   // Lista de criptomoedas disponíveis
-  const availableCryptos: CryptoOption[] = [
-    { symbol: 'BTC', coinId: 'bitcoin', name: 'Bitcoin' },
-    { symbol: 'ETH', coinId: 'ethereum', name: 'Ethereum' },
-    { symbol: 'USDT', coinId: 'tether', name: 'Tether' },
-    { symbol: 'BNB', coinId: 'binancecoin', name: 'Binance Coin' },
-    { symbol: 'SOL', coinId: 'solana', name: 'Solana' },
-    { symbol: 'ADA', coinId: 'cardano', name: 'Cardano' },
-    { symbol: 'XRP', coinId: 'ripple', name: 'Ripple' },
-    { symbol: 'DOT', coinId: 'polkadot', name: 'Polkadot' },
-    { symbol: 'DOGE', coinId: 'dogecoin', name: 'Dogecoin' },
-    { symbol: 'AVAX', coinId: 'avalanche-2', name: 'Avalanche' },
-    { symbol: 'MATIC', coinId: 'matic-network', name: 'Polygon' },
-    { symbol: 'LINK', coinId: 'chainlink', name: 'Chainlink' },
-    { symbol: 'UNI', coinId: 'uniswap', name: 'Uniswap' },
-    { symbol: 'LTC', coinId: 'litecoin', name: 'Litecoin' },
-    { symbol: 'ATOM', coinId: 'cosmos', name: 'Cosmos' },
-  ];
+  const availableCryptos: CryptoOption[] = AVAILABLE_CRYPTOS;
 
   const handleEdit = (symbol: string, amount: number) => {
     setEditingSymbol(symbol);
