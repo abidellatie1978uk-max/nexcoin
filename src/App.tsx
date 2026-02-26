@@ -1,14 +1,17 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, lazy, Suspense } from 'react';
 import { Welcome } from './components/Welcome';
 import { Login } from './components/Login';
 import { SignUp } from './components/SignUp';
 import { PinSetup } from './components/PinSetup';
 import { CountrySelection } from './components/CountrySelection';
-import { NewHome } from './components/NewHome';
-import { Wallet } from './components/Wallet';
-import { Convert } from './components/Convert';
-import { Crypto } from './components/Crypto';
-import { NewProfile } from './components/NewProfile';
+
+// ✅ Lazy load heavy components
+const NewHome = lazy(() => import('./components/NewHome').then(m => ({ default: m.NewHome })));
+const Wallet = lazy(() => import('./components/Wallet').then(m => ({ default: m.Wallet })));
+const Convert = lazy(() => import('./components/Convert').then(m => ({ default: m.Convert })));
+const Crypto = lazy(() => import('./components/Crypto').then(m => ({ default: m.Crypto })));
+const NewProfile = lazy(() => import('./components/NewProfile').then(m => ({ default: m.NewProfile })));
+
 import { PersonalInfo } from './components/PersonalInfo';
 import { AccountData } from './components/AccountData';
 import { Security } from './components/Security';
@@ -272,6 +275,13 @@ function AppContent() {
     }
   };
 
+  const ScreenLoader = () => (
+    <div className="flex flex-col items-center justify-center min-h-[60vh]">
+      <div className="w-12 h-12 border-4 border-white/10 border-t-white rounded-full animate-spin mb-4"></div>
+      <p className="text-white/40 animate-pulse text-sm">Carregando...</p>
+    </div>
+  );
+
   return (
     <div className="min-h-screen bg-black text-white w-full max-w-[430px] mx-auto relative">
       {/* 🔒 VERIFICAÇÃO DE APROVAÇÃO: Se usuário não aprovado, mostrar tela de pendência */}
@@ -296,7 +306,9 @@ function AppContent() {
                     : `page-${transitionType}-enter`
                 }
               >
-                {renderScreen()}
+                <Suspense fallback={<ScreenLoader />}>
+                  {renderScreen()}
+                </Suspense>
               </div>
 
               {/* Show BottomNav only on main app screens */}
